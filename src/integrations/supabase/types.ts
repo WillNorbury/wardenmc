@@ -3952,6 +3952,10 @@ export type Database = {
         | "titan"
         | "immortal"
         | "founder"
+        | "guardian"
+        | "sentinel"
+        | "warden"
+        | "ascendant"
       application_status: "pending" | "approved" | "rejected" | "reviewed"
       application_type: "staff" | "builder" | "youtuber"
       org_member_role: "owner" | "admin" | "member"
@@ -4129,6 +4133,10 @@ export const Constants = {
         "titan",
         "immortal",
         "founder",
+        "guardian",
+        "sentinel",
+        "warden",
+        "ascendant",
       ],
       application_status: ["pending", "approved", "rejected", "reviewed"],
       application_type: ["staff", "builder", "youtuber"],
