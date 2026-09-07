@@ -77,6 +77,7 @@ import Gallery from "./pages/Gallery.tsx";
 import Contact from "./pages/Contact.tsx";
 import Trust from "./pages/Trust.tsx";
 import Discord from "./pages/Discord.tsx";
+import DiscordBot from "./pages/DiscordBot.tsx";
 import QuizListPage from "./pages/Quiz.tsx";
 import QuizTake from "./pages/QuizTake.tsx";
 import QuizResult from "./pages/QuizResult.tsx";
@@ -286,7 +287,9 @@ const Shell = () => {
                   <Route path="/staff-chat" element={<Navigate to="/staffchat" replace />} />
                    <Route path="/fire-market" element={<FireMarket />} />
                    <Route path="/firemarket" element={<Navigate to="/fire-market" replace />} />
-                   <Route path="/discord" element={<Discord />} />
+                    <Route path="/discord" element={<Discord />} />
+                    <Route path="/bot" element={<DiscordBot />} />
+                    <Route path="/discord-bot" element={<Navigate to="/bot" replace />} />
                   <Route path="/store" element={<Store />} />
                   <Route path="/store/category/:slug" element={<StoreCategory />} />
                   <Route path="/store/package/:id" element={<StorePackage />} />

@@ -34,6 +34,7 @@ const GROUPS: { title: string; links: { to: string; label: string }[] }[] = [
     links: [
       { to: "/community", label: "Community" },
       { to: "/discord", label: "Discord" },
+      { to: "/bot", label: "Discord Bot" },
       { to: "/gallery", label: "Gallery" },
       { to: "/live", label: "Live Streams" },
       { to: "/partners", label: "Partners" },
