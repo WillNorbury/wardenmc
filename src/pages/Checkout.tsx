@@ -54,76 +54,107 @@ export default function Checkout() {
       return;
     }
     if (!user) {
-      toast.message("Sign in to complete checkout — we'll open a support ticket with your order.");
+      toast.message("Sign in to complete checkout.");
       nav("/auth?next=/checkout");
       return;
     }
     setSubmitting(true);
-    const lines = cart.items.flatMap((ci) => {
-      const base = `• ${ci.name} × ${ci.quantity} — ${formatMoney(
-        (Number(ci.price) || 0) * ci.quantity,
-        (ci.currency || cart.currency || "USD").toUpperCase(),
-      )}${ci.recipient ? `  (gift to: ${ci.recipient})` : ""}`;
-      const extras: string[] = [];
-      if (ci.giftMessage) extras.push(`   ↳ Message: ${ci.giftMessage}`);
-      return [base, ...extras];
-    });
 
-    const summary = [
-      "New store checkout submitted via the website.",
-      "",
-      "Items:",
-      ...lines,
-      "",
-      `Subtotal: ${formatMoney(cart.subtotal, cart.currency)}`,
-    ];
-    if (cart.storeSaleDiscount > 0 && cart.storeSale) {
-      summary.push(
-        `Store-wide sale: ${cart.storeSale.label} (${cart.storeSalePercent}% off, no code needed, -${formatMoney(cart.storeSaleDiscount, cart.currency)})`,
-      );
+    // Membership ranks are granted instantly on the website — no support ticket.
+    const membershipItems = cart.items.filter((ci) => ci.id.startsWith("membership:"));
+    const otherItems = cart.items.filter((ci) => !ci.id.startsWith("membership:"));
+    const grantedRanks: string[] = [];
+    for (const ci of membershipItems) {
+      const slug = ci.id.split(":")[1];
+      const { data: tierName, error: grantError } = await supabase.rpc("grant_membership_rank", {
+        _slug: slug,
+      });
+      if (grantError) {
+        setSubmitting(false);
+        toast.error(grantError.message || "Could not activate your rank.");
+        return;
+      }
+      if (tierName) grantedRanks.push(tierName as string);
     }
-    if (cart.coupon && cart.discount > 0) {
-      summary.push(
-        `Coupon: ${cart.coupon.code} (${
-          cart.coupon.discount_type === "percent"
-            ? `${cart.coupon.discount_value}% off`
-            : `${formatMoney(cart.coupon.discount_value, cart.currency)} off`
-        })`,
-      );
-      summary.push(`Discount: -${formatMoney(cart.discount, cart.currency)}`);
-    }
-    if (cart.creatorDiscount > 0 && cart.creatorCode) {
-      summary.push(
-        `Creator code: ${cart.creatorCode.code} — ${cart.creatorCode.creator_name} (${cart.creatorCode.discount_percent}% off, -${formatMoney(cart.creatorDiscount, cart.currency)})`,
-      );
-    }
-    if (cart.bundleDiscount > 0) {
-      summary.push(
-        `Bundle discount: ${cart.bundlePercent}% off (-${formatMoney(cart.bundleDiscount, cart.currency)})`,
-      );
-    }
-    summary.push(`Total: ${formatMoney(cart.total, cart.currency)}`);
-    summary.push("", "Staff: please reply with payment instructions or fulfillment status.");
-    const subject = `Store order — ${cart.count} item${
-      cart.count === 1 ? "" : "s"
-    } (${formatMoney(cart.total, cart.currency)})`;
 
-    const { data, error } = await supabase
-      .from("support_tickets")
-      .insert({
-        subject,
-        body: summary.join("\n"),
-        category: "Store & Payments",
-        priority: "normal",
-        user_id: user.id,
-      })
-      .select("id")
-      .single();
+    let ticketId: string | null = null;
+
+    if (otherItems.length > 0) {
+      const lines = otherItems.flatMap((ci) => {
+        const base = `• ${ci.name} × ${ci.quantity} — ${formatMoney(
+          (Number(ci.price) || 0) * ci.quantity,
+          (ci.currency || cart.currency || "USD").toUpperCase(),
+        )}${ci.recipient ? `  (gift to: ${ci.recipient})` : ""}`;
+        const extras: string[] = [];
+        if (ci.giftMessage) extras.push(`   ↳ Message: ${ci.giftMessage}`);
+        return [base, ...extras];
+      });
+
+      const summary = [
+        "New store checkout submitted via the website.",
+        "",
+        "Items:",
+        ...lines,
+        "",
+        `Subtotal: ${formatMoney(cart.subtotal, cart.currency)}`,
+      ];
+      if (grantedRanks.length > 0) {
+        summary.push(`Ranks activated automatically: ${grantedRanks.join(", ")}`);
+      }
+      if (cart.storeSaleDiscount > 0 && cart.storeSale) {
+        summary.push(
+          `Store-wide sale: ${cart.storeSale.label} (${cart.storeSalePercent}% off, no code needed, -${formatMoney(cart.storeSaleDiscount, cart.currency)})`,
+        );
+      }
+      if (cart.coupon && cart.discount > 0) {
+        summary.push(
+          `Coupon: ${cart.coupon.code} (${
+            cart.coupon.discount_type === "percent"
+              ? `${cart.coupon.discount_value}% off`
+              : `${formatMoney(cart.coupon.discount_value, cart.currency)} off`
+          })`,
+        );
+        summary.push(`Discount: -${formatMoney(cart.discount, cart.currency)}`);
+      }
+      if (cart.creatorDiscount > 0 && cart.creatorCode) {
+        summary.push(
+          `Creator code: ${cart.creatorCode.code} — ${cart.creatorCode.creator_name} (${cart.creatorCode.discount_percent}% off, -${formatMoney(cart.creatorDiscount, cart.currency)})`,
+        );
+      }
+      if (cart.bundleDiscount > 0) {
+        summary.push(
+          `Bundle discount: ${cart.bundlePercent}% off (-${formatMoney(cart.bundleDiscount, cart.currency)})`,
+        );
+      }
+      summary.push(`Total: ${formatMoney(cart.total, cart.currency)}`);
+      summary.push("", "Staff: please reply with payment instructions or fulfillment status.");
+      const itemCount = otherItems.reduce((n, ci) => n + ci.quantity, 0);
+      const subject = `Store order — ${itemCount} item${
+        itemCount === 1 ? "" : "s"
+      } (${formatMoney(cart.total, cart.currency)})`;
+
+      const { data, error } = await supabase
+        .from("support_tickets")
+        .insert({
+          subject,
+          body: summary.join("\n"),
+          category: "Store & Payments",
+          priority: "normal",
+          user_id: user.id,
+        })
+        .select("id")
+        .single();
+      if (error) {
+        setSubmitting(false);
+        toast.error(error.message || "Could not create ticket.");
+        return;
+      }
+      ticketId = data.id;
+    }
+
     setSubmitting(false);
-    if (error) {
-      toast.error(error.message || "Could not create ticket.");
-      return;
-    }
+
+    const orderRef = ticketId ?? `${user.id.slice(0, 8)}-${Date.now()}`;
 
     // Fire-and-forget order confirmation email
     if (user.email) {
@@ -153,13 +184,13 @@ export default function Checkout() {
           body: {
             templateName: "order-confirmation",
             recipientEmail: user.email,
-            idempotencyKey: `order-confirm-${data.id}`,
+            idempotencyKey: `order-confirm-${orderRef}`,
             templateData: {
               recipientName:
                 (user.user_metadata as any)?.username ||
                 (user.user_metadata as any)?.full_name ||
                 user.email.split("@")[0],
-              orderId: data.id,
+              orderId: orderRef,
               items: emailItems,
               subtotalFormatted: formatMoney(cart.subtotal, currency),
               storeSaleSummary:
@@ -182,9 +213,19 @@ export default function Checkout() {
     }
 
     cart.clear();
-    toast.success("Order sent — a support ticket has been created.");
-    nav(`/tickets?ticket=${data.id}`);
+    if (grantedRanks.length > 0) {
+      toast.success(
+        `${grantedRanks.join(", ")} unlocked — your rank is now active on your account.`,
+      );
+    }
+    if (ticketId) {
+      if (grantedRanks.length === 0) toast.success("Order sent — a support ticket has been created.");
+      nav(`/tickets?ticket=${ticketId}`);
+    } else {
+      nav("/me/account");
+    }
   };
+
 
   return (
     <div className="relative min-h-screen flex flex-col bg-background text-foreground">

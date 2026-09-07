@@ -3795,6 +3795,7 @@ export type Database = {
           uptime_pct: number
         }[]
       }
+      grant_membership_rank: { Args: { _slug: string }; Returns: string }
       is_current_user_admin: { Args: never; Returns: boolean }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
