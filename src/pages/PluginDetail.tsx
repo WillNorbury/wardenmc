@@ -175,7 +175,9 @@ const PluginDetail = () => {
         document.title = `${p.name} — Plugin — Warden Network`;
         const [vsRes, dlRes, favRes, myFavRes]: any = await Promise.all([
           (supabase.from("plugin_versions" as any) as any)
-            .select("*")
+            .select(user
+              ? "id, version, changelog, jar_filename, jar_size, jar_path, download_url, created_at"
+              : "id, version, changelog, jar_size, download_url, created_at")
             .eq("plugin_id", p.id)
             .order("created_at", { ascending: false }),
           supabase.rpc("get_plugin_download_counts" as any, { _plugin_ids: [p.id] }),
