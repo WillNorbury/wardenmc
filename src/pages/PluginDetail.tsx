@@ -593,11 +593,9 @@ const PluginDetail = () => {
                                   <p className="text-xs text-muted-foreground whitespace-pre-wrap mt-1.5">{v.changelog}</p>
                                 )}
                               </div>
-                              {url ? (
-                                <Button size="sm" variant="outline" onClick={() => downloadVersion(v)}>
-                                  <Download className="h-4 w-4 mr-1" /> Download
-                                </Button>
-                              ) : null}
+                              <Button size="sm" variant="outline" onClick={() => downloadVersion(v)}>
+                                <Download className="h-4 w-4 mr-1" /> Download
+                              </Button>
 
                             </div>
                           );
