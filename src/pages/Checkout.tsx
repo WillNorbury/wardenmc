@@ -135,7 +135,7 @@ export default function Checkout() {
       }
       summary.push(`Total: ${formatMoney(cart.total, cart.currency)}`);
       summary.push("", "Staff: please reply with payment instructions or fulfillment status.");
-      const itemCount = otherItems.reduce((n, ci) => n + ci.quantity, 0);
+      const itemCount = ticketItems.reduce((n, ci) => n + ci.quantity, 0);
       const subject = `Store order — ${itemCount} item${
         itemCount === 1 ? "" : "s"
       } (${formatMoney(cart.total, cart.currency)})`;
