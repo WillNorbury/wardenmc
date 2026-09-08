@@ -64,6 +64,7 @@ export default function Checkout() {
     const membershipItems = cart.items.filter((ci) => ci.id.startsWith("membership:"));
     const otherItems = cart.items.filter((ci) => !ci.id.startsWith("membership:"));
     const grantedRanks: string[] = [];
+    const manualMembershipItems: typeof cart.items = [];
     for (const ci of membershipItems) {
       const slug = ci.id.split(":")[1];
       const { data: tierName, error: grantError } = await supabase.rpc("grant_membership_rank", {
@@ -75,12 +76,18 @@ export default function Checkout() {
         return;
       }
       if (tierName) grantedRanks.push(tierName as string);
+      // Tiers without an automatic website rank still need staff fulfillment.
+      else manualMembershipItems.push(ci);
     }
+
+    // Anything not auto-granted goes through a support ticket.
+    const ticketItems = [...otherItems, ...manualMembershipItems];
 
     let ticketId: string | null = null;
 
-    if (otherItems.length > 0) {
-      const lines = otherItems.flatMap((ci) => {
+    if (ticketItems.length > 0) {
+      const lines = ticketItems.flatMap((ci) => {
+
         const base = `• ${ci.name} × ${ci.quantity} — ${formatMoney(
           (Number(ci.price) || 0) * ci.quantity,
           (ci.currency || cart.currency || "USD").toUpperCase(),
