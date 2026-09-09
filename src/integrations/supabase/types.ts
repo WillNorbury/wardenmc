@@ -3957,6 +3957,15 @@ export type Database = {
         | "sentinel"
         | "warden"
         | "ascendant"
+        | "management"
+        | "discord_manager"
+        | "dev_team"
+        | "head_developer"
+        | "admins"
+        | "mods"
+        | "helpers"
+        | "beta_tester"
+        | "star"
       application_status: "pending" | "approved" | "rejected" | "reviewed"
       application_type: "staff" | "builder" | "youtuber"
       org_member_role: "owner" | "admin" | "member"
@@ -4138,6 +4147,15 @@ export const Constants = {
         "sentinel",
         "warden",
         "ascendant",
+        "management",
+        "discord_manager",
+        "dev_team",
+        "head_developer",
+        "admins",
+        "mods",
+        "helpers",
+        "beta_tester",
+        "star",
       ],
       application_status: ["pending", "approved", "rejected", "reviewed"],
       application_type: ["staff", "builder", "youtuber"],

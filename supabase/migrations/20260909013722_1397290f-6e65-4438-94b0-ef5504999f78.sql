@@ -1,0 +1,9 @@
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'management';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'discord_manager';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'dev_team';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'head_developer';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'admins';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'mods';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'helpers';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'beta_tester';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'star';
