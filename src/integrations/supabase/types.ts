@@ -2163,6 +2163,67 @@ export type Database = {
           },
         ]
       }
+      post_likes: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          reply_to: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          reply_to?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          reply_to?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_reply_to_fkey"
+            columns: ["reply_to"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2173,6 +2234,7 @@ export type Database = {
           mc_username: string | null
           preferences: Json
           updated_at: string
+          verified: boolean
         }
         Insert: {
           avatar_url?: string | null
@@ -2183,6 +2245,7 @@ export type Database = {
           mc_username?: string | null
           preferences?: Json
           updated_at?: string
+          verified?: boolean
         }
         Update: {
           avatar_url?: string | null
@@ -2193,6 +2256,7 @@ export type Database = {
           mc_username?: string | null
           preferences?: Json
           updated_at?: string
+          verified?: boolean
         }
         Relationships: []
       }
