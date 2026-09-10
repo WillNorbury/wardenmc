@@ -24,6 +24,8 @@ import NewsArticle from "./pages/NewsArticle.tsx";
 import Staff from "./pages/Staff.tsx";
 import Vote from "./pages/Vote.tsx";
 import Community from "./pages/Community.tsx";
+import Posts from "./pages/Posts.tsx";
+import PostCompose from "./pages/PostCompose.tsx";
 import Rules from "./pages/Rules.tsx";
 import Support from "./pages/Support.tsx";
 import Tickets from "./pages/Tickets.tsx";
