@@ -141,7 +141,7 @@ export default function OrgProfile() {
       setLoading(true);
       setNotFound(false);
       const { data: o } = await supabase
-        .from("organizations")
+        .from("organizations_public" as any)
         .select("id, slug, name, description, avatar_url, created_at")
         .eq("slug", slug.toLowerCase())
         .maybeSingle();

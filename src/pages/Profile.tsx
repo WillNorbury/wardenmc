@@ -146,11 +146,12 @@ const Profile = () => {
         display_name: displayName || null,
         mc_username: trimmedMc,
         avatar_url: avatarUrl || null,
-        preferences: prefs,
       })
       .eq("id", user.id);
+    const { error: prefError } = await (supabase as any).rpc("set_my_preferences", { _prefs: prefs });
     setSaving(false);
     if (error) return toast.error(error.message);
+    if (prefError) return toast.error(prefError.message);
     setSavedMc(trimmedMc);
     setMcUsername(trimmedMc);
     toast.success("Profile saved");
