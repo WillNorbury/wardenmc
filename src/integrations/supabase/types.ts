@@ -1616,6 +1616,13 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "mods_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       news: {
@@ -1783,6 +1790,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2161,6 +2175,13 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "plugins_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       post_likes: {
@@ -2232,7 +2253,6 @@ export type Database = {
           display_name: string | null
           id: string
           mc_username: string | null
-          preferences: Json
           updated_at: string
           verified: boolean
         }
@@ -2243,7 +2263,6 @@ export type Database = {
           display_name?: string | null
           id: string
           mc_username?: string | null
-          preferences?: Json
           updated_at?: string
           verified?: boolean
         }
@@ -2254,7 +2273,6 @@ export type Database = {
           display_name?: string | null
           id?: string
           mc_username?: string | null
-          preferences?: Json
           updated_at?: string
           verified?: boolean
         }
@@ -2266,6 +2284,7 @@ export type Database = {
           discord_avatar: string | null
           discord_id: string | null
           discord_username: string | null
+          preferences: Json
           updated_at: string
           user_id: string
         }
@@ -2274,6 +2293,7 @@ export type Database = {
           discord_avatar?: string | null
           discord_id?: string | null
           discord_username?: string | null
+          preferences?: Json
           updated_at?: string
           user_id: string
         }
@@ -2282,6 +2302,7 @@ export type Database = {
           discord_avatar?: string | null
           discord_id?: string | null
           discord_username?: string | null
+          preferences?: Json
           updated_at?: string
           user_id?: string
         }
@@ -3570,6 +3591,36 @@ export type Database = {
           },
         ]
       }
+      organizations_public: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          name: string | null
+          slug: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          name?: string | null
+          slug?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          name?: string | null
+          slug?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_get_application_notes: {
@@ -3938,6 +3989,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_my_preferences: { Args: { _prefs: Json }; Returns: undefined }
       slugify: { Args: { _input: string }; Returns: string }
       status_unsubscribe: { Args: { _token: string }; Returns: boolean }
       submit_quiz_attempt: {
