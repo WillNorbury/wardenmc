@@ -140,17 +140,17 @@ export default function OrgProfile() {
     (async () => {
       setLoading(true);
       setNotFound(false);
-      const { data: o } = await supabase
-        .from("organizations")
+      const { data: oRaw } = await (supabase.from("organizations_public" as any) as any)
         .select("id, slug, name, description, avatar_url, created_at")
         .eq("slug", slug.toLowerCase())
         .maybeSingle();
+      const o = oRaw as Org | null;
       if (!o) {
         setNotFound(true);
         setLoading(false);
         return;
       }
-      setOrg(o as Org);
+      setOrg(o);
       document.title = `${o.name} — Warden Network`;
 
       const { data: m } = await supabase
