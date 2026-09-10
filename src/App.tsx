@@ -203,6 +203,8 @@ const Shell = () => {
                   <Route path="/staff" element={<Staff />} />
                   <Route path="/vote" element={<Vote />} />
                   <Route path="/community" element={<Community />} />
+                  <Route path="/posts" element={<Posts />} />
+                  <Route path="/post" element={<PostCompose />} />
                   <Route path="/rules" element={<Rules />} />
                   <Route path="/support" element={<Support />} />
                   <Route path="/tickets" element={<Tickets />} />
