@@ -65,6 +65,7 @@ import {
   Tornado,
   FileCode,
   Server as ServerIconSidebar,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -115,6 +116,7 @@ const communityGroup: NavGroup = {
     { to: "/users", label: "Users", icon: UsersIcon },
     { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
     { to: "/community", label: "Community", icon: UsersIcon },
+    { to: "/posts", label: "Posts", icon: MessageSquare },
     { to: "/staff", label: "Staff", icon: ShieldCheck },
     { to: "/mod-tiers", label: "Mod Tiers", icon: Star },
     { to: "/tiers", label: "Player Tiers", icon: Trophy },
