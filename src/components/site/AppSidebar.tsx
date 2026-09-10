@@ -65,6 +65,7 @@ import {
   Tornado,
   FileCode,
   Server as ServerIconSidebar,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
