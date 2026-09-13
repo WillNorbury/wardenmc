@@ -36,6 +36,7 @@ import {
   Menu,
   Boxes,
   Package,
+  Inbox,
   Database,
   Sun,
   Layers,
