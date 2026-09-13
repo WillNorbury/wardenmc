@@ -126,26 +126,20 @@ Deno.serve(async (req) => {
       );
       const { data: link } = await supabase
         .from("profiles_private")
-        .select("user_id")
+        .select("user_id, preferences")
         .eq("discord_id", discordId)
         .maybeSingle();
-      const { data: profile } = link
-        ? await supabase
-            .from("profiles")
-            .select("id, preferences")
-            .eq("id", link.user_id)
-            .maybeSingle()
-        : { data: null as any };
 
-      if (!profile) {
+      if (!link) {
         return reply("⚠️ Your Discord account isn't linked to a Warden Network account yet. Sign in on the website and link Discord first.");
       }
 
-      const prefs = { ...(profile.preferences ?? {}), email_subscribed: subscribed };
+      const prefs = { ...((link as any).preferences ?? {}), email_subscribed: subscribed };
       const { error } = await supabase
-        .from("profiles")
+        .from("profiles_private")
         .update({ preferences: prefs })
-        .eq("id", profile.id);
+        .eq("user_id", link.user_id);
+
 
       if (error) return reply(`❌ Failed to update: ${error.message}`);
       return reply(subscribed
