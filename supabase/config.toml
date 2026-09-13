@@ -15,6 +15,8 @@ project_id = "xedqdxjorneezfnpyogg"
     verify_jwt = true
   [functions.send-app-email]
     verify_jwt = true
+  [functions.notify-post]
+    verify_jwt = true
   [functions.handle-email-events]
     verify_jwt = false
   [functions.preview-transactional-email]
