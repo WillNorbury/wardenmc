@@ -85,13 +85,24 @@ export async function fetchPosts(opts: { replyTo?: string | null; viewerId?: str
 }
 
 export async function createPost(input: { userId: string; content: string; imageUrl?: string | null; replyTo?: string | null }) {
-  const { error } = await supabase.from("posts").insert({
-    user_id: input.userId,
-    content: input.content.trim(),
-    image_url: input.imageUrl?.trim() || null,
-    reply_to: input.replyTo ?? null,
-  });
+  const { data, error } = await supabase
+    .from("posts")
+    .insert({
+      user_id: input.userId,
+      content: input.content.trim(),
+      image_url: input.imageUrl?.trim() || null,
+      reply_to: input.replyTo ?? null,
+    })
+    .select("id")
+    .maybeSingle();
   if (error) throw error;
+
+  if (data?.id) {
+    // Fire-and-forget email notifications (post confirmation + reply alert).
+    supabase.functions
+      .invoke("notify-post", { body: { postId: data.id } })
+      .catch((e) => console.warn("notify-post failed", e));
+  }
 }
 
 export async function toggleLike(postId: string, userId: string, liked: boolean) {
