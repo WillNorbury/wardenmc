@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { SEO } from "@/components/site/SEO";
 import { Mail, Loader2, ShieldCheck, KeyRound } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { trackFunnelEvent } from "@/lib/funnel";
 
 const schema = z.object({
   email: z.string().email("Invalid email").max(255),
@@ -53,6 +54,11 @@ const Auth = () => {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+
+  // Funnel: record each time a visitor lands on the sign-up form.
+  useEffect(() => {
+    if (mode === "signup") trackFunnelEvent("signup_view");
+  }, [mode]);
 
   useEffect(() => {
     if (!user) return;
@@ -116,6 +122,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
+        trackFunnelEvent("signup_complete");
         setOtp("");
         setMode("verify");
       } else {
