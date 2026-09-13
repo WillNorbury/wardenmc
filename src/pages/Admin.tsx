@@ -328,6 +328,7 @@ const Admin = () => {
           {section === "console" && (isOwner ? <ConsoleAdminSection /> : denied)}
           {section === "mysql" && (isOwner ? <MySqlAdminSection /> : denied)}
           {section === "servers-status" && <ServersStatusAdminSection />}
+          {section === "orders" && <OrdersAdminSection />}
           {section === "store" && (
             <div className="space-y-10">
               <StoreAdminSection />
