@@ -36,6 +36,7 @@ import {
   Menu,
   Boxes,
   Package,
+  Inbox,
   Database,
   Sun,
   Layers,
@@ -89,6 +90,7 @@ export type AdminSection =
   | "mysql"
   | "servers-status"
   | "store"
+  | "orders"
   | "vote-links"
   | "partners"
   | "tiers"
@@ -112,7 +114,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   "features", "rules", "alerts", "maintenance", "faqs", "events",
   "ban-appeals", "wiki", "gallery", "contact", "email-test", "send-email",
   "email-diagnostics", "quizzes", "reports", "bot-dashboard", "bot-management",
-  "bot-config", "punishments", "console", "mysql", "servers-status", "store",
+  "bot-config", "punishments", "console", "mysql", "servers-status", "store", "orders",
   "vote-links", "partners", "tiers", "memberships", "account-removals", "seasons", "tab-animations", "server-panel", "skripts", "game-modes", "site-pages",
   "mod-skripts", "mod-servers", "mod-mods", "mod-reviews",
 ];
@@ -134,6 +136,9 @@ export const ADMIN_SECTION_ALIASES: Record<string, AdminSection> = {
   "membership-tiers": "memberships",
   membership: "memberships",
   ranks: "memberships",
+  order: "orders",
+  "order-inbox": "orders",
+  purchases: "orders",
   votes: "vote-links",
   vote: "vote-links",
   servers: "servers-status",
@@ -209,6 +214,7 @@ const items: NavItem[] = [
   { kind: "link", id: "plugins", icon: Puzzle, label: "Plugins" },
   { kind: "link", id: "changelog", icon: Zap, label: "Changelog" },
   { kind: "link", id: "store", icon: Package, label: "Store" },
+  { kind: "link", id: "orders", icon: Inbox, label: "Order Inbox" },
   { kind: "link", id: "vote-links", icon: ExternalLink, label: "Vote Links" },
   { kind: "link", id: "partners", icon: Users, label: "Partners" },
   { kind: "link", id: "tiers", icon: Trophy, label: "Player Tiers" },
