@@ -89,6 +89,7 @@ export type AdminSection =
   | "mysql"
   | "servers-status"
   | "store"
+  | "orders"
   | "vote-links"
   | "partners"
   | "tiers"
@@ -112,7 +113,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   "features", "rules", "alerts", "maintenance", "faqs", "events",
   "ban-appeals", "wiki", "gallery", "contact", "email-test", "send-email",
   "email-diagnostics", "quizzes", "reports", "bot-dashboard", "bot-management",
-  "bot-config", "punishments", "console", "mysql", "servers-status", "store",
+  "bot-config", "punishments", "console", "mysql", "servers-status", "store", "orders",
   "vote-links", "partners", "tiers", "memberships", "account-removals", "seasons", "tab-animations", "server-panel", "skripts", "game-modes", "site-pages",
   "mod-skripts", "mod-servers", "mod-mods", "mod-reviews",
 ];
@@ -134,6 +135,9 @@ export const ADMIN_SECTION_ALIASES: Record<string, AdminSection> = {
   "membership-tiers": "memberships",
   membership: "memberships",
   ranks: "memberships",
+  order: "orders",
+  "order-inbox": "orders",
+  purchases: "orders",
   votes: "vote-links",
   vote: "vote-links",
   servers: "servers-status",
