@@ -85,6 +85,7 @@ import { ApplicationStatusEmailEditor } from "@/components/admin/ApplicationStat
 import { MySqlAdminSection } from "@/components/admin/MySqlAdminSection";
 import ServersStatusAdminSection from "@/components/admin/ServersStatusAdminSection";
 import { StoreAdminSection } from "@/components/admin/StoreAdminSection";
+import { OrdersAdminSection } from "@/components/admin/OrdersAdminSection";
 import { CreatorCodesAdminSection } from "@/components/admin/CreatorCodesAdminSection";
 import { VoteLinksAdminSection } from "@/components/admin/VoteLinksAdminSection";
 import { GameModesAdminSection } from "@/components/admin/GameModesAdminSection";
