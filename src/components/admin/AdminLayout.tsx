@@ -37,6 +37,7 @@ import {
   Boxes,
   Package,
   Inbox,
+  Filter,
   Database,
   Sun,
   Layers,
@@ -91,6 +92,7 @@ export type AdminSection =
   | "servers-status"
   | "store"
   | "orders"
+  | "signup-funnel"
   | "vote-links"
   | "partners"
   | "tiers"
@@ -115,6 +117,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   "ban-appeals", "wiki", "gallery", "contact", "email-test", "send-email",
   "email-diagnostics", "quizzes", "reports", "bot-dashboard", "bot-management",
   "bot-config", "punishments", "console", "mysql", "servers-status", "store", "orders",
+  "signup-funnel",
   "vote-links", "partners", "tiers", "memberships", "account-removals", "seasons", "tab-animations", "server-panel", "skripts", "game-modes", "site-pages",
   "mod-skripts", "mod-servers", "mod-mods", "mod-reviews",
 ];
@@ -139,6 +142,8 @@ export const ADMIN_SECTION_ALIASES: Record<string, AdminSection> = {
   order: "orders",
   "order-inbox": "orders",
   purchases: "orders",
+  funnel: "signup-funnel",
+  signup: "signup-funnel",
   votes: "vote-links",
   vote: "vote-links",
   servers: "servers-status",
@@ -215,6 +220,7 @@ const items: NavItem[] = [
   { kind: "link", id: "changelog", icon: Zap, label: "Changelog" },
   { kind: "link", id: "store", icon: Package, label: "Store" },
   { kind: "link", id: "orders", icon: Inbox, label: "Order Inbox" },
+  { kind: "link", id: "signup-funnel", icon: Filter, label: "Sign-up Funnel" },
   { kind: "link", id: "vote-links", icon: ExternalLink, label: "Vote Links" },
   { kind: "link", id: "partners", icon: Users, label: "Partners" },
   { kind: "link", id: "tiers", icon: Trophy, label: "Player Tiers" },
