@@ -159,6 +159,7 @@ const sectionMeta: Record<AdminSection, { title: string; description: string }> 
   mysql: { title: "LiteBans MySQL", description: "Connect and edit the LiteBans database directly. Use with caution." },
   "servers-status": { title: "Servers (Public Status)", description: "Edit the per-server cards on /servers-status: players, TPS, uptime, IP, and MOTD." },
   store: { title: "Store", description: "Manage the categories and items shown on /store." },
+  orders: { title: "Order Inbox", description: "Track every store order and its payment status in one place." },
   "vote-links": { title: "Vote Links", description: "Manage the vote sites shown on /vote." },
   partners: { title: "Partners", description: "Manage the partners shown in the sidebar Partners dropdown." },
   "account-removals": { title: "Deleted / Banned Accounts", description: "Historical log of removed and suspended accounts." },

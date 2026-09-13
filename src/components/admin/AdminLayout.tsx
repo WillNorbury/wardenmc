@@ -213,6 +213,7 @@ const items: NavItem[] = [
   { kind: "link", id: "plugins", icon: Puzzle, label: "Plugins" },
   { kind: "link", id: "changelog", icon: Zap, label: "Changelog" },
   { kind: "link", id: "store", icon: Package, label: "Store" },
+  { kind: "link", id: "orders", icon: Inbox, label: "Order Inbox" },
   { kind: "link", id: "vote-links", icon: ExternalLink, label: "Vote Links" },
   { kind: "link", id: "partners", icon: Users, label: "Partners" },
   { kind: "link", id: "tiers", icon: Trophy, label: "Player Tiers" },
