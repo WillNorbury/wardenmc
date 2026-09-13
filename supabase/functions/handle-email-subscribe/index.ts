@@ -46,11 +46,11 @@ Deno.serve(async (req) => {
     .update({ used_at: null })
     .eq("email", email);
 
-  // Re-enable notification preferences on profile
+  // Re-enable notification preferences on the private profile
   const { data: profile } = await admin
-    .from("profiles")
+    .from("profiles_private")
     .select("preferences")
-    .eq("id", userData.user.id)
+    .eq("user_id", userData.user.id)
     .maybeSingle();
 
   const prefs = {
@@ -60,7 +60,13 @@ Deno.serve(async (req) => {
     notify_tickets: true,
     notify_applications: true,
   };
-  await admin.from("profiles").update({ preferences: prefs }).eq("id", userData.user.id);
+  const { error: prefErr } = await admin
+    .from("profiles_private")
+    .upsert({ user_id: userData.user.id, preferences: prefs }, { onConflict: "user_id" });
+  if (prefErr) {
+    console.error("Failed to update preferences", prefErr);
+    return json({ error: "Failed to subscribe" }, 500);
+  }
 
   return json({ success: true, email });
 });
