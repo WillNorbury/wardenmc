@@ -165,7 +165,7 @@ const Shell = () => {
   const hideSidebar = isAdmin || isWiki || isStore || isChangelog;
   return (
     <MaintenanceGate>
-      <div className="flex min-h-svh w-full flex-col">
+      <div className="flex min-h-svh w-full flex-col" style={{ paddingTop: "var(--sale-bar-h, 0px)" }}>
         {!isAdmin && <GlobalSaleBar />}
         <SidebarProvider>
           {!hideSidebar && <AppSidebar />}
