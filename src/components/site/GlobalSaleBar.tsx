@@ -124,7 +124,11 @@ const GlobalSaleBar = () => {
     );
   }
 
-  return <div ref={barRef} className="w-full">{content}</div>;
+  return (
+    <div ref={barRef} className="fixed inset-x-0 top-0 z-[60] w-full">
+      {content}
+    </div>
+  );
 };
 
 export default GlobalSaleBar;
