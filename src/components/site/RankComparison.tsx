@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/lib/cart";
-import { Check, Minus, Crown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 
 type Item = {
   id: string;
@@ -23,6 +22,16 @@ const COMPARE_SLUGS = ["ranks", "rank-upgrades", "keys", "kits", "coins", "gems"
 const INHERIT_SLUGS = new Set(["ranks"]);
 /** One-per-account purchases. */
 const SINGLE_SLUGS = new Set(["ranks", "rank-upgrades"]);
+
+/** Per-tier accent hues, Oceanias-style (mint → cyan → magenta → gold…). */
+const TIER_ACCENTS = [
+  { h: "160 100% 50%", name: "mint" },
+  { h: "199 100% 55%", name: "cyan" },
+  { h: "300 100% 55%", name: "magenta" },
+  { h: "45 100% 55%", name: "gold" },
+  { h: "265 100% 65%", name: "violet" },
+  { h: "10 100% 58%", name: "ember" },
+];
 
 const money = (p: number | null, c?: string | null) => {
   if (p == null) return "—";
@@ -111,7 +120,7 @@ const StoreComparison = () => {
 
   if (!cat || tiers.length < 2) return null;
 
-  const best = tiers[tiers.length - 1];
+  const accentFor = (i: number) => TIER_ACCENTS[i % TIER_ACCENTS.length].h;
 
   return (
     <section id="compare" className="scroll-mt-24">
@@ -130,7 +139,7 @@ const StoreComparison = () => {
       </div>
 
       {cats.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-6">
           {cats.map((c) => (
             <button
               key={c.id}
@@ -148,42 +157,76 @@ const StoreComparison = () => {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-border bg-card/60">
-        <table className="w-full min-w-[720px] text-sm border-collapse">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[720px] text-sm border-separate border-spacing-y-1">
           <thead>
             <tr>
-              <th className="text-left p-4 font-medium text-muted-foreground w-[38%]">Includes</th>
-              {tiers.map((r) => (
-                <th key={r.id} className="p-4 text-center align-bottom">
-                  <div className="flex flex-col items-center gap-1">
-                    {r.id === best.id && (
-                      <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest text-primary">
-                        <Crown className="h-3 w-3" /> Best value
-                      </span>
-                    )}
-                    <Link
-                      to={`/store/package/${r.id}`}
-                      className="font-display font-bold text-base hover:text-primary transition"
-                    >
-                      {r.name.replace(/\s*Rank$/i, "")}
-                    </Link>
-                    <span className="font-mono text-primary">{money(r.price, r.currency)}</span>
-                  </div>
-                </th>
-              ))}
+              <th className="w-[34%]" />
+              {tiers.map((r, i) => {
+                const accent = accentFor(i);
+                return (
+                  <th key={r.id} className="px-2 pb-4 text-center align-bottom">
+                    <div className="flex flex-col items-center gap-2">
+                      <Link
+                        to={`/store/package/${r.id}`}
+                        className="font-mono font-bold text-sm uppercase tracking-[0.25em] hover:opacity-80 transition"
+                        style={{ color: `hsl(${accent})` }}
+                      >
+                        {r.name.replace(/\s*Rank$/i, "")}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          cart.add({
+                            id: r.id,
+                            name: r.name,
+                            price: Number(r.price ?? 0),
+                            currency: r.currency ?? "USD",
+                            image_url: null,
+                            external_url: null,
+                            maxQuantity: SINGLE_SLUGS.has(cat.slug) ? 1 : undefined,
+                          })
+                        }
+                        className="font-mono font-bold text-xs uppercase tracking-widest px-5 py-2 border-2 transition hover:brightness-110"
+                        style={{
+                          backgroundColor: `hsl(${accent})`,
+                          borderColor: "hsl(0 0% 100% / 0.85)",
+                          color: "hsl(0 0% 100%)",
+                          textShadow: "0 1px 0 hsl(0 0% 0% / 0.4)",
+                          boxShadow: `0 0 16px hsl(${accent} / 0.45)`,
+                        }}
+                      >
+                        {money(r.price, r.currency)} – Add
+                      </button>
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
             {allPerks.map((perk, i) => (
-              <tr key={perk} className={i % 2 ? "bg-secondary/20" : undefined}>
-                <td className="p-3 px-4 border-t border-border/60">{perk}</td>
+              <tr key={perk}>
+                <td
+                  className={`p-3 px-4 font-medium ${i % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
+                >
+                  {perk}
+                </td>
                 {tiers.map((r) => (
-                  <td key={r.id} className="p-3 text-center border-t border-border/60">
+                  <td
+                    key={r.id}
+                    className={`p-3 text-center ${i % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
+                  >
                     {has(r, perk) ? (
-                      <Check className="h-4 w-4 text-primary mx-auto" aria-label="Included" />
+                      <Check
+                        className="h-4 w-4 mx-auto"
+                        style={{ color: "hsl(145 80% 45%)" }}
+                        aria-label="Included"
+                      />
                     ) : (
-                      <Minus
-                        className="h-4 w-4 text-muted-foreground/40 mx-auto"
+                      <X
+                        className="h-4 w-4 mx-auto"
+                        style={{ color: "hsl(0 85% 55%)" }}
                         aria-label="Not included"
                       />
                     )}
@@ -191,30 +234,6 @@ const StoreComparison = () => {
                 ))}
               </tr>
             ))}
-            <tr>
-              <td className="p-4 border-t border-border" />
-              {tiers.map((r) => (
-                <td key={r.id} className="p-4 border-t border-border text-center">
-                  <Button
-                    size="sm"
-                    variant={r.id === best.id ? "default" : "outline"}
-                    onClick={() =>
-                      cart.add({
-                        id: r.id,
-                        name: r.name,
-                        price: Number(r.price ?? 0),
-                        currency: r.currency ?? "USD",
-                        image_url: null,
-                        external_url: null,
-                        maxQuantity: SINGLE_SLUGS.has(cat.slug) ? 1 : undefined,
-                      })
-                    }
-                  >
-                    Add to cart
-                  </Button>
-                </td>
-              ))}
-            </tr>
           </tbody>
         </table>
       </div>
