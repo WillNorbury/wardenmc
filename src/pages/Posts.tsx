@@ -117,7 +117,17 @@ const Posts = () => {
           </div>
         </div>
 
-        {loading ? (
+        {!user ? (
+          <Card className="p-10 text-center">
+            <p className="font-semibold mb-1">Sign in to view posts</p>
+            <p className="text-muted-foreground text-sm mb-4">
+              The community feed is only visible to members.
+            </p>
+            <Button asChild>
+              <Link to="/auth">Sign in</Link>
+            </Button>
+          </Card>
+        ) : loading ? (
           <div className="space-y-3">
             {[0, 1, 2, 3].map((i) => (
               <Card key={i} className="p-4">
