@@ -106,10 +106,18 @@ const StoreComparison = () => {
   const allPerks = useMemo(() => {
     const seen: string[] = [];
     const rollup = /^everything in /i;
+    const gemAmount = /^\d+\s+gems?$/i;
     for (const t of tiers)
-      for (const p of t.perks ?? []) if (!rollup.test(p) && !seen.includes(p)) seen.push(p);
+      for (const p of t.perks ?? [])
+        if (!rollup.test(p) && !(cat?.slug === "gems" && gemAmount.test(p)) && !seen.includes(p))
+          seen.push(p);
     return seen;
-  }, [tiers]);
+  }, [tiers, cat?.slug]);
+
+  const gemAmountFor = (tier: Item) => {
+    const amount = (tier.perks ?? []).find((perk) => /^\d+\s+gems?$/i.test(perk))?.match(/^\d+/)?.[0];
+    return amount ?? tier.name.match(/^\d+/)?.[0] ?? "—";
+  };
 
   const has = (tier: Item, perk: string) => {
     if (!inherits) return (tier.perks ?? []).includes(perk);
@@ -205,17 +213,27 @@ const StoreComparison = () => {
             </tr>
           </thead>
           <tbody>
+            {cat.slug === "gems" && (
+              <tr>
+                <td className="bg-secondary/40 p-3 px-4 font-medium">Gems</td>
+                {tiers.map((tier) => (
+                  <td key={tier.id} className="bg-secondary/40 p-3 text-center font-semibold">
+                    {gemAmountFor(tier)}
+                  </td>
+                ))}
+              </tr>
+            )}
             {allPerks.map((perk, i) => (
               <tr key={perk}>
                 <td
-                  className={`p-3 px-4 font-medium ${i % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
+                  className={`p-3 px-4 font-medium ${(i + (cat.slug === "gems" ? 1 : 0)) % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
                 >
                   {perk}
                 </td>
                 {tiers.map((r) => (
                   <td
                     key={r.id}
-                    className={`p-3 text-center ${i % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
+                    className={`p-3 text-center ${(i + (cat.slug === "gems" ? 1 : 0)) % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
                   >
                     {has(r, perk) ? (
                       <Check
