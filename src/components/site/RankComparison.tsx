@@ -22,6 +22,12 @@ const COMPARE_SLUGS = ["ranks", "rank-upgrades", "keys", "kits", "coins", "gems"
 const INHERIT_SLUGS = new Set(["ranks"]);
 /** One-per-account purchases. */
 const SINGLE_SLUGS = new Set(["ranks", "rank-upgrades"]);
+const AMOUNT_ROWS: Record<string, { label: string; pattern: RegExp }> = {
+  keys: { label: "Keys", pattern: /^\d+\s+(?:crate\s+)?keys?$/i },
+  coins: { label: "Coins", pattern: /^\d+\s+coins?$/i },
+  gems: { label: "Gems", pattern: /^\d+\s+gems?$/i },
+  shards: { label: "Shards", pattern: /^\d+\s+shards?$/i },
+};
 
 /** Per-tier accent hues, Oceanias-style (mint → cyan → magenta → gold…). */
 const TIER_ACCENTS = [
@@ -106,16 +112,18 @@ const StoreComparison = () => {
   const allPerks = useMemo(() => {
     const seen: string[] = [];
     const rollup = /^everything in /i;
-    const gemAmount = /^\d+\s+gems?$/i;
+    const amountPattern = cat ? AMOUNT_ROWS[cat.slug]?.pattern : undefined;
     for (const t of tiers)
       for (const p of t.perks ?? [])
-        if (!rollup.test(p) && !(cat?.slug === "gems" && gemAmount.test(p)) && !seen.includes(p))
+        if (!rollup.test(p) && !amountPattern?.test(p) && !seen.includes(p))
           seen.push(p);
     return seen;
   }, [tiers, cat?.slug]);
 
-  const gemAmountFor = (tier: Item) => {
-    const amount = (tier.perks ?? []).find((perk) => /^\d+\s+gems?$/i.test(perk))?.match(/^\d+/)?.[0];
+  const amountRow = cat ? AMOUNT_ROWS[cat.slug] : undefined;
+
+  const amountFor = (tier: Item) => {
+    const amount = (tier.perks ?? []).find((perk) => amountRow?.pattern.test(perk))?.match(/^\d+/)?.[0];
     return amount ?? tier.name.match(/^\d+/)?.[0] ?? "—";
   };
 
@@ -213,12 +221,12 @@ const StoreComparison = () => {
             </tr>
           </thead>
           <tbody>
-            {cat.slug === "gems" && (
+            {amountRow && (
               <tr>
-                <td className="bg-secondary/40 p-3 px-4 font-medium">Gems</td>
+                <td className="bg-secondary/40 p-3 px-4 font-medium">{amountRow.label}</td>
                 {tiers.map((tier) => (
                   <td key={tier.id} className="bg-secondary/40 p-3 text-center font-semibold">
-                    {gemAmountFor(tier)}
+                    {amountFor(tier)}
                   </td>
                 ))}
               </tr>
@@ -226,14 +234,14 @@ const StoreComparison = () => {
             {allPerks.map((perk, i) => (
               <tr key={perk}>
                 <td
-                  className={`p-3 px-4 font-medium ${(i + (cat.slug === "gems" ? 1 : 0)) % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
+                  className={`p-3 px-4 font-medium ${(i + (amountRow ? 1 : 0)) % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
                 >
                   {perk}
                 </td>
                 {tiers.map((r) => (
                   <td
                     key={r.id}
-                    className={`p-3 text-center ${(i + (cat.slug === "gems" ? 1 : 0)) % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
+                    className={`p-3 text-center ${(i + (amountRow ? 1 : 0)) % 2 === 0 ? "bg-secondary/40" : "bg-transparent"}`}
                   >
                     {has(r, perk) ? (
                       <Check
