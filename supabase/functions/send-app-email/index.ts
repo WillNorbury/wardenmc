@@ -67,6 +67,85 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+  // ---------------------------------------------------------------------
+  // Authorization.
+  // Internal (service-role) callers and staff may send anything.
+  // Ordinary signed-in users may only trigger a small set of self-service
+  // templates, always addressed to their own account email, with no
+  // subject/body/from overrides.
+  // ---------------------------------------------------------------------
+  const SELF_TEMPLATES = new Set([
+    'order-confirmation',
+    'application-received',
+    'ban-appeal-received',
+  ])
+  // Templates that always go to the site's own staff inbox — the client
+  // never chooses the recipient for these.
+  const STAFF_INBOX_TEMPLATES = new Set([
+    'ban-appeal-admin',
+    'application-admin',
+    'report-admin',
+  ])
+
+  const authHeader = req.headers.get('Authorization') ?? ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
+  if (!token) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  let callerRole = ''
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    callerRole = typeof payload?.role === 'string' ? payload.role : ''
+  } catch {
+    callerRole = ''
+  }
+
+  if (callerRole !== 'service_role') {
+    const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+      global: { headers: { Authorization: authHeader } },
+    })
+    const { data: userData } = await userClient.auth.getUser()
+    const caller = userData?.user
+    if (!caller) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const { data: isAdmin } = await userClient.rpc('is_current_user_admin')
+
+    if (!isAdmin) {
+      if (subjectOverride || bodyHtmlOverride || bodyTextOverride || fromOverride) {
+        return new Response(JSON.stringify({ error: 'forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      if (STAFF_INBOX_TEMPLATES.has(templateName)) {
+        // Fixed internal recipient — ignore anything the client supplied.
+        recipientEmail = ''
+      } else if (SELF_TEMPLATES.has(templateName)) {
+        if (!caller.email) {
+          return new Response(JSON.stringify({ error: 'forbidden' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+        recipientEmail = caller.email
+      } else {
+        return new Response(JSON.stringify({ error: 'forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+    }
+  }
+
   const log = async (status: string, errorMessage?: string) => {
     const { error } = await supabase.from('email_send_log').insert({
       template_name: templateName,

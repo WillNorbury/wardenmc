@@ -245,8 +245,10 @@ Deno.serve(async (req) => {
     }
 
 
-    // Recent mode: return latest punishments across all players within N days
+    // Recent mode: bulk network-wide punishment history — admin/owner only.
     if (recentDays > 0) {
+      const gate = await requireAdmin(req)
+      if (!gate.ok) return gate.resp
       const conn = await connect()
       const sinceMs = Date.now() - recentDays * 86400_000
       const kinds: Array<'bans'|'mutes'|'warnings'|'kicks'> = ['bans','mutes','warnings','kicks']
