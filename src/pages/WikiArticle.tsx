@@ -90,7 +90,11 @@ export default function WikiArticle() {
   const headings = useMemo(() => extractHeadings(article?.content ?? ""), [article?.content]);
 
   useEffect(() => {
-    if (!headings.length) return;
+    if (!headings.length) {
+      setActiveHeading("");
+      return;
+    }
+
     setActiveHeading(headings[0].id);
     const observer = new IntersectionObserver(
       (entries) => {
@@ -101,11 +105,18 @@ export default function WikiArticle() {
       },
       { rootMargin: "-112px 0px -72% 0px", threshold: 0 },
     );
-    headings.forEach((heading) => {
-      const element = document.getElementById(heading.id);
-      if (element) observer.observe(element);
+
+    const frame = window.requestAnimationFrame(() => {
+      headings.forEach((heading) => {
+        const element = document.getElementById(heading.id);
+        if (element) observer.observe(element);
+      });
     });
-    return () => observer.disconnect();
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, [headings]);
 
   const canonicalPath = `/wiki/${slug ?? ""}`;
@@ -117,6 +128,14 @@ export default function WikiArticle() {
       .replace(/\s+/g, " ")
       .trim() ||
     "Warden Network wiki article.";
+
+  const renderedHeadingCounts = new Map<string, number>();
+  const nextHeadingId = (text: string) => {
+    const base = slugifyHeading(text) || "section";
+    const count = renderedHeadingCounts.get(base) ?? 0;
+    renderedHeadingCounts.set(base, count + 1);
+    return count ? `${base}-${count + 1}` : base;
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -229,51 +248,51 @@ export default function WikiArticle() {
               <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
                 <article className="min-w-0 rounded-lg border border-border bg-card/70 px-5 py-6 shadow-elegant md:px-8 md:py-9">
                   <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-li:text-muted-foreground prose-blockquote:border-primary prose-blockquote:bg-secondary/50 prose-blockquote:px-5 prose-blockquote:py-2 prose-code:before:content-none prose-code:after:content-none">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      h2: ({ children }) => {
-                        const id = slugifyHeading(plainText(children));
-                        return (
-                          <h2 id={id} className="scroll-mt-28 font-display text-2xl font-black">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h2: ({ children }) => {
+                          const id = nextHeadingId(plainText(children));
+                          return (
+                            <h2 id={id} className="scroll-mt-28 font-display text-2xl font-black">
+                              {children}
+                            </h2>
+                          );
+                        },
+                        h3: ({ children }) => {
+                          const id = nextHeadingId(plainText(children));
+                          return (
+                            <h3 id={id} className="scroll-mt-28 font-display text-xl font-bold">
+                              {children}
+                            </h3>
+                          );
+                        },
+                        a: ({ href, children }) => (
+                          <a href={href} className="font-medium text-primary underline underline-offset-4 hover:text-foreground">
                             {children}
-                          </h2>
-                        );
-                      },
-                      h3: ({ children }) => {
-                        const id = slugifyHeading(plainText(children));
-                        return (
-                          <h3 id={id} className="scroll-mt-28 font-display text-xl font-bold">
+                          </a>
+                        ),
+                        table: ({ children }) => (
+                          <div className="my-6 overflow-x-auto rounded-lg border border-border">
+                            <table className="w-full min-w-[560px] border-collapse text-sm">{children}</table>
+                          </div>
+                        ),
+                        th: ({ children }) => <th className="border-b border-border bg-secondary px-4 py-3 text-left font-bold">{children}</th>,
+                        td: ({ children }) => <td className="border-b border-border px-4 py-3 text-muted-foreground">{children}</td>,
+                        code: ({ children, className }) => (
+                          <code
+                            className={cn(
+                              "rounded border border-border bg-secondary px-1.5 py-0.5 text-sm text-primary",
+                              className,
+                            )}
+                          >
                             {children}
-                          </h3>
-                        );
-                      },
-                      a: ({ href, children }) => (
-                        <a href={href} className="font-medium text-primary underline underline-offset-4 hover:text-foreground">
-                          {children}
-                        </a>
-                      ),
-                      table: ({ children }) => (
-                        <div className="my-6 overflow-x-auto rounded-lg border border-border">
-                          <table className="w-full min-w-[560px] border-collapse text-sm">{children}</table>
-                        </div>
-                      ),
-                      th: ({ children }) => <th className="border-b border-border bg-secondary px-4 py-3 text-left font-bold">{children}</th>,
-                      td: ({ children }) => <td className="border-b border-border px-4 py-3 text-muted-foreground">{children}</td>,
-                      code: ({ children, className }) => (
-                        <code
-                          className={cn(
-                            "rounded border border-border bg-secondary px-1.5 py-0.5 text-sm text-primary",
-                            className,
-                          )}
-                        >
-                          {children}
-                        </code>
-                      ),
-                    }}
-                  >
-                    {article.content || ""}
-                  </ReactMarkdown>
+                          </code>
+                        ),
+                      }}
+                    >
+                      {article.content || ""}
+                    </ReactMarkdown>
                   </div>
                 </article>
 
