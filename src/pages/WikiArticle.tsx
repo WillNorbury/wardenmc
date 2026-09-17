@@ -228,6 +228,7 @@ export default function WikiArticle() {
             <div className="container max-w-6xl py-10 md:py-14">
               <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
                 <article className="min-w-0 rounded-lg border border-border bg-card/70 px-5 py-6 shadow-elegant md:px-8 md:py-9">
+                  <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-li:text-muted-foreground prose-blockquote:border-primary prose-blockquote:bg-secondary/50 prose-blockquote:px-5 prose-blockquote:py-2 prose-code:before:content-none prose-code:after:content-none">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
@@ -270,10 +271,10 @@ export default function WikiArticle() {
                         </code>
                       ),
                     }}
-                    className="prose prose-invert max-w-none prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-li:text-muted-foreground prose-blockquote:border-primary prose-blockquote:bg-secondary/50 prose-blockquote:px-5 prose-blockquote:py-2 prose-code:before:content-none prose-code:after:content-none"
                   >
                     {article.content || ""}
                   </ReactMarkdown>
+                  </div>
                 </article>
 
                 <aside className="hidden lg:sticky lg:top-24 lg:block">
