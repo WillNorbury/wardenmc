@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
       if (!payload.length) return json({ upserted: 0 })
       const { error } = await admin
         .from('player_stats')
-        .upsert(payload, { onConflict: 'player_uuid' })
+        .upsert(payload, { onConflict: 'server_id,player_uuid' })
       if (error) return json({ error: error.message }, 500)
       return json({ upserted: payload.length })
     }
