@@ -124,7 +124,7 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
             {reason === "new_network"
               ? "You're signing in from a new network."
               : "You're signing in from a new device."}{" "}
-            We emailed a 6-digit code
+            We emailed an 8-digit code
             {maskedEmail ? <> to <span className="font-medium">{maskedEmail}</span></> : null}.
           </p>
         </CardHeader>

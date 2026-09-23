@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
     if (action === 'confirm') {
       const code = String(body.code ?? '').trim()
       const remember = body.remember === true
-      if (!/^\d{6}$/.test(code)) return json(400, { ok: false, error: 'invalid_code_format' })
+      if (!/^\d{8}$/.test(code)) return json(400, { ok: false, error: 'invalid_code_format' })
 
       const { data: rows } = await admin
         .from('login_verifications')
