@@ -115,11 +115,11 @@ const Skripts = () => {
   const latest = skripts[0]?.created_at;
 
   const download = async (sk: Skript) => {
-    const { data, error } = await supabase.storage
-      .from("user-skripts")
-      .createSignedUrl(sk.storage_path, 60);
-    if (error || !data?.signedUrl) {
-      toast.error(error?.message ?? "Download failed");
+    const { data, error } = await supabase.functions.invoke("skript-file-url", {
+      body: { skript_id: sk.id },
+    });
+    if (error || !data?.url) {
+      toast.error(error?.message ?? data?.error ?? "Download failed");
       return;
     }
     await supabase.rpc("record_user_skript_download" as any, { _skript_id: sk.id });
