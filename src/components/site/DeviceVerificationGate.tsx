@@ -130,9 +130,9 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="flex justify-center">
-            <InputOTP maxLength={6} value={code} onChange={setCode}>
+            <InputOTP maxLength={8} value={code} onChange={setCode}>
               <InputOTPGroup>
-                {[0, 1, 2, 3, 4, 5].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
                   <InputOTPSlot key={i} index={i} />
                 ))}
               </InputOTPGroup>
