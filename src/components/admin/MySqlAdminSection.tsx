@@ -105,31 +105,12 @@ const cellDisplay = (v: unknown) => {
   return String(v);
 };
 
-type MysqlConfig = {
-  host: string;
-  port: number;
-  database: string;
-  username: string;
-  password: string;
-};
-
 export const MySqlAdminSection = () => {
   const [sql, setSql] = useState<string>("SHOW TABLES LIKE 'litebans_%';");
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
-
-  const [cfg, setCfg] = useState<MysqlConfig>({
-    host: "",
-    port: 3306,
-    database: "",
-    username: "",
-    password: "",
-  });
-  const [cfgLoading, setCfgLoading] = useState(true);
-  const [cfgSaving, setCfgSaving] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     try {
@@ -139,52 +120,6 @@ export const MySqlAdminSection = () => {
       /* ignore */
     }
   }, []);
-
-  useEffect(() => {
-    (async () => {
-      setCfgLoading(true);
-      const { data, error } = await supabase
-        .from("litebans_mysql_config")
-        .select("host, port, database, username, password")
-        .eq("id", true)
-        .maybeSingle();
-      if (!error && data) {
-        setCfg({
-          host: data.host ?? "",
-          port: data.port ?? 3306,
-          database: data.database ?? "",
-          username: data.username ?? "",
-          password: data.password ?? "",
-        });
-      }
-      setCfgLoading(false);
-    })();
-  }, []);
-
-  const saveConfig = async () => {
-    if (!cfg.host.trim() || !cfg.database.trim() || !cfg.username.trim()) {
-      toast.error("Host, database and username are required");
-      return;
-    }
-    setCfgSaving(true);
-    const { error } = await supabase
-      .from("litebans_mysql_config")
-      .upsert({
-        id: true,
-        host: cfg.host.trim(),
-        port: Number(cfg.port) || 3306,
-        database: cfg.database.trim(),
-        username: cfg.username.trim(),
-        password: cfg.password,
-        updated_at: new Date().toISOString(),
-      });
-    setCfgSaving(false);
-    if (error) {
-      toast.error(`Save failed: ${error.message}`);
-    } else {
-      toast.success("Connection saved");
-    }
-  };
 
 
   const pushHistory = (q: string) => {

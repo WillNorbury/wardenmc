@@ -57,19 +57,13 @@ Deno.serve(async (req) => {
   if (!sql) return json(400, { error: "sql required" });
   if (sql.length > 20000) return json(400, { error: "sql too long" });
 
-  // --- Load MySQL connection from DB (fallback to env secrets) ---
-  const { data: cfg } = await admin
-    .from("litebans_mysql_config")
-    .select("host, port, database, username, password")
-    .eq("id", true)
-    .maybeSingle();
-
-  const host = cfg?.host ?? Deno.env.get("LITEBANS_MYSQL_HOST");
-  const port = Number(cfg?.port ?? Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
-  const user = cfg?.username ?? Deno.env.get("LITEBANS_MYSQL_USER");
-  const password = cfg?.password ?? Deno.env.get("LITEBANS_MYSQL_PASSWORD");
-  const database = cfg?.database ?? Deno.env.get("LITEBANS_MYSQL_DATABASE");
-  if (!host || !user || !database) {
+  // --- Load MySQL connection from server-side secrets only ---
+  const host = Deno.env.get("LITEBANS_MYSQL_HOST");
+  const port = Number(Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
+  const user = Deno.env.get("LITEBANS_MYSQL_USER");
+  const password = Deno.env.get("LITEBANS_MYSQL_PASSWORD");
+  const database = Deno.env.get("LITEBANS_MYSQL_DATABASE");
+  if (!host || !user || !password || !database) {
     return json(500, { error: "MySQL connection not configured" });
   }
 

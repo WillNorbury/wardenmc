@@ -46,22 +46,18 @@ Deno.serve(async (req) => {
     return json(403, { error: "owner only" });
   }
 
-  // --- Destination is always server-chosen (stored config / env secrets) ---
+  // --- Destination and credentials come only from server-side secrets ---
   // Caller-supplied host/port are intentionally ignored so this endpoint can
   // never be used to probe arbitrary destinations with our credentials.
-  const { data: cfg } = await admin
-    .from("litebans_mysql_config")
-    .select("host, port, database, username, password")
-    .eq("id", true)
-    .maybeSingle();
+  const host = Deno.env.get("LITEBANS_MYSQL_HOST");
+  const port = Number(Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
+  const user = Deno.env.get("LITEBANS_MYSQL_USER");
+  const password = Deno.env.get("LITEBANS_MYSQL_PASSWORD");
+  const database = Deno.env.get("LITEBANS_MYSQL_DATABASE");
 
-  const host = cfg?.host ?? Deno.env.get("LITEBANS_MYSQL_HOST");
-  const port = Number(cfg?.port ?? Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
-  const user = cfg?.username ?? Deno.env.get("LITEBANS_MYSQL_USER");
-  const password = cfg?.password ?? Deno.env.get("LITEBANS_MYSQL_PASSWORD");
-  const database = cfg?.database ?? Deno.env.get("LITEBANS_MYSQL_DATABASE");
-
-  if (!host) return json(200, { ok: false, status: "not_configured", error: "No MySQL host configured" });
+  if (!host || !user || !password || !database) {
+    return json(200, { ok: false, status: "not_configured", error: "MySQL connection not configured" });
+  }
 
   const target = `${host}:${port}`;
   const checkedAt = new Date().toISOString();
