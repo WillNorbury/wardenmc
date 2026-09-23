@@ -74,26 +74,31 @@ export async function fetchIssues(viewerId?: string | null) {
   const rows = (data ?? []) as Omit<Issue, "author" | "votes" | "votedByMe" | "comments">[];
   const ids = rows.map((r) => r.id);
 
-  const [authors, votesRes, commentsRes] = await Promise.all([
+  const [authors, votesRes, commentsRes, myVotesRes] = await Promise.all([
     fetchAuthors(rows.map((r) => r.user_id)),
     ids.length
-      ? supabase.from("issue_votes").select("issue_id,user_id").in("issue_id", ids)
+      ? supabase.rpc("get_issue_vote_counts", { _issue_ids: ids })
       : Promise.resolve({ data: [] } as any),
     ids.length
-      ? supabase.from("issue_comments").select("issue_id").in("issue_id", ids)
+      ? supabase.rpc("get_issue_comment_counts", { _issue_ids: ids })
+      : Promise.resolve({ data: [] } as any),
+    viewerId && ids.length
+      ? supabase.from("issue_votes").select("issue_id").in("issue_id", ids)
       : Promise.resolve({ data: [] } as any),
   ]);
 
   const voteCounts = new Map<string, number>();
-  const mine = new Set<string>();
-  for (const v of (votesRes.data ?? []) as { issue_id: string; user_id: string }[]) {
-    voteCounts.set(v.issue_id, (voteCounts.get(v.issue_id) ?? 0) + 1);
-    if (viewerId && v.user_id === viewerId) mine.add(v.issue_id);
+  for (const v of (votesRes.data ?? []) as { issue_id: string; votes: number }[]) {
+    voteCounts.set(v.issue_id, Number(v.votes) || 0);
   }
 
+  const mine = new Set<string>(
+    ((myVotesRes.data ?? []) as { issue_id: string }[]).map((v) => v.issue_id),
+  );
+
   const commentCounts = new Map<string, number>();
-  for (const c of (commentsRes.data ?? []) as { issue_id: string }[]) {
-    commentCounts.set(c.issue_id, (commentCounts.get(c.issue_id) ?? 0) + 1);
+  for (const c of (commentsRes.data ?? []) as { issue_id: string; comments: number }[]) {
+    commentCounts.set(c.issue_id, Number(c.comments) || 0);
   }
 
   return rows.map<Issue>((r) => ({
@@ -114,19 +119,23 @@ export async function fetchIssue(id: string, viewerId?: string | null): Promise<
   if (error) throw error;
   if (!data) return null;
 
-  const [authors, votesRes, commentsRes] = await Promise.all([
+  const [authors, votesRes, commentsRes, myVoteRes] = await Promise.all([
     fetchAuthors([data.user_id]),
-    supabase.from("issue_votes").select("issue_id,user_id").eq("issue_id", id),
-    supabase.from("issue_comments").select("issue_id").eq("issue_id", id),
+    supabase.rpc("get_issue_vote_counts", { _issue_ids: [id] }),
+    supabase.rpc("get_issue_comment_counts", { _issue_ids: [id] }),
+    viewerId
+      ? supabase.from("issue_votes").select("issue_id").eq("issue_id", id)
+      : Promise.resolve({ data: [] } as any),
   ]);
 
-  const votes = (votesRes.data ?? []) as { user_id: string }[];
+  const votes = Number(((votesRes.data ?? []) as { votes: number }[])[0]?.votes ?? 0);
+  const comments = Number(((commentsRes.data ?? []) as { comments: number }[])[0]?.comments ?? 0);
   return {
     ...(data as any),
     author: authors.get(data.user_id) ?? null,
-    votes: votes.length,
-    votedByMe: !!viewerId && votes.some((v) => v.user_id === viewerId),
-    comments: (commentsRes.data ?? []).length,
+    votes,
+    votedByMe: ((myVoteRes.data ?? []) as unknown[]).length > 0,
+    comments,
   };
 }
 
