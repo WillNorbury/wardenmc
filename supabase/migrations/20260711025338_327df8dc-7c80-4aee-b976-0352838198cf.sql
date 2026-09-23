@@ -31,6 +31,4 @@ TO authenticated
 USING (private.has_role(auth.uid(), 'owner'::public.app_role))
 WITH CHECK (private.has_role(auth.uid(), 'owner'::public.app_role));
 
-INSERT INTO public.litebans_mysql_config (id, host, port, database, username, password)
-VALUES (true, '198.96.92.19', 3306, 's200_litebans', 'u200_PflhMoa5Na', 'LEFt5j1KWQrd2=e@g79nMhAZ')
-ON CONFLICT (id) DO NOTHING;
+-- Connection credentials are configured as backend secrets and are not seeded here.
