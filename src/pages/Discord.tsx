@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 const Discord = () => {
   useEffect(() => {
-    window.location.replace("https://discord.warden.rip");
+    window.location.replace("https://discord.gg/AjFfxDT7Wc");
   }, []);
 
   return (
