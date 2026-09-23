@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS public.litebans_mysql_config CASCADE;
