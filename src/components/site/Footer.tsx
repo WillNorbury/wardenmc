@@ -4,7 +4,7 @@ import { Twitter, Youtube, MessageCircle, Twitch } from "lucide-react";
 
 const SOCIALS = [
   { icon: MessageCircle, href: "https://discord.gg/wD6K3nr2MG", label: "Discord" },
-  { icon: Twitter, href: "https://tiktok.com/play.warden.rip", label: "TikTok" },
+  { icon: Twitter, href: "https://tiktok.com/@play.warden.rip", label: "TikTok" },
   { icon: Youtube, href: "https://youtube.com/@WillNorbury", label: "YouTube" },
   { icon: Twitch, href: "https://twitch.tv/Will_Norbury", label: "Twitch" },
 ];
