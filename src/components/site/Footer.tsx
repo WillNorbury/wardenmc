@@ -4,9 +4,9 @@ import { Twitter, Youtube, MessageCircle, Twitch } from "lucide-react";
 
 const SOCIALS = [
   { icon: MessageCircle, href: "https://discord.gg/wD6K3nr2MG", label: "Discord" },
-  { icon: Twitter, href: "https://x.com/CarnageMC", label: "Twitter" },
+  { icon: Twitter, href: "https://tiktok.com/play.warden.rip", label: "TikTok" },
   { icon: Youtube, href: "https://youtube.com/@WillNorbury", label: "YouTube" },
-  { icon: Twitch, href: "https://twitch.tv/Will_Norbury", label: "Twitch" }
+  { icon: Twitch, href: "https://twitch.tv/Will_Norbury", label: "Twitch" },
 ];
 
 const COLUMNS: { title: string; links: { to: string; label: string }[] }[] = [
@@ -115,20 +115,11 @@ const Footer = () => (
               <dd className="font-mono text-foreground">play.warden.rip</dd>
             </div>
             <div className="flex flex-wrap items-baseline gap-x-2">
-              <dt className="text-muted-foreground">Bedrock port</dt>
-              <dd className="font-mono text-foreground">25577</dd>
-            </div>
-            <div className="flex flex-wrap items-baseline gap-x-2">
               <dt className="text-muted-foreground">Version</dt>
-              <dd className="text-foreground">1.21.x Paper</dd>
+              <dd className="text-foreground">26.x Velocity</dd>
             </div>
           </dl>
-          <a
-            href="https://discord.gg/wD6K3nr2MG"
-            target="_blank"
-            rel="noreferrer"
-            className={`${footerLink} mt-4`}
-          >
+          <a href="https://discord.gg/AjFfxDT7Wc" target="_blank" rel="noreferrer" className={`${footerLink} mt-4`}>
             Join the Discord →
           </a>
         </div>
