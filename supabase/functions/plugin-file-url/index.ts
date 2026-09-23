@@ -46,6 +46,7 @@ Deno.serve(async (req) => {
 
     let path: string | null = null;
     let pluginId: string | null = null;
+    let externalUrl: string | null = null;
 
     if (versionId) {
       // Preferred flow: look the jar up server-side so internal storage paths
@@ -60,7 +61,8 @@ Deno.serve(async (req) => {
       if (ver.jar_path) {
         path = ver.jar_path;
       } else if (ver.download_url && /^https?:\/\//i.test(ver.download_url)) {
-        return json({ url: ver.download_url });
+        // Authorization is checked below before this URL is returned.
+        externalUrl = ver.download_url;
       } else {
         return json({ error: "File not found" }, 404);
       }
