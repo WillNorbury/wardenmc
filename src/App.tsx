@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/site/AppSidebar";
 import { SwipeToOpenSidebar } from "@/components/site/SwipeToOpenSidebar";
 import { UpdatePrompt } from "@/components/site/UpdatePrompt";
 import GlobalSaleBar from "@/components/site/GlobalSaleBar";
+import VersionChecker from "@/components/site/VersionChecker";
 
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
@@ -169,6 +170,7 @@ const Shell = () => {
     <MaintenanceGate>
       <div className="flex min-h-svh w-full flex-col" style={{ paddingTop: "var(--sale-bar-h, 0px)" }}>
         {!isAdmin && <GlobalSaleBar />}
+        <VersionChecker />
         <SidebarProvider>
           {!hideSidebar && <AppSidebar />}
           {!hideSidebar && <SwipeToOpenSidebar />}
