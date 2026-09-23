@@ -39,6 +39,8 @@ const GROUPS: { title: string; links: { to: string; label: string }[] }[] = [
       { to: "/live", label: "Live Streams" },
       { to: "/partners", label: "Partners" },
       { to: "/users", label: "Members" },
+      { to: "/posts", label: "Posts Feed" },
+      { to: "/post", label: "Create a Post" },
       { to: "/vote", label: "Vote" },
       { to: "/map", label: "Live Map" },
     ],
@@ -71,6 +73,7 @@ const GROUPS: { title: string; links: { to: string; label: string }[] }[] = [
     links: [
       { to: "/support", label: "Support Center" },
       { to: "/tickets", label: "My Tickets" },
+      { to: "/issues", label: "Issue Tracker" },
       { to: "/contact", label: "Contact" },
       { to: "/faq", label: "FAQ" },
       { to: "/appeal", label: "Ban Appeals" },
