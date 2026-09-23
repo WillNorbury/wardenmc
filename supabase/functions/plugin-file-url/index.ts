@@ -134,6 +134,9 @@ Deno.serve(async (req) => {
 
     if (!allowed) return json({ error: "Not authorised to download this file" }, 403);
 
+    if (externalUrl) return json({ url: externalUrl });
+    if (!path) return json({ error: "File not found" }, 404);
+
     const { data: signed, error } = await admin.storage
       .from(bucket)
       .createSignedUrl(path, 300, { download: true });
