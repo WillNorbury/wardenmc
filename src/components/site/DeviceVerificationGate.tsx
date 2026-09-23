@@ -73,7 +73,7 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
   }, [uid, loading, runCheck]);
 
   const confirm = async () => {
-    if (code.length !== 6) return;
+    if (code.length !== 8) return;
     setSubmitting(true);
     const { data, error } = await supabase.functions.invoke("device-verify", {
       body: { action: "confirm", device_id: getDeviceId(), code, remember },
@@ -153,7 +153,7 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
             </span>
           </label>
 
-          <Button className="w-full" onClick={confirm} disabled={submitting || code.length !== 6}>
+          <Button className="w-full" onClick={confirm} disabled={submitting || code.length !== 8}>
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify and continue"}
           </Button>
 
