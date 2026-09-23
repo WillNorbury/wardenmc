@@ -124,7 +124,7 @@ const Skripts = () => {
     }
     await supabase.rpc("record_user_skript_download" as any, { _skript_id: sk.id });
     try {
-      const res = await fetch(data.signedUrl);
+      const res = await fetch(data.url);
       if (!res.ok) throw new Error();
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
