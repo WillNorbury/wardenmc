@@ -53,6 +53,14 @@ Deno.serve(async (req) => {
       if (!emailRe.test(testEmail)) {
         return json({ ok: false, error: 'Invalid testEmail' }, 400)
       }
+      // Test sends may only go to the requesting admin's own address, so this
+      // endpoint can't be used to deliver mail to arbitrary recipients.
+      if (testEmail !== (userData.user.email ?? '').toLowerCase()) {
+        return json(
+          { ok: false, error: 'Test emails can only be sent to your own account email' },
+          403,
+        )
+      }
     }
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
