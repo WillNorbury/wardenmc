@@ -26,6 +26,8 @@ import Vote from "./pages/Vote.tsx";
 import Community from "./pages/Community.tsx";
 import Posts from "./pages/Posts.tsx";
 import PostCompose from "./pages/PostCompose.tsx";
+import Issues from "./pages/Issues.tsx";
+import IssueDetail from "./pages/IssueDetail.tsx";
 import Rules from "./pages/Rules.tsx";
 import Support from "./pages/Support.tsx";
 import Tickets from "./pages/Tickets.tsx";
@@ -205,6 +207,8 @@ const Shell = () => {
                   <Route path="/community" element={<Community />} />
                   <Route path="/posts" element={<Posts />} />
                   <Route path="/post" element={<PostCompose />} />
+                  <Route path="/issues" element={<Issues />} />
+                  <Route path="/issues/:id" element={<IssueDetail />} />
                   <Route path="/rules" element={<Rules />} />
                   <Route path="/support" element={<Support />} />
                   <Route path="/tickets" element={<Tickets />} />
