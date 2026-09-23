@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
@@ -33,9 +31,6 @@ import {
   Copy,
   History,
   BookOpen,
-  Save,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -195,87 +190,14 @@ export const MySqlAdminSection = () => {
       </Card>
 
       <Card className="p-4">
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-2">
           <Database className="h-4 w-4 text-primary" />
           <h2 className="font-bold">Connection</h2>
           <Badge variant="outline" className="ml-1 text-xs">MySQL</Badge>
-          <div className="ml-auto">
-            <Button size="sm" onClick={saveConfig} disabled={cfgSaving || cfgLoading}>
-              {cfgSaving ? (
-                <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-              ) : (
-                <Save className="h-3.5 w-3.5 mr-1" />
-              )}
-              Save
-            </Button>
-          </div>
         </div>
-        {cfgLoading ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading connection…
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="mysql-address" className="text-xs">Address (host:port)</Label>
-              <Input
-                id="mysql-address"
-                value={`${cfg.host}${cfg.port ? `:${cfg.port}` : ""}`}
-                onChange={(e) => {
-                  const v = e.target.value.trim();
-                  const [h, p] = v.split(":");
-                  setCfg((c) => ({ ...c, host: h ?? "", port: p ? Number(p) || c.port : c.port }));
-                }}
-                placeholder="198.96.92.19:3306"
-                className="font-mono"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="mysql-database" className="text-xs">Database</Label>
-              <Input
-                id="mysql-database"
-                value={cfg.database}
-                onChange={(e) => setCfg((c) => ({ ...c, database: e.target.value }))}
-                placeholder="s200_litebans"
-                className="font-mono"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="mysql-username" className="text-xs">Username</Label>
-              <Input
-                id="mysql-username"
-                value={cfg.username}
-                onChange={(e) => setCfg((c) => ({ ...c, username: e.target.value }))}
-                placeholder="u200_xxx"
-                className="font-mono"
-              />
-            </div>
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="mysql-password" className="text-xs">Password</Label>
-              <div className="relative">
-                <Input
-                  id="mysql-password"
-                  type={showPassword ? "text" : "password"}
-                  value={cfg.password}
-                  onChange={(e) => setCfg((c) => ({ ...c, password: e.target.value }))}
-                  placeholder="••••••••"
-                  className="font-mono pr-10"
-                />
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  className="absolute top-0 right-0 h-full w-9"
-                  onClick={() => setShowPassword((s) => !s)}
-                >
-                  {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-        <p className="text-xs text-muted-foreground mt-3">
-          Stored in Lovable Cloud. Owner-only. Changes take effect on the next query.
+        <p className="text-sm text-muted-foreground">
+          The LiteBans connection is managed through protected backend secrets and is never stored in
+          the website database or shown in the browser.
         </p>
       </Card>
 
