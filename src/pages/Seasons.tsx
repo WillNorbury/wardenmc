@@ -204,7 +204,16 @@ const Seasons = () => {
         description="Every Warden Network season: start and end dates, themes, highlights, and the players who topped the leaderboards."
         path="/seasons"
       />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          // Escape characters that could break out of the script tag.
+          __html: JSON.stringify(jsonLd)
+            .replace(/</g, "\\u003c")
+            .replace(/>/g, "\\u003e")
+            .replace(/&/g, "\\u0026"),
+        }}
+      />
       <Navbar />
 
       <main className="flex-1">
