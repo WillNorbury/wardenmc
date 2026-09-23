@@ -46,29 +46,17 @@ Deno.serve(async (req) => {
     return json(403, { error: "owner only" });
   }
 
-  // --- Optional overrides ---
-  let body: any = {};
-  if (req.method === "POST") {
-    try {
-      body = await req.json();
-    } catch {
-      body = {};
-    }
-  }
-  const url = new URL(req.url);
-  const overrideHost = body?.host ?? url.searchParams.get("host") ?? null;
-  const overridePort = body?.port ?? url.searchParams.get("port") ?? null;
-
+  // --- Destination is always server-chosen (stored config / env secrets) ---
+  // Caller-supplied host/port are intentionally ignored so this endpoint can
+  // never be used to probe arbitrary destinations with our credentials.
   const { data: cfg } = await admin
     .from("litebans_mysql_config")
     .select("host, port, database, username, password")
     .eq("id", true)
     .maybeSingle();
 
-  const host = overrideHost ?? cfg?.host ?? Deno.env.get("LITEBANS_MYSQL_HOST");
-  const port = Number(
-    overridePort ?? cfg?.port ?? Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306",
-  );
+  const host = cfg?.host ?? Deno.env.get("LITEBANS_MYSQL_HOST");
+  const port = Number(cfg?.port ?? Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
   const user = cfg?.username ?? Deno.env.get("LITEBANS_MYSQL_USER");
   const password = cfg?.password ?? Deno.env.get("LITEBANS_MYSQL_PASSWORD");
   const database = cfg?.database ?? Deno.env.get("LITEBANS_MYSQL_DATABASE");

@@ -37,10 +37,11 @@ Deno.serve(async (req) => {
   if (!serverId) return json({ error: 'missing server_id' }, 400)
   if (!command || command.length > 1000) return json({ error: 'invalid command' }, 400)
 
-  // Verify server exists and is enabled
+  // Verify the server exists, is enabled, and belongs to the caller
   const { data: srv } = await admin
-    .from('mc_servers').select('id, enabled').eq('id', serverId).maybeSingle()
+    .from('mc_servers').select('id, enabled, created_by').eq('id', serverId).maybeSingle()
   if (!srv) return json({ error: 'server not found' }, 404)
+  if (srv.created_by !== u.user.id) return json({ error: 'forbidden' }, 403)
   if (!srv.enabled) return json({ error: 'server disabled' }, 400)
 
   // Rate limit: max 30 commands/min per server

@@ -73,7 +73,7 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
   }, [uid, loading, runCheck]);
 
   const confirm = async () => {
-    if (code.length !== 6) return;
+    if (code.length !== 8) return;
     setSubmitting(true);
     const { data, error } = await supabase.functions.invoke("device-verify", {
       body: { action: "confirm", device_id: getDeviceId(), code, remember },
@@ -124,15 +124,15 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
             {reason === "new_network"
               ? "You're signing in from a new network."
               : "You're signing in from a new device."}{" "}
-            We emailed a 6-digit code
+            We emailed an 8-digit code
             {maskedEmail ? <> to <span className="font-medium">{maskedEmail}</span></> : null}.
           </p>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="flex justify-center">
-            <InputOTP maxLength={6} value={code} onChange={setCode}>
+            <InputOTP maxLength={8} value={code} onChange={setCode}>
               <InputOTPGroup>
-                {[0, 1, 2, 3, 4, 5].map((i) => (
+                {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
                   <InputOTPSlot key={i} index={i} />
                 ))}
               </InputOTPGroup>
@@ -153,7 +153,7 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
             </span>
           </label>
 
-          <Button className="w-full" onClick={confirm} disabled={submitting || code.length !== 6}>
+          <Button className="w-full" onClick={confirm} disabled={submitting || code.length !== 8}>
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify and continue"}
           </Button>
 

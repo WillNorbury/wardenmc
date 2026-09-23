@@ -84,7 +84,11 @@ Deno.serve(async (req) => {
 
   /** Returns true only when a code was actually emailed to the user. */
   const issueCode = async (): Promise<boolean> => {
-    const code = String(Math.floor(100000 + Math.random() * 900000))
+    // Cryptographically secure 8-digit code (not Math.random)
+    const buf = new Uint32Array(2)
+    crypto.getRandomValues(buf)
+    const n = (buf[0] * 4294967296 + buf[1]) % 90000000
+    const code = String(10000000 + n)
     await admin.from('login_verifications').insert({
       user_id: user.id,
       device_id: deviceId,
@@ -156,7 +160,7 @@ Deno.serve(async (req) => {
     if (action === 'confirm') {
       const code = String(body.code ?? '').trim()
       const remember = body.remember === true
-      if (!/^\d{6}$/.test(code)) return json(400, { ok: false, error: 'invalid_code_format' })
+      if (!/^\d{8}$/.test(code)) return json(400, { ok: false, error: 'invalid_code_format' })
 
       const { data: rows } = await admin
         .from('login_verifications')

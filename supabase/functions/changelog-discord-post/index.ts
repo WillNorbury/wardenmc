@@ -29,6 +29,39 @@ Deno.serve(async (req) => {
     const entryId: string | undefined = body?.entryId
     if (!entryId) return json({ ok: false, error: 'entryId required' }, 400)
 
+    // --- Caller authentication: staff session or internal service-role call ---
+    const ANON_KEY =
+      Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    const authHeader = req.headers.get('Authorization') ?? ''
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
+    if (!token) return json({ ok: false, error: 'Unauthorized' }, 401)
+
+    let callerRole = ''
+    try {
+      callerRole = JSON.parse(
+        atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
+      )?.role ?? ''
+    } catch {
+      callerRole = ''
+    }
+
+    if (callerRole !== 'service_role') {
+      const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+        global: { headers: { Authorization: authHeader } },
+      })
+      const { data: userData } = await userClient.auth.getUser()
+      if (!userData?.user) return json({ ok: false, error: 'Unauthorized' }, 401)
+      const { data: roleRows } = await userClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userData.user.id)
+        .in('role', ['admin', 'owner'])
+        .limit(1)
+      if (!roleRows || roleRows.length === 0) {
+        return json({ ok: false, error: 'Forbidden — admin only' }, 403)
+      }
+    }
+
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } })
     const { data: entry, error } = await admin
       .from('changelog_entries')
