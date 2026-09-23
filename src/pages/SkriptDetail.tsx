@@ -141,7 +141,7 @@ const SkriptDetail = () => {
       a.remove();
       URL.revokeObjectURL(url);
     } catch {
-      window.open(data.signedUrl, "_blank", "noopener");
+      window.open(data.url, "_blank", "noopener");
     }
     setDownloadCount((n) => n + 1);
   };

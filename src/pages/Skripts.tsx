@@ -136,7 +136,7 @@ const Skripts = () => {
       a.remove();
       URL.revokeObjectURL(url);
     } catch {
-      window.open(data.signedUrl, "_blank", "noopener");
+      window.open(data.url, "_blank", "noopener");
     }
     setSkripts((prev) =>
       prev.map((s) => (s.id === sk.id ? { ...s, downloads: s.downloads + 1 } : s)),
