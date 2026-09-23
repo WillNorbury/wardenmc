@@ -1,10 +1,21 @@
 import { Link } from "react-router-dom";
 import logo from "@/assets/warden-network-icon.png";
-import { Twitter, Youtube, MessageCircle, Twitch } from "lucide-react";
+import { Youtube, MessageCircle, Twitch } from "lucide-react";
+
+const TikTok = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.3 0 .6.04.88.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.78a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.91a8.16 8.16 0 0 0 4.76 1.52V6.98a4.85 4.85 0 0 1-1.85-.29z" />
+  </svg>
+);
 
 const SOCIALS = [
   { icon: MessageCircle, href: "https://discord.gg/wD6K3nr2MG", label: "Discord" },
-  { icon: Twitter, href: "https://tiktok.com/@play.warden.rip", label: "TikTok" },
+  { icon: TikTok, href: "https://tiktok.com/@play.warden.rip", label: "TikTok" },
   { icon: Youtube, href: "https://youtube.com/@WillNorbury", label: "YouTube" },
   { icon: Twitch, href: "https://twitch.tv/Will_Norbury", label: "Twitch" },
 ];
