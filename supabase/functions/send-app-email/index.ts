@@ -70,14 +70,14 @@ Deno.serve(async (req) => {
   // ---------------------------------------------------------------------
   // Authorization.
   // Internal (service-role) callers and staff may send anything.
-  // Ordinary signed-in users may only trigger a small set of self-service
-  // templates, always addressed to their own account email, with no
-  // subject/body/from overrides.
+  // Everyone else may only trigger a small set of transactional templates.
+  // Client-supplied subject/body/from overrides are ignored for them, and
+  // the recipient is derived server-side (account email, fixed staff inbox,
+  // or the contact address on a verified ban appeal row).
   // ---------------------------------------------------------------------
   const SELF_TEMPLATES = new Set([
     'order-confirmation',
     'application-received',
-    'ban-appeal-received',
   ])
   // Templates that always go to the site's own staff inbox — the client
   // never chooses the recipient for these.
@@ -86,6 +86,17 @@ Deno.serve(async (req) => {
     'application-admin',
     'report-admin',
   ])
+  // Ban appeals may be filed without an account, so these two are reachable
+  // by anonymous callers, but only when a matching appeal row exists.
+  const APPEAL_TEMPLATES = new Set([
+    'ban-appeal-received',
+    'ban-appeal-admin',
+  ])
+  // Server-side From addresses, so callers never need to pass `from`.
+  const TEMPLATE_FROM: Record<string, string> = {
+    'application-received': 'Warden Network Applications <applications@warden.rip>',
+    'application-admin': 'Warden Network Applications <applications@warden.rip>',
+  }
 
   const authHeader = req.headers.get('Authorization') ?? ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
@@ -104,44 +115,63 @@ Deno.serve(async (req) => {
     callerRole = ''
   }
 
+  const forbidden = () =>
+    new Response(JSON.stringify({ error: 'forbidden' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+
+  // Confirms an appeal matching the supplied details was really filed here.
+  const findRecentAppeal = async (username: unknown) => {
+    if (typeof username !== 'string' || !username.trim()) return null
+    const since = new Date(Date.now() - 15 * 60 * 1000).toISOString()
+    const { data } = await supabase
+      .from('ban_appeals')
+      .select('id, email, minecraft_username, created_at')
+      .eq('minecraft_username', username.trim())
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    return data ?? null
+  }
+
   if (callerRole !== 'service_role') {
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       global: { headers: { Authorization: authHeader } },
     })
     const { data: userData } = await userClient.auth.getUser()
     const caller = userData?.user
-    if (!caller) {
-      return new Response(JSON.stringify({ error: 'unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
 
-    const { data: isAdmin } = await userClient.rpc('is_current_user_admin')
+    const { data: isAdmin } = caller
+      ? await userClient.rpc('is_current_user_admin')
+      : { data: false }
 
     if (!isAdmin) {
-      if (subjectOverride || bodyHtmlOverride || bodyTextOverride || fromOverride) {
-        return new Response(JSON.stringify({ error: 'forbidden' }), {
-          status: 403,
+      // Untrusted caller: never honour client-supplied content overrides.
+      subjectOverride = undefined
+      bodyHtmlOverride = undefined
+      bodyTextOverride = undefined
+      fromOverride = TEMPLATE_FROM[templateName]
+
+      if (APPEAL_TEMPLATES.has(templateName)) {
+        const appeal = await findRecentAppeal(templateData?.minecraftUsername)
+        if (!appeal) return forbidden()
+        recipientEmail = templateName === 'ban-appeal-admin' ? '' : (appeal.email ?? '')
+        if (!recipientEmail && templateName === 'ban-appeal-received') return forbidden()
+      } else if (!caller) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), {
+          status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
-      }
-      if (STAFF_INBOX_TEMPLATES.has(templateName)) {
+      } else if (STAFF_INBOX_TEMPLATES.has(templateName)) {
         // Fixed internal recipient — ignore anything the client supplied.
         recipientEmail = ''
       } else if (SELF_TEMPLATES.has(templateName)) {
-        if (!caller.email) {
-          return new Response(JSON.stringify({ error: 'forbidden' }), {
-            status: 403,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          })
-        }
+        if (!caller.email) return forbidden()
         recipientEmail = caller.email
       } else {
-        return new Response(JSON.stringify({ error: 'forbidden' }), {
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
+        return forbidden()
       }
     }
   }
