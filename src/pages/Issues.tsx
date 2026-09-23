@@ -204,7 +204,12 @@ const NewIssueForm = ({ userId, onCancel, onCreated }: { userId: string; onCance
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     setSending(true);
     try {
-      const id = await createIssue({ userId, ...parsed.data });
+      const id = await createIssue({
+        userId,
+        title: parsed.data.title,
+        description: parsed.data.description,
+        category: parsed.data.category,
+      });
       toast.success("Issue posted");
       onCreated(id);
     } catch (e: any) {
