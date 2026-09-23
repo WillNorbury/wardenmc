@@ -3778,6 +3778,20 @@ export type Database = {
       }
       get_follower_count: { Args: { _user_id: string }; Returns: number }
       get_following_count: { Args: { _user_id: string }; Returns: number }
+      get_issue_comment_counts: {
+        Args: { _issue_ids?: string[] }
+        Returns: {
+          comments: number
+          issue_id: string
+        }[]
+      }
+      get_issue_vote_counts: {
+        Args: { _issue_ids?: string[] }
+        Returns: {
+          issue_id: string
+          votes: number
+        }[]
+      }
       get_mod_like_counts: {
         Args: { _mod_ids: string[] }
         Returns: {
