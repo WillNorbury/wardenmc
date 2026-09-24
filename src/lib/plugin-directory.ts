@@ -121,6 +121,7 @@ type RawPlugin = {
   description: string | null;
   author: string | null;
   user_id: string | null;
+  org_id: string | null;
   icon_url: string | null;
   category: string | null;
   tags: string[];
@@ -130,6 +131,15 @@ type RawPlugin = {
   featured: boolean;
   created_at: string;
   updated_at: string;
+};
+
+type RawOrg = {
+  id: string;
+  name: string | null;
+  slug: string | null;
+  description: string | null;
+  avatar_url: string | null;
+  updated_at: string | null;
 };
 
 type RawProfile = {
@@ -174,7 +184,7 @@ export const formatRelativeDate = (iso: string) => {
 export async function loadPluginDirectory(userId?: string | null) {
   const { data, error } = await supabase
     .from("plugins")
-    .select("id, short_id, slug, name, description, author, user_id, icon_url, category, tags, platform, platforms, mc_versions, featured, created_at, updated_at")
+    .select("id, short_id, slug, name, description, author, user_id, org_id, icon_url, category, tags, platform, platforms, mc_versions, featured, created_at, updated_at")
     .eq("published", true)
     .order("updated_at", { ascending: false });
 
@@ -182,8 +192,12 @@ export async function loadPluginDirectory(userId?: string | null) {
   const rows = (data ?? []) as RawPlugin[];
   const pluginIds = rows.map((plugin) => plugin.id);
   const userIds = [...new Set(rows.map((plugin) => plugin.user_id).filter((id): id is string => Boolean(id)))];
+  const orgIds = [...new Set(rows.map((plugin) => plugin.org_id).filter((id): id is string => Boolean(id)))];
 
-  const [profilesResult, downloadsResult, favoritesResult, myFavoritesResult, rolesResult, ...reviewResults] = await Promise.all([
+  const [orgsResult, profilesResult, downloadsResult, favoritesResult, myFavoritesResult, rolesResult, ...reviewResults] = await Promise.all([
+    orgIds.length
+      ? supabase.from("organizations_public").select("id, name, slug, description, avatar_url, updated_at").in("id", orgIds)
+      : Promise.resolve({ data: [], error: null }),
     userIds.length
       ? supabase.from("profiles").select("id, display_name, mc_username, avatar_url, bio, verified, updated_at").in("id", userIds)
       : Promise.resolve({ data: [], error: null }),
@@ -203,6 +217,7 @@ export async function loadPluginDirectory(userId?: string | null) {
   ]);
 
   const profiles = new Map(((profilesResult.data ?? []) as RawProfile[]).map((profile) => [profile.id, profile]));
+  const orgs = new Map(((orgsResult.data ?? []) as RawOrg[]).map((org) => [org.id, org]));
   const staffIds = new Set(
     ((rolesResult.data ?? []) as { user_id: string; role: string }[])
       .filter((row) => isStaffRole(row.role))
@@ -223,16 +238,28 @@ export async function loadPluginDirectory(userId?: string | null) {
     const verified = Boolean(profile?.verified || (row.user_id && staffIds.has(row.user_id)));
     const developerName = profile?.display_name || profile?.mc_username || row.author || "WardenMC Community";
     const platforms = [...new Set((row.platforms?.length ? row.platforms : row.platform ? [row.platform] : []).map(normalizePlatform))];
-    const developer: PluginCreator = {
-      id: row.user_id ?? `author:${developerName.toLowerCase()}`,
-      username: profile?.mc_username || profile?.display_name || developerName,
-      displayName: developerName,
-      avatar: profile?.avatar_url ?? null,
-      bio: profile?.bio ?? null,
-      verified,
-      profilePath: profile ? userProfilePath(profile) : null,
-      updatedAt: profile?.updated_at ?? row.updated_at,
-    };
+    const org = row.org_id ? orgs.get(row.org_id) : undefined;
+    const developer: PluginCreator = org
+      ? {
+          id: `org:${org.id}`,
+          username: org.slug ?? org.name ?? "organization",
+          displayName: org.name ?? developerName,
+          avatar: org.avatar_url,
+          bio: org.description,
+          verified,
+          profilePath: org.slug ? `/organization/${org.slug}` : null,
+          updatedAt: org.updated_at ?? row.updated_at,
+        }
+      : {
+          id: row.user_id ?? `author:${developerName.toLowerCase()}`,
+          username: profile?.mc_username || profile?.display_name || developerName,
+          displayName: developerName,
+          avatar: profile?.avatar_url ?? null,
+          bio: profile?.bio ?? null,
+          verified,
+          profilePath: profile ? userProfilePath(profile) : null,
+          updatedAt: profile?.updated_at ?? row.updated_at,
+        };
 
     return {
       id: row.id,
