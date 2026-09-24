@@ -78,8 +78,8 @@ export const PluginBadge = ({ status }: { status: PluginStatus }) => {
 export const RatingDisplay = ({ rating, reviews, compact = false }: { rating: number; reviews: number; compact?: boolean }) => (
   <span className="inline-flex items-center gap-1 text-sm" aria-label={reviews ? `${rating.toFixed(1)} out of 5 from ${reviews} reviews` : "Not yet rated"}>
     <Star className={cn("h-3.5 w-3.5", reviews ? "fill-orange-400 text-orange-400" : "text-muted-foreground/50")} />
-    <span className="font-semibold text-foreground">{reviews ? rating.toFixed(1) : "New"}</span>
-    {!compact && reviews > 0 && <span className="text-muted-foreground">({reviews})</span>}
+    <span className="font-semibold text-foreground">{rating.toFixed(1)}</span>
+    {!compact && <span className="text-muted-foreground">({reviews})</span>}
   </span>
 );
 

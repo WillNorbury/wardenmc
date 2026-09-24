@@ -18,6 +18,7 @@ import MyPluginsPanel from "@/components/dashboard/MyPluginsPanel";
 import MySkriptsPanel from "@/components/dashboard/MySkriptsPanel";
 import MyServersPanel from "@/components/dashboard/MyServersPanel";
 import MyFavoritePluginsPanel from "@/components/dashboard/MyFavoritePluginsPanel";
+import OrganizationsCard from "@/components/site/OrganizationsCard";
 
 type Streaks = {
   login_streak: number;
@@ -285,6 +286,7 @@ const Dashboard = () => {
 
         {/* My Stuff */}
         <h2 className="font-display text-2xl font-black mb-3 mt-2">My Stuff</h2>
+        <OrganizationsCard userId={user!.id} />
         <MyFavoritePluginsPanel userId={user!.id} />
         <MyPluginsPanel userId={user!.id} />
         <MySkriptsPanel />
