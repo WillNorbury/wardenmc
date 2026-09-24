@@ -654,7 +654,7 @@ const UserProfile = () => {
                     return (
                       <li key={o.id}>
                         <Link
-                          to={`/org/${o.slug}`}
+                          to={`/organization/${o.slug}`}
                           className="flex items-center gap-3 rounded-md p-2 -mx-2 hover:bg-muted transition-colors"
                         >
                           <Avatar className="h-9 w-9">

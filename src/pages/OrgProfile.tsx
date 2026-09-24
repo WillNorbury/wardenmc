@@ -196,19 +196,22 @@ export default function OrgProfile() {
       .eq("id", user.id)
       .maybeSingle();
     const authorNames = [prof?.display_name, prof?.mc_username].filter(Boolean) as string[];
-    if (authorNames.length === 0) {
-      setAttachable([]);
-      setAttachLoading(false);
-      return;
-    }
-    const [{ data: mods }, { data: plugins }] = await Promise.all([
-      (supabase.from("mods" as any) as any)
-        .select("id, slug, short_id, name, description, icon_url, category, org_id")
-        .in("author", authorNames),
-      (supabase.from("plugins" as any) as any)
-        .select("id, short_id, name, description, icon_url, category, org_id")
-        .in("author", authorNames),
+    const cols = "id, short_id, name, description, icon_url, category, org_id";
+    const [{ data: mods }, { data: ownPlugins }, { data: authoredPlugins }] = await Promise.all([
+      authorNames.length
+        ? (supabase.from("mods" as any) as any)
+            .select("id, slug, short_id, name, description, icon_url, category, org_id")
+            .in("author", authorNames)
+        : Promise.resolve({ data: [] }),
+      (supabase.from("plugins" as any) as any).select(cols).eq("user_id", user.id),
+      authorNames.length
+        ? (supabase.from("plugins" as any) as any).select(cols).in("author", authorNames)
+        : Promise.resolve({ data: [] }),
     ]);
+    const seen = new Set<string>();
+    const plugins = [...((ownPlugins ?? []) as any[]), ...((authoredPlugins ?? []) as any[])].filter((p) =>
+      seen.has(p.id) ? false : (seen.add(p.id), true),
+    );
     const list: Project[] = [
       ...((mods ?? []) as any[]).filter((m) => !m.org_id).map((m) => ({ kind: "mod" as const, ...m })),
       ...((plugins ?? []) as any[]).filter((p) => !p.org_id).map((p) => ({ kind: "plugin" as const, ...p })),
@@ -339,7 +342,7 @@ export default function OrgProfile() {
           <div className="flex items-center gap-2 shrink-0">
             {isOwner && (
               <Button asChild variant="outline" size="sm">
-                <Link to={`/org/${org.slug}/settings`}>
+                <Link to={`/organization/${org.slug}/settings`}>
                   <Settings className="h-4 w-4 mr-1.5" /> Manage
                 </Link>
               </Button>
@@ -579,7 +582,7 @@ function AttachDialogContent({
         </div>
       ) : attachable.length === 0 ? (
         <p className="text-sm text-muted-foreground py-4">
-          No unassigned mods or plugins authored by you were found. Projects must list your display name or Minecraft username as the author.
+          No unassigned mods or plugins under your name were found.
         </p>
       ) : (
         <ul className="max-h-80 overflow-y-auto divide-y divide-border -mx-2">

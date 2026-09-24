@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Building2, Loader2, Plus } from "lucide-react";
@@ -208,8 +209,8 @@ export default function OrganizationsCard({ userId }: { userId: string }) {
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
-                    <div className="font-semibold truncate">{org.name}</div>
-                    <div className="text-xs text-muted-foreground font-mono truncate">/{org.slug}</div>
+                    <Link to={`/organization/${org.slug}`} className="font-semibold truncate hover:text-primary block">{org.name}</Link>
+                    <div className="text-xs text-muted-foreground font-mono truncate">/organization/{org.slug}</div>
                   </div>
                 </div>
                 <Badge variant={m.role === "owner" ? "default" : "secondary"} className="capitalize">
