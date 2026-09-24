@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import PluginVersionsDialog from "./PluginVersionsDialog";
 import { MultiTagInput } from "@/components/ui/multi-tag-input";
+import { McVersionSelect } from "./McVersionSelect";
 import { MC_VERSIONS } from "@/lib/plugin-directory";
 import FoliaBadge, { supportsFolia } from "@/components/site/FoliaBadge";
 import { confirm } from "@/lib/confirm";
@@ -121,7 +122,6 @@ const slugify = (s: string) =>
     .replace(/^-+|-+$/g, "");
 
 const PLATFORMS = ["paper", "spigot", "bukkit", "folia", "purpur", "velocity", "bungeecord"];
-const MC_VERSIONS_SUGGEST = [...MC_VERSIONS];
 
 const pluginPlatforms = (p: Plugin): string[] =>
   p.platforms && p.platforms.length ? p.platforms : p.platform ? [p.platform] : [];
@@ -594,11 +594,10 @@ export default function MyPluginsPanel({ userId }: { userId: string }) {
 
             <div>
               <Label>Minecraft versions</Label>
-              <MultiTagInput
+              <McVersionSelect
                 values={form.mc_versions}
                 onChange={(v) => setForm({ ...form, mc_versions: v })}
-                placeholder="Add a MC version (1.21, 1.20.4...)"
-                suggestions={MC_VERSIONS_SUGGEST}
+                options={[...MC_VERSIONS]}
               />
             </div>
 
