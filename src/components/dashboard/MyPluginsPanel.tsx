@@ -122,7 +122,6 @@ const slugify = (s: string) =>
     .replace(/^-+|-+$/g, "");
 
 const PLATFORMS = ["paper", "spigot", "bukkit", "folia", "purpur", "velocity", "bungeecord"];
-const MC_VERSIONS_SUGGEST = [...MC_VERSIONS];
 
 const pluginPlatforms = (p: Plugin): string[] =>
   p.platforms && p.platforms.length ? p.platforms : p.platform ? [p.platform] : [];
