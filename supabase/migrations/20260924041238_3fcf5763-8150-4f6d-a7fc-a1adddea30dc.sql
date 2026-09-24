@@ -1,0 +1,1 @@
+CREATE POLICY "Organization memberships are publicly readable" ON public.organization_members FOR SELECT TO anon, authenticated USING (true);
