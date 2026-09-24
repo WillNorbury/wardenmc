@@ -595,11 +595,10 @@ export default function MyPluginsPanel({ userId }: { userId: string }) {
 
             <div>
               <Label>Minecraft versions</Label>
-              <MultiTagInput
+              <McVersionSelect
                 values={form.mc_versions}
                 onChange={(v) => setForm({ ...form, mc_versions: v })}
-                placeholder="Add a MC version (1.21, 1.20.4...)"
-                suggestions={MC_VERSIONS_SUGGEST}
+                options={[...MC_VERSIONS]}
               />
             </div>
 
