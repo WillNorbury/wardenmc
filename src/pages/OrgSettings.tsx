@@ -97,7 +97,7 @@ export default function OrgSettings() {
     }
     toast.success("Organization updated");
     setOrg({ ...org, name: cleanName, slug: cleanSlug });
-    if (cleanSlug !== org.slug) navigate(`/org/${cleanSlug}/settings`, { replace: true });
+    if (cleanSlug !== org.slug) navigate(`/organization/${cleanSlug}/settings`, { replace: true });
   };
 
   const remove = async () => {
@@ -127,7 +127,7 @@ export default function OrgSettings() {
       <Navbar />
       <main className="container pt-28 pb-16 max-w-3xl">
         <Button variant="ghost" size="sm" asChild className="mb-4">
-          <Link to={org ? `/org/${org.slug}` : "/users"}>
+          <Link to={org ? `/organization/${org.slug}` : "/users"}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back to organization
           </Link>
         </Button>

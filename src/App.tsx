@@ -219,8 +219,9 @@ const Shell = () => {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/users" element={<Users />} />
                   <Route path="/user/:slug" element={<UserProfile />} />
-                  <Route path="/org/:slug" element={<OrgProfile />} />
-                  <Route path="/org/:slug/settings" element={<OrgSettings />} />
+                  <Route path="/organization/:slug" element={<OrgProfile />} />
+                  <Route path="/organization/:slug/settings" element={<OrgSettings />} />
+                  <Route path="/org/:slug/*" element={<OrgRedirect />} />
 
                  <Route path="/plugins" element={<Plugins />} />
                   <Route path="/plugins/categories" element={<PluginCategories />} />
@@ -339,6 +340,11 @@ const Shell = () => {
       </div>
     </MaintenanceGate>
   );
+};
+
+const OrgRedirect = () => {
+  const loc = useLocation();
+  return <Navigate to={loc.pathname.replace(/^\/org\//, "/organization/") + loc.search} replace />;
 };
 
 const App = () => (
