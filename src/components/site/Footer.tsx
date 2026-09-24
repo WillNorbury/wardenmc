@@ -141,7 +141,7 @@ const Footer = () => (
               <dd className="text-foreground">26.x Velocity</dd>
             </div>
           </dl>
-          <a href="https://discord.gg/AjFfxDT7Wc" target="_blank" rel="noreferrer" className={`${footerLink} mt-4`}>
+          <a href="https://discord.gg/wD6K3nr2MG" target="_blank" rel="noreferrer" className={`${footerLink} mt-4`}>
             Join the Discord →
           </a>
         </div>
