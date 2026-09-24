@@ -36,6 +36,8 @@ import Profile from "./pages/Profile.tsx";
 import UserProfile from "./pages/UserProfile.tsx";
 import Users from "./pages/Users.tsx";
 import Plugins from "./pages/Plugins.tsx";
+import PluginCategories from "./pages/PluginCategories.tsx";
+import PluginDevelopers from "./pages/PluginDevelopers.tsx";
 import ModrinthPlugins from "./pages/ModrinthPlugins.tsx";
 import ModrinthPluginDetail from "./pages/ModrinthPluginDetail.tsx";
 import PluginDetail from "./pages/PluginDetail.tsx";
@@ -221,6 +223,8 @@ const Shell = () => {
                   <Route path="/org/:slug/settings" element={<OrgSettings />} />
 
                  <Route path="/plugins" element={<Plugins />} />
+                  <Route path="/plugins/categories" element={<PluginCategories />} />
+                  <Route path="/plugins/developers" element={<PluginDevelopers />} />
                  <Route path="/modrinth-plugins" element={<ModrinthPlugins />} />
                  <Route path="/modrinth-plugins/:projectId" element={<ModrinthPluginDetail />} />
                   <Route path="/plugin/:slug" element={<PluginDetail />} />

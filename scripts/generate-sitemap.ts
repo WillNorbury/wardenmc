@@ -31,6 +31,8 @@ const entries: SitemapEntry[] = [
   { path: "/users", changefreq: "weekly", priority: "0.6" },
   { path: "/mods", changefreq: "daily", priority: "0.8" },
   { path: "/plugins", changefreq: "daily", priority: "0.8" },
+  { path: "/plugins/categories", changefreq: "weekly", priority: "0.7" },
+  { path: "/plugins/developers", changefreq: "weekly", priority: "0.7" },
   { path: "/resource-packs", changefreq: "daily", priority: "0.7" },
   { path: "/data-packs", changefreq: "daily", priority: "0.7" },
   { path: "/shaders", changefreq: "daily", priority: "0.7" },
