@@ -165,10 +165,10 @@ export default function Plugins() {
               <div><h2 className="font-display text-2xl font-bold">All Plugins</h2><p className="mt-1 text-sm text-muted-foreground">Browse every published plugin in the WardenMC ecosystem.</p></div>
               {activeFilterCount > 0 && <Button variant="ghost" onClick={clearFilters}>Clear Filters</Button>}
             </div>
-            <div className="flex gap-7">
+            <div className="flex flex-col gap-7 lg:flex-row">
               <PluginFilters value={filters} onChange={updateFilters} versions={availableVersions} activeCount={activeFilterCount} onClear={clearFilters} />
               <div className="min-w-0 flex-1">
-                <div className="mb-4 flex items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{loading ? "Loading plugins…" : `Showing ${filtered.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length} plugins`}</p><div className="lg:hidden"><PluginFilters value={filters} onChange={updateFilters} versions={availableVersions} activeCount={activeFilterCount} onClear={clearFilters} /></div></div>
+                <div className="mb-4 flex items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{loading ? "Loading plugins…" : `Showing ${filtered.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length} plugins`}</p></div>
                 {loading ? (
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{Array.from({ length: 6 }).map((_, index) => <div key={index} className="h-[330px] animate-pulse rounded-md border border-border bg-card/60" />)}</div>
                 ) : loadError ? (

@@ -64,6 +64,8 @@ const GROUPS: { title: string; links: { to: string; label: string }[] }[] = [
       { to: "/economy-guide", label: "Economy Guide" },
       { to: "/building-guide", label: "Building Guide" },
       { to: "/plugins", label: "Plugins" },
+      { to: "/plugins/categories", label: "Plugin Categories" },
+      { to: "/plugins/developers", label: "Plugin Developers" },
       { to: "/skripts", label: "Skripts" },
       { to: "/servers", label: "Servers" },
     ],
