@@ -133,6 +133,15 @@ type RawPlugin = {
   updated_at: string;
 };
 
+type RawOrg = {
+  id: string;
+  name: string | null;
+  slug: string | null;
+  description: string | null;
+  avatar_url: string | null;
+  updated_at: string | null;
+};
+
 type RawProfile = {
   id: string;
   display_name: string | null;
@@ -183,8 +192,12 @@ export async function loadPluginDirectory(userId?: string | null) {
   const rows = (data ?? []) as RawPlugin[];
   const pluginIds = rows.map((plugin) => plugin.id);
   const userIds = [...new Set(rows.map((plugin) => plugin.user_id).filter((id): id is string => Boolean(id)))];
+  const orgIds = [...new Set(rows.map((plugin) => plugin.org_id).filter((id): id is string => Boolean(id)))];
 
-  const [profilesResult, downloadsResult, favoritesResult, myFavoritesResult, rolesResult, ...reviewResults] = await Promise.all([
+  const [profilesResult, orgsResult, downloadsResult, favoritesResult, myFavoritesResult, rolesResult, ...reviewResults] = await Promise.all([
+    orgIds.length
+      ? supabase.from("organizations_public").select("id, name, slug, description, avatar_url, updated_at").in("id", orgIds)
+      : Promise.resolve({ data: [], error: null }),
     userIds.length
       ? supabase.from("profiles").select("id, display_name, mc_username, avatar_url, bio, verified, updated_at").in("id", userIds)
       : Promise.resolve({ data: [], error: null }),
