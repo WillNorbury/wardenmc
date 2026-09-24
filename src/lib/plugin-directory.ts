@@ -194,7 +194,7 @@ export async function loadPluginDirectory(userId?: string | null) {
   const userIds = [...new Set(rows.map((plugin) => plugin.user_id).filter((id): id is string => Boolean(id)))];
   const orgIds = [...new Set(rows.map((plugin) => plugin.org_id).filter((id): id is string => Boolean(id)))];
 
-  const [profilesResult, orgsResult, downloadsResult, favoritesResult, myFavoritesResult, rolesResult, ...reviewResults] = await Promise.all([
+  const [orgsResult, profilesResult, downloadsResult, favoritesResult, myFavoritesResult, rolesResult, ...reviewResults] = await Promise.all([
     orgIds.length
       ? supabase.from("organizations_public").select("id, name, slug, description, avatar_url, updated_at").in("id", orgIds)
       : Promise.resolve({ data: [], error: null }),
