@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import PluginVersionsDialog from "./PluginVersionsDialog";
 import { MultiTagInput } from "@/components/ui/multi-tag-input";
+import { McVersionSelect } from "./McVersionSelect";
 import { MC_VERSIONS } from "@/lib/plugin-directory";
 import FoliaBadge, { supportsFolia } from "@/components/site/FoliaBadge";
 import { confirm } from "@/lib/confirm";
