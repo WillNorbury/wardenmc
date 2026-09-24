@@ -1,12 +1,10 @@
+import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ChevronDown, X } from "lucide-react";
 
 interface McVersionSelectProps {
   values: string[];
@@ -16,16 +14,30 @@ interface McVersionSelectProps {
 
 /**
  * Multi-select dropdown for Minecraft versions.
- * Selected versions show as removable badges; the dropdown adds a version.
+ * A popover with checkboxes lets you pick several at once; selected
+ * versions show as removable badges and are filtered out of the list.
  */
 export function McVersionSelect({ values, onChange, options }: McVersionSelectProps) {
-  const remaining = options.filter(
-    (o) => !values.some((v) => v.toLowerCase() === o.toLowerCase()),
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const selectedSet = useMemo(
+    () => new Set(values.map((v) => v.toLowerCase())),
+    [values],
   );
 
-  const add = (v: string) => {
-    if (!v || values.some((x) => x.toLowerCase() === v.toLowerCase())) return;
-    onChange([...values, v]);
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((o) => o.toLowerCase().includes(q));
+  }, [options, query]);
+
+  const toggle = (v: string) => {
+    if (selectedSet.has(v.toLowerCase())) {
+      onChange(values.filter((x) => x !== v));
+    } else {
+      onChange([...values, v]);
+    }
   };
 
   const remove = (v: string) => onChange(values.filter((x) => x !== v));
@@ -49,22 +61,51 @@ export function McVersionSelect({ values, onChange, options }: McVersionSelectPr
           ))}
         </div>
       )}
-      {remaining.length > 0 ? (
-        <Select value="" onValueChange={add}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a Minecraft version…" />
-          </SelectTrigger>
-          <SelectContent className="max-h-64 overflow-y-auto">
-            {remaining.map((v) => (
-              <SelectItem key={v} value={v}>
-                {v}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      ) : (
-        <p className="text-xs text-muted-foreground">All versions selected.</p>
-      )}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            className="w-full justify-between font-normal"
+          >
+            {values.length > 0
+              ? `${values.length} version${values.length > 1 ? "s" : ""} selected`
+              : "Select Minecraft versions…"}
+            <ChevronDown className="h-4 w-4 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+          <div className="p-2 border-b">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Filter versions…"
+              className="h-8"
+            />
+          </div>
+          <div className="max-h-64 overflow-y-auto p-1">
+            {filtered.length === 0 ? (
+              <p className="text-xs text-muted-foreground px-2 py-4 text-center">
+                No versions match.
+              </p>
+            ) : (
+              filtered.map((v) => {
+                const checked = selectedSet.has(v.toLowerCase());
+                return (
+                  <label
+                    key={v}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent cursor-pointer text-sm"
+                  >
+                    <Checkbox checked={checked} onCheckedChange={() => toggle(v)} />
+                    {v}
+                  </label>
+                );
+              })
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
