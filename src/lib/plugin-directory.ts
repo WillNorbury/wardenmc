@@ -21,21 +21,73 @@ export const PLUGIN_PLATFORMS = ["Paper", "Spigot", "Purpur", "Folia", "Velocity
 
 // Canonical Minecraft release versions, newest first. Includes the 26.x line.
 export const MC_VERSIONS = [
-  "26.3", "26.2", "26.1", "26.0",
-  "1.21.11", "1.21.10", "1.21.9", "1.21.8", "1.21.7", "1.21.6", "1.21.5", "1.21.4", "1.21.3", "1.21.2", "1.21.1", "1.21",
-  "1.20.6", "1.20.5", "1.20.4", "1.20.3", "1.20.2", "1.20.1", "1.20",
-  "1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19",
-  "1.18.2", "1.18.1", "1.18",
-  "1.17.1", "1.17",
-  "1.16.5", "1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16",
-  "1.15.2", "1.15.1", "1.15",
-  "1.14.4", "1.14.3", "1.14.2", "1.14.1", "1.14",
-  "1.13.2", "1.13.1", "1.13",
-  "1.12.2", "1.12.1", "1.12",
-  "1.11.2", "1.11.1", "1.11",
-  "1.10.2", "1.10.1", "1.10",
-  "1.9.4", "1.9.2", "1.9.1", "1.9",
-  "1.8.9", "1.8.8", "1.8",
+  "26.3",
+  "26.2",
+  "26.1.2",
+  "26.1.1",
+  "26.1",
+  "1.21.11",
+  "1.21.10",
+  "1.21.9",
+  "1.21.8",
+  "1.21.7",
+  "1.21.6",
+  "1.21.5",
+  "1.21.4",
+  "1.21.3",
+  "1.21.2",
+  "1.21.1",
+  "1.21",
+  "1.20.6",
+  "1.20.5",
+  "1.20.4",
+  "1.20.3",
+  "1.20.2",
+  "1.20.1",
+  "1.20",
+  "1.19.4",
+  "1.19.3",
+  "1.19.2",
+  "1.19.1",
+  "1.19",
+  "1.18.2",
+  "1.18.1",
+  "1.18",
+  "1.17.1",
+  "1.17",
+  "1.16.5",
+  "1.16.4",
+  "1.16.3",
+  "1.16.2",
+  "1.16.1",
+  "1.16",
+  "1.15.2",
+  "1.15.1",
+  "1.15",
+  "1.14.4",
+  "1.14.3",
+  "1.14.2",
+  "1.14.1",
+  "1.14",
+  "1.13.2",
+  "1.13.1",
+  "1.13",
+  "1.12.2",
+  "1.12.1",
+  "1.12",
+  "1.11.2",
+  "1.11.1",
+  "1.11",
+  "1.10.2",
+  "1.10.1",
+  "1.10",
+  "1.9.4",
+  "1.9.2",
+  "1.9.1",
+  "1.9",
+  "1.8.9",
+  "1.8.8",
+  "1.8",
 ] as const;
 
 export const CATEGORY_DESCRIPTIONS: Record<(typeof PLUGIN_CATEGORIES)[number], string> = {
@@ -184,7 +236,9 @@ export const normalizePlatform = (platform: string) => {
 };
 
 export const formatCompactNumber = (value: number) =>
-  new Intl.NumberFormat("en", { notation: value >= 1000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
+  new Intl.NumberFormat("en", { notation: value >= 1000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(
+    value,
+  );
 
 export const formatRelativeDate = (iso: string) => {
   const seconds = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
@@ -203,7 +257,9 @@ export const formatRelativeDate = (iso: string) => {
 export async function loadPluginDirectory(userId?: string | null) {
   const { data, error } = await supabase
     .from("plugins")
-    .select("id, short_id, slug, name, description, author, user_id, org_id, icon_url, category, tags, platform, platforms, mc_versions, featured, created_at, updated_at")
+    .select(
+      "id, short_id, slug, name, description, author, user_id, org_id, icon_url, category, tags, platform, platforms, mc_versions, featured, created_at, updated_at",
+    )
     .eq("published", true)
     .order("updated_at", { ascending: false });
 
@@ -213,12 +269,26 @@ export async function loadPluginDirectory(userId?: string | null) {
   const userIds = [...new Set(rows.map((plugin) => plugin.user_id).filter((id): id is string => Boolean(id)))];
   const orgIds = [...new Set(rows.map((plugin) => plugin.org_id).filter((id): id is string => Boolean(id)))];
 
-  const [orgsResult, profilesResult, downloadsResult, favoritesResult, myFavoritesResult, rolesResult, ...reviewResults] = await Promise.all([
+  const [
+    orgsResult,
+    profilesResult,
+    downloadsResult,
+    favoritesResult,
+    myFavoritesResult,
+    rolesResult,
+    ...reviewResults
+  ] = await Promise.all([
     orgIds.length
-      ? supabase.from("organizations_public").select("id, name, slug, description, avatar_url, updated_at").in("id", orgIds)
+      ? supabase
+          .from("organizations_public")
+          .select("id, name, slug, description, avatar_url, updated_at")
+          .in("id", orgIds)
       : Promise.resolve({ data: [], error: null }),
     userIds.length
-      ? supabase.from("profiles").select("id, display_name, mc_username, avatar_url, bio, verified, updated_at").in("id", userIds)
+      ? supabase
+          .from("profiles")
+          .select("id, display_name, mc_username, avatar_url, bio, verified, updated_at")
+          .in("id", userIds)
       : Promise.resolve({ data: [], error: null }),
     pluginIds.length
       ? supabase.rpc("get_plugin_download_counts", { _plugin_ids: pluginIds })
@@ -232,7 +302,9 @@ export async function loadPluginDirectory(userId?: string | null) {
     userIds.length
       ? supabase.from("user_roles").select("user_id, role").in("user_id", userIds)
       : Promise.resolve({ data: [], error: null }),
-    ...pluginIds.map((pluginId) => supabase.rpc("get_public_item_reviews", { _target_type: "plugin", _target_id: pluginId })),
+    ...pluginIds.map((pluginId) =>
+      supabase.rpc("get_public_item_reviews", { _target_type: "plugin", _target_id: pluginId }),
+    ),
   ]);
 
   const profiles = new Map(((profilesResult.data ?? []) as RawProfile[]).map((profile) => [profile.id, profile]));
@@ -243,10 +315,16 @@ export async function loadPluginDirectory(userId?: string | null) {
       .map((row) => row.user_id),
   );
   const downloadMap = new Map(
-    ((downloadsResult.data ?? []) as { plugin_id: string; total: number }[]).map((row) => [row.plugin_id, Number(row.total) || 0]),
+    ((downloadsResult.data ?? []) as { plugin_id: string; total: number }[]).map((row) => [
+      row.plugin_id,
+      Number(row.total) || 0,
+    ]),
   );
   const favoriteMap = new Map(
-    ((favoritesResult.data ?? []) as { plugin_id: string; total: number }[]).map((row) => [row.plugin_id, Number(row.total) || 0]),
+    ((favoritesResult.data ?? []) as { plugin_id: string; total: number }[]).map((row) => [
+      row.plugin_id,
+      Number(row.total) || 0,
+    ]),
   );
   const myFavorites = new Set(((myFavoritesResult.data ?? []) as { plugin_id: string }[]).map((row) => row.plugin_id));
 
@@ -256,7 +334,9 @@ export async function loadPluginDirectory(userId?: string | null) {
     const reviewTotal = reviewRows.reduce((sum, review) => sum + Number(review.rating), 0);
     const verified = Boolean(profile?.verified || (row.user_id && staffIds.has(row.user_id)));
     const developerName = profile?.display_name || profile?.mc_username || row.author || "WardenMC Community";
-    const platforms = [...new Set((row.platforms?.length ? row.platforms : row.platform ? [row.platform] : []).map(normalizePlatform))];
+    const platforms = [
+      ...new Set((row.platforms?.length ? row.platforms : row.platform ? [row.platform] : []).map(normalizePlatform)),
+    ];
     const org = row.org_id ? orgs.get(row.org_id) : undefined;
     const developer: PluginCreator = org
       ? {
@@ -326,7 +406,7 @@ export const buildDevelopers = (plugins: PluginDirectoryItem[]): PluginDeveloper
     }
     const combinedReviews = existing.reviewCount + plugin.reviews;
     existing.rating = combinedReviews
-      ? ((existing.rating * existing.reviewCount) + (plugin.rating * plugin.reviews)) / combinedReviews
+      ? (existing.rating * existing.reviewCount + plugin.rating * plugin.reviews) / combinedReviews
       : 0;
     existing.reviewCount = combinedReviews;
     existing.pluginCount += 1;
