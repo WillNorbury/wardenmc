@@ -120,7 +120,7 @@ const slugify = (s: string) =>
     .replace(/^-+|-+$/g, "");
 
 const PLATFORMS = ["paper", "spigot", "bukkit", "folia", "purpur", "velocity", "bungeecord"];
-const MC_VERSIONS_SUGGEST = ["1.21.4", "1.21", "1.20.6", "1.20.4", "1.20.1", "1.19.4", "1.19.2", "1.18.2"];
+const MC_VERSIONS_SUGGEST = [...MC_VERSIONS];
 
 const pluginPlatforms = (p: Plugin): string[] =>
   p.platforms && p.platforms.length ? p.platforms : p.platform ? [p.platform] : [];
