@@ -16,7 +16,7 @@ import {
   PluginStats,
   type PluginFilterState,
 } from "@/components/plugins/PluginDirectoryComponents";
-import { PLUGIN_CATEGORIES, loadPluginDirectory, type PluginDirectoryItem } from "@/lib/plugin-directory";
+import { MC_VERSIONS, PLUGIN_CATEGORIES, loadPluginDirectory, type PluginDirectoryItem } from "@/lib/plugin-directory";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -74,7 +74,7 @@ export default function Plugins() {
     updateFilters(EMPTY_FILTERS);
   };
 
-  const availableVersions = useMemo(() => [...new Set(plugins.flatMap((plugin) => plugin.versions))].sort((a, b) => b.localeCompare(a, undefined, { numeric: true })), [plugins]);
+  const availableVersions = useMemo(() => [...new Set([...MC_VERSIONS, ...plugins.flatMap((plugin) => plugin.versions)])].sort((a, b) => b.localeCompare(a, undefined, { numeric: true })), [plugins]);
   const activeFilterCount = Object.values(filters).filter(Boolean).length + (query.trim() ? 1 : 0);
 
   const filtered = useMemo(() => {
