@@ -217,6 +217,7 @@ export async function loadPluginDirectory(userId?: string | null) {
   ]);
 
   const profiles = new Map(((profilesResult.data ?? []) as RawProfile[]).map((profile) => [profile.id, profile]));
+  const orgs = new Map(((orgsResult.data ?? []) as RawOrg[]).map((org) => [org.id, org]));
   const staffIds = new Set(
     ((rolesResult.data ?? []) as { user_id: string; role: string }[])
       .filter((row) => isStaffRole(row.role))
@@ -237,16 +238,28 @@ export async function loadPluginDirectory(userId?: string | null) {
     const verified = Boolean(profile?.verified || (row.user_id && staffIds.has(row.user_id)));
     const developerName = profile?.display_name || profile?.mc_username || row.author || "WardenMC Community";
     const platforms = [...new Set((row.platforms?.length ? row.platforms : row.platform ? [row.platform] : []).map(normalizePlatform))];
-    const developer: PluginCreator = {
-      id: row.user_id ?? `author:${developerName.toLowerCase()}`,
-      username: profile?.mc_username || profile?.display_name || developerName,
-      displayName: developerName,
-      avatar: profile?.avatar_url ?? null,
-      bio: profile?.bio ?? null,
-      verified,
-      profilePath: profile ? userProfilePath(profile) : null,
-      updatedAt: profile?.updated_at ?? row.updated_at,
-    };
+    const org = row.org_id ? orgs.get(row.org_id) : undefined;
+    const developer: PluginCreator = org
+      ? {
+          id: `org:${org.id}`,
+          username: org.slug ?? org.name ?? "organization",
+          displayName: org.name ?? developerName,
+          avatar: org.avatar_url,
+          bio: org.description,
+          verified,
+          profilePath: org.slug ? `/organization/${org.slug}` : null,
+          updatedAt: org.updated_at ?? row.updated_at,
+        }
+      : {
+          id: row.user_id ?? `author:${developerName.toLowerCase()}`,
+          username: profile?.mc_username || profile?.display_name || developerName,
+          displayName: developerName,
+          avatar: profile?.avatar_url ?? null,
+          bio: profile?.bio ?? null,
+          verified,
+          profilePath: profile ? userProfilePath(profile) : null,
+          updatedAt: profile?.updated_at ?? row.updated_at,
+        };
 
     return {
       id: row.id,
