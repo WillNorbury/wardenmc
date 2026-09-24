@@ -121,6 +121,7 @@ type RawPlugin = {
   description: string | null;
   author: string | null;
   user_id: string | null;
+  org_id: string | null;
   icon_url: string | null;
   category: string | null;
   tags: string[];
@@ -174,7 +175,7 @@ export const formatRelativeDate = (iso: string) => {
 export async function loadPluginDirectory(userId?: string | null) {
   const { data, error } = await supabase
     .from("plugins")
-    .select("id, short_id, slug, name, description, author, user_id, icon_url, category, tags, platform, platforms, mc_versions, featured, created_at, updated_at")
+    .select("id, short_id, slug, name, description, author, user_id, org_id, icon_url, category, tags, platform, platforms, mc_versions, featured, created_at, updated_at")
     .eq("published", true)
     .order("updated_at", { ascending: false });
 
