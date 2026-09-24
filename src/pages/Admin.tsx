@@ -1677,7 +1677,7 @@ const StatusTab = () => {
             { key: "minecraft", name: "Minecraft Server", desc: "warden.rip", url: "" },
             { key: "api", name: "API & Database", desc: "Backend services", url: "" },
             { key: "panel", name: "Panel", desc: "dash.nightly.host", url: "" },
-            { key: "discord", name: "Discord Server", desc: "https://discord.gg/wD6K3nr2MG", url: "" },
+            { key: "discord", name: "Discord Server", desc: "https://discord.warden.rip", url: "https://discord.warden.rip" },
           ],
         }));
       });

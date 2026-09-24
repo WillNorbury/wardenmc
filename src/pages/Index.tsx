@@ -146,7 +146,7 @@ const Index = () => {
 
   // Fetch live Discord member count via server-side proxy (reliable, no CORS/rate-limit issues)
   useEffect(() => {
-    const inviteRaw: string = content.server?.discord ?? "https://discord.gg/wD6K3nr2MG";
+    const inviteRaw: string = content.server?.discord ?? "https://discord.warden.rip";
     let cancelled = false;
 
     const isTransient = (msg: string) =>
@@ -455,7 +455,7 @@ const Index = () => {
                 asChild
                 className="font-display uppercase tracking-wider px-7 border-primary/40 hover:border-primary hover:text-primary"
               >
-                <a href={content.server?.discord ?? "https://discord.gg/wD6K3nr2MG"} target="_blank" rel="noreferrer">
+                <a href={content.server?.discord ?? "https://discord.warden.rip"} target="_blank" rel="noreferrer">
                   <MessageCircle className="h-4 w-4 mr-2" /> Discord
                 </a>
               </Button>
@@ -717,7 +717,7 @@ const Index = () => {
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Button size="lg" asChild className="glow font-display uppercase tracking-wider">
                     <a
-                      href={content.server?.discord ?? "https://discord.gg/wD6K3nr2MG"}
+                      href={content.server?.discord ?? "https://discord.warden.rip"}
                       target="_blank"
                       rel="noreferrer"
                     >
