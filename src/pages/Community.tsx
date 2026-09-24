@@ -60,7 +60,7 @@ const Community = () => {
               <h2 className="font-display text-2xl font-bold mb-2">Join our Discord</h2>
               <p className="text-sm text-muted-foreground mb-5">Get real-time updates, voice with friends, and chat directly with staff.</p>
               <Button asChild className="glow w-full">
-                <a href="https://discord.gg/wD6K3nr2MG" target="_blank" rel="noreferrer">
+                <a href="https://discord.warden.rip" target="_blank" rel="noreferrer">
                   Join Discord <ArrowRight className="h-4 w-4 ml-1" />
                 </a>
               </Button>

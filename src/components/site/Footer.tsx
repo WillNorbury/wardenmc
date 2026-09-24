@@ -25,7 +25,7 @@ const Discord = ({ className }: { className?: string }) => (
 );
 
 const SOCIALS = [
-  { icon: Discord, href: "https://discord.gg/wD6K3nr2MG", label: "Discord" },
+  { icon: Discord, href: "https://discord.warden.rip", label: "Discord" },
   { icon: TikTok, href: "https://tiktok.com/@play.warden.rip", label: "TikTok" },
   { icon: Youtube, href: "https://youtube.com/@WillNorbury", label: "YouTube" },
   { icon: Twitch, href: "https://twitch.tv/Will_Norbury", label: "Twitch" },
@@ -141,7 +141,7 @@ const Footer = () => (
               <dd className="text-foreground">26.x Velocity</dd>
             </div>
           </dl>
-          <a href="https://discord.gg/wD6K3nr2MG" target="_blank" rel="noreferrer" className={`${footerLink} mt-4`}>
+          <a href="https://discord.warden.rip" target="_blank" rel="noreferrer" className={`${footerLink} mt-4`}>
             Join the Discord →
           </a>
         </div>

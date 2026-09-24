@@ -72,7 +72,7 @@ const DEFAULT_SERVICES: Service[] = [
   { key: "minecraft", name: "Minecraft Server", desc: "mc.warden.rip", url: "" },
   { key: "api", name: "API & Database", desc: "Backend services", url: "" },
   { key: "panel", name: "Panel", desc: "dash.nightly.host", url: "https://dash.nightly.host" },
-  { key: "discord", name: "Discord Server", desc: "https://discord.gg/wD6K3nr2MG", url: "https://discord.warden.rip" },
+  { key: "discord", name: "Discord Server", desc: "https://discord.warden.rip", url: "https://discord.warden.rip" },
 ];
 
 const toDayKey = (d: Date) => d.toISOString().slice(0, 10);
