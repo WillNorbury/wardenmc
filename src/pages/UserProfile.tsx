@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { VerifiedBadge } from "@/components/site/VerifiedBadge";
+import AffiliatesCard from "@/components/site/AffiliatesCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -641,6 +642,7 @@ const UserProfile = () => {
           </div>
 
           <aside className="space-y-4">
+            <AffiliatesCard profileId={profile.id} isOwn={isOwn} viewerId={user?.id} />
             <Card className="p-5">
               <h3 className="font-bold mb-3 flex items-center gap-2">
                 <Building2 className="h-4 w-4" /> Organizations
