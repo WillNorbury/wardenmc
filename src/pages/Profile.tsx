@@ -30,6 +30,7 @@ import { applyTheme, DEFAULT_PREFS, type UserPreferences } from "@/lib/preferenc
 import { toast } from "sonner";
 import { Bell, ExternalLink, Loader2, Lock, MessageCircle, Palette, Unlink } from "lucide-react";
 import OrganizationsCard from "@/components/site/OrganizationsCard";
+import AffiliatesCard from "@/components/site/AffiliatesCard";
 import TwoFactorCard from "@/components/profile/TwoFactorCard";
 import MyPluginsPanel from "@/components/dashboard/MyPluginsPanel";
 
@@ -363,6 +364,7 @@ const Profile = () => {
         </Card>
 
         <OrganizationsCard userId={user!.id} />
+        <AffiliatesCard profileId={user!.id} isOwn viewerId={user!.id} />
 
         <div className="mt-6">
           <MyPluginsPanel userId={user!.id} />
