@@ -691,13 +691,6 @@ const UserProfile = () => {
               )}
             </Card>
 
-            <Card className="p-5">
-              <h3 className="font-bold mb-3">Followers</h3>
-              <div className="text-2xl font-display font-bold text-glow">{followerCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {followerCount === 1 ? "person follows" : "people follow"} this member
-              </p>
-            </Card>
           </aside>
         </div>
       </main>
