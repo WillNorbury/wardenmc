@@ -292,7 +292,7 @@ export async function loadPluginDirectory(userId?: string | null) {
     favoritesResult,
     myFavoritesResult,
     rolesResult,
-    ...reviewResults
+    ratingsResult,
   ] = await Promise.all([
     orgIds.length
       ? supabase
