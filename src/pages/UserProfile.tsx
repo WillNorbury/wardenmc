@@ -5,6 +5,7 @@ import Footer from "@/components/site/Footer";
 import { VerifiedBadge } from "@/components/site/VerifiedBadge";
 import AffiliatesCard from "@/components/site/AffiliatesCard";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -438,53 +439,30 @@ const UserProfile = () => {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 pt-24 pb-16 max-w-6xl">
-        {/* Header row */}
-        <div className="flex items-start gap-5 pb-6 border-b border-border">
-          <Avatar className="h-24 w-24 rounded-full border border-border shrink-0">
-            <AvatarImage src={avatar} />
-            <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-          </Avatar>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+        <div className="min-w-0 rounded-xl border border-border overflow-hidden bg-card/40">
+        {/* Banner */}
+        <div className="h-36 md:h-48 bg-gradient-to-br from-primary/40 via-primary/15 to-accent/30 relative">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,hsl(var(--primary)/0.35),transparent_60%)]" />
+        </div>
 
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl md:text-3xl font-display font-bold leading-tight flex items-center gap-2">
-              {profile.display_name ?? "Unnamed Player"}
-              {((profile as any).verified || roles.some(isVerifiedRole)) && <VerifiedBadge className="h-6 w-6" />}
-            </h1>
-            {profile.bio ? (
-              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{profile.bio}</p>
-            ) : isOwn ? (
-              <p className="text-sm text-muted-foreground/70 italic mt-1">
-                Add a bio to tell people about yourself.
-              </p>
-            ) : null}
+        <div className="px-4 md:px-6">
+          {/* Avatar + actions */}
+          <div className="flex items-end justify-between -mt-12 md:-mt-16">
+            <Avatar className="h-24 w-24 md:h-32 md:w-32 rounded-full border-4 border-background shrink-0 bg-background">
+              <AvatarImage src={avatar} />
+              <AvatarFallback className="text-3xl">{initials}</AvatarFallback>
+            </Avatar>
 
-            <div className="flex items-center gap-5 mt-3 text-sm text-muted-foreground flex-wrap">
-              <span className="flex items-center gap-1.5">
-                <Package className="h-4 w-4" />
-                <strong className="text-foreground">{projects.length}</strong> project{projects.length === 1 ? "" : "s"}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Download className="h-4 w-4" />
-                <strong className="text-foreground">0</strong> downloads
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4" />
-                Joined {timeAgo(profile.created_at)}
-              </span>
-              {roles.length > 0 && roles.slice(0, 3).map((r) => (
-                <Badge key={r} variant="secondary" className="rounded-full">{roleLabel(r)}</Badge>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 pb-2">
             {isOwn ? (
-              <Button variant="outline" size="sm" className="rounded-md" onClick={openEdit}>
-                <Pencil className="h-4 w-4 mr-1.5" /> Edit
+              <Button variant="outline" size="sm" className="rounded-full" onClick={openEdit}>
+                <Pencil className="h-4 w-4 mr-1.5" /> Edit profile
               </Button>
             ) : user ? (
               <Button
                 size="sm"
+                className="rounded-full"
                 variant={isFollowing ? "outline" : "default"}
                 onClick={toggleFollow}
                 disabled={followBusy}
@@ -500,14 +478,14 @@ const UserProfile = () => {
             ) : null}
 
             {profile.mc_username && (
-              <Button asChild variant="outline" size="sm" className="rounded-md">
+              <Button asChild variant="outline" size="sm" className="rounded-full">
                 <Link to={`/punishments/${encodeURIComponent(profile.mc_username)}`}>Punishments</Link>
               </Button>
             )}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-md" aria-label="More">
+                <Button variant="outline" size="icon" className="rounded-full h-9 w-9" aria-label="More">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -545,15 +523,51 @@ const UserProfile = () => {
               />
             )}
           </div>
+          </div>
+
+          {/* Name, handle, bio */}
+          <div className="mt-3">
+            <h1 className="text-xl md:text-2xl font-display font-bold leading-tight flex items-center gap-1.5">
+              {profile.display_name ?? "Unnamed Player"}
+              {((profile as any).verified || roles.some(isVerifiedRole)) && <VerifiedBadge className="h-5 w-5" />}
+            </h1>
+            {profile.mc_username && (
+              <p className="text-sm text-muted-foreground">@{profile.mc_username}</p>
+            )}
+            {profile.bio ? (
+              <p className="text-sm mt-3 whitespace-pre-line">{profile.bio}</p>
+            ) : isOwn ? (
+              <p className="text-sm text-muted-foreground/70 italic mt-3">Add a bio to tell people about yourself.</p>
+            ) : null}
+
+            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground flex-wrap">
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4" /> Joined {timeAgo(profile.created_at)}
+              </span>
+              {roles.slice(0, 3).map((r) => (
+                <Badge key={r} variant="secondary" className="rounded-full">{roleLabel(r)}</Badge>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-5 mt-3 text-sm">
+              <span><strong className="text-foreground">{followerCount}</strong> <span className="text-muted-foreground">Followers</span></span>
+              <span><strong className="text-foreground">{projects.length}</strong> <span className="text-muted-foreground">Projects</span></span>
+              <span><strong className="text-foreground">{orgs.length}</strong> <span className="text-muted-foreground">Organizations</span></span>
+            </div>
+          </div>
         </div>
 
-        {/* Gameplay stats */}
+        <Tabs defaultValue="projects" className="mt-4">
+          <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent p-0 h-auto">
+            <TabsTrigger value="projects" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Projects</TabsTrigger>
+            {stats && (
+              <TabsTrigger value="stats" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Stats</TabsTrigger>
+            )}
+          </TabsList>
+
         {stats && (
-          <Card className="p-5 mt-6">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
-              <Swords className="h-4 w-4 text-primary" /> In-Game Stats
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          <TabsContent value="stats" className="p-4 md:p-6 mt-0">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { label: "Kills", value: stats.kills.toLocaleString(), icon: Swords },
                 { label: "Deaths", value: stats.deaths.toLocaleString(), icon: Skull },
@@ -575,15 +589,12 @@ const UserProfile = () => {
               })}
             </div>
             {stats.last_seen_at && (
-              <p className="text-xs text-muted-foreground mt-3">
-                Last seen {timeAgo(stats.last_seen_at)}
-              </p>
+              <p className="text-xs text-muted-foreground mt-3">Last seen {timeAgo(stats.last_seen_at)}</p>
             )}
-          </Card>
+          </TabsContent>
         )}
 
-        {/* Body: projects + sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 mt-6">
+          <TabsContent value="projects" className="p-4 md:p-6 mt-0">
           <div className="space-y-3">
             {projects.length === 0 ? (
               <Card className="p-10 text-center">
@@ -640,6 +651,9 @@ const UserProfile = () => {
               })
             )}
           </div>
+          </TabsContent>
+        </Tabs>
+        </div>
 
           <aside className="space-y-4">
             <AffiliatesCard profileId={profile.id} isOwn={isOwn} viewerId={user?.id} />
@@ -677,13 +691,6 @@ const UserProfile = () => {
               )}
             </Card>
 
-            <Card className="p-5">
-              <h3 className="font-bold mb-3">Followers</h3>
-              <div className="text-2xl font-display font-bold text-glow">{followerCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {followerCount === 1 ? "person follows" : "people follow"} this member
-              </p>
-            </Card>
           </aside>
         </div>
       </main>
