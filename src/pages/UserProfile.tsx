@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
+import { VerifiedBadge } from "@/components/site/VerifiedBadge";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -144,7 +145,7 @@ const UserProfile = () => {
       setNotFound(false);
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name, avatar_url, mc_username, bio, created_at");
+        .select("id, display_name, avatar_url, mc_username, bio, created_at, verified");
       const match = (profiles ?? []).find((p) => matchesUserSlug(p, slug))
         ?? (user?.id.toLowerCase().startsWith(slug.trim().toLowerCase())
           ? (profiles ?? []).find((p) => p.id === user.id)
@@ -444,8 +445,9 @@ const UserProfile = () => {
           </Avatar>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl md:text-3xl font-display font-bold leading-tight">
+            <h1 className="text-2xl md:text-3xl font-display font-bold leading-tight flex items-center gap-2">
               {profile.display_name ?? "Unnamed Player"}
+              {(profile as any).verified && <VerifiedBadge className="h-6 w-6" />}
             </h1>
             {profile.bio ? (
               <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{profile.bio}</p>

@@ -9,9 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_ROLES, roleLabel, type AppRole } from "@/lib/roles";
 import { userProfilePath } from "@/lib/userSlug";
+import { VerifiedBadge } from "@/components/site/VerifiedBadge";
 import { Loader2, Search, Users as UsersIcon } from "lucide-react";
 
 type Profile = {
+  verified?: boolean | null;
   id: string;
   display_name: string | null;
   avatar_url: string | null;
@@ -34,7 +36,7 @@ const Users = () => {
     document.title = "Members — Warden Network";
     (async () => {
       const [{ data: p }, { data: r }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, avatar_url, mc_username, created_at").order("created_at", { ascending: false }),
+        supabase.from("profiles").select("id, display_name, avatar_url, mc_username, created_at, verified").order("created_at", { ascending: false }),
         supabase.from("user_roles").select("user_id, role"),
       ]);
       const grouped: Record<string, AppRole[]> = {};
@@ -101,7 +103,7 @@ const Users = () => {
                         <AvatarFallback>{initials}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <div className="font-medium truncate">{p.display_name ?? "Unnamed"}</div>
+                        <div className="font-medium truncate flex items-center gap-1"><span className="truncate">{p.display_name ?? "Unnamed"}</span>{p.verified && <VerifiedBadge className="h-4 w-4 shrink-0" />}</div>
                         <div className="text-xs text-muted-foreground font-mono truncate">
                           {p.mc_username ? `@${p.mc_username}` : p.id.slice(0, 8)}
                         </div>
