@@ -3269,6 +3269,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_affiliates: {
+        Row: {
+          affiliate_id: string
+          created_at: string
+          id: string
+          owner_id: string
+        }
+        Insert: {
+          affiliate_id: string
+          created_at?: string
+          id?: string
+          owner_id: string
+        }
+        Update: {
+          affiliate_id?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
       user_custom_roles: {
         Row: {
           created_at: string
