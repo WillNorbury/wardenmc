@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { VerifiedBadge } from "@/components/site/VerifiedBadge";
+import AffiliatesCard from "@/components/site/AffiliatesCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,7 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { ALL_ROLES, roleLabel, type AppRole } from "@/lib/roles";
+import { ALL_ROLES, roleLabel, isVerifiedRole, type AppRole } from "@/lib/roles";
 import { matchesUserSlug, userProfileSlug } from "@/lib/userSlug";
 import {
   Loader2,
@@ -447,7 +448,7 @@ const UserProfile = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl md:text-3xl font-display font-bold leading-tight flex items-center gap-2">
               {profile.display_name ?? "Unnamed Player"}
-              {(profile as any).verified && <VerifiedBadge className="h-6 w-6" />}
+              {((profile as any).verified || roles.some(isVerifiedRole)) && <VerifiedBadge className="h-6 w-6" />}
             </h1>
             {profile.bio ? (
               <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{profile.bio}</p>
@@ -641,6 +642,7 @@ const UserProfile = () => {
           </div>
 
           <aside className="space-y-4">
+            <AffiliatesCard profileId={profile.id} isOwn={isOwn} viewerId={user?.id} />
             <Card className="p-5">
               <h3 className="font-bold mb-3 flex items-center gap-2">
                 <Building2 className="h-4 w-4" /> Organizations

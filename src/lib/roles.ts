@@ -71,3 +71,6 @@ export const roleLabelWithEmoji = (v: string) => {
   const r = ALL_ROLES.find((x) => x.value === v);
   return r ? `${r.emoji} ${r.label}` : v;
 };
+
+/** Roles that earn a verified checkmark automatically (staff + media). */
+export const isVerifiedRole = (v: string) => isStaffRole(v) || v === "media";
