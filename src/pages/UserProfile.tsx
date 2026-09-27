@@ -5,6 +5,7 @@ import Footer from "@/components/site/Footer";
 import { VerifiedBadge } from "@/components/site/VerifiedBadge";
 import AffiliatesCard from "@/components/site/AffiliatesCard";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -650,6 +651,9 @@ const UserProfile = () => {
               })
             )}
           </div>
+          </TabsContent>
+        </Tabs>
+        </div>
 
           <aside className="space-y-4">
             <AffiliatesCard profileId={profile.id} isOwn={isOwn} viewerId={user?.id} />
