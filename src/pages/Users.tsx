@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { ALL_ROLES, roleLabel, type AppRole } from "@/lib/roles";
+import { ALL_ROLES, roleLabel, isVerifiedRole, type AppRole } from "@/lib/roles";
 import { userProfilePath } from "@/lib/userSlug";
 import { VerifiedBadge } from "@/components/site/VerifiedBadge";
 import { Loader2, Search, Users as UsersIcon } from "lucide-react";
@@ -103,7 +103,7 @@ const Users = () => {
                         <AvatarFallback>{initials}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <div className="font-medium truncate flex items-center gap-1"><span className="truncate">{p.display_name ?? "Unnamed"}</span>{p.verified && <VerifiedBadge className="h-4 w-4 shrink-0" />}</div>
+                        <div className="font-medium truncate flex items-center gap-1"><span className="truncate">{p.display_name ?? "Unnamed"}</span>{(p.verified || (rolesByUser[p.id] ?? []).some(isVerifiedRole)) && <VerifiedBadge className="h-4 w-4 shrink-0" />}</div>
                         <div className="text-xs text-muted-foreground font-mono truncate">
                           {p.mc_username ? `@${p.mc_username}` : p.id.slice(0, 8)}
                         </div>

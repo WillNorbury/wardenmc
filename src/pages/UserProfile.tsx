@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { ALL_ROLES, roleLabel, type AppRole } from "@/lib/roles";
+import { ALL_ROLES, roleLabel, isVerifiedRole, type AppRole } from "@/lib/roles";
 import { matchesUserSlug, userProfileSlug } from "@/lib/userSlug";
 import {
   Loader2,
@@ -447,7 +447,7 @@ const UserProfile = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl md:text-3xl font-display font-bold leading-tight flex items-center gap-2">
               {profile.display_name ?? "Unnamed Player"}
-              {(profile as any).verified && <VerifiedBadge className="h-6 w-6" />}
+              {((profile as any).verified || roles.some(isVerifiedRole)) && <VerifiedBadge className="h-6 w-6" />}
             </h1>
             {profile.bio ? (
               <p className="text-sm text-muted-foreground mt-1 max-w-2xl">{profile.bio}</p>
