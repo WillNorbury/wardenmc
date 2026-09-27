@@ -82,7 +82,7 @@ export default function Plugins() {
     const result = plugins.filter((plugin) => {
       const searchable = [plugin.name, plugin.description, plugin.developer.displayName, plugin.developer.username, plugin.category, plugin.sourceCategory ?? "", ...plugin.tags].join(" ").toLowerCase();
       if (needle && !searchable.includes(needle)) return false;
-      if (filters.category && plugin.category.toLowerCase() !== filters.category.toLowerCase()) return false;
+      if (filters.category && plugin.category.toLowerCase() !== filters.category.toLowerCase() && (plugin.sourceCategory ?? "").trim().toLowerCase() !== filters.category.toLowerCase() && !plugin.tags.some((t) => t.toLowerCase() === filters.category.toLowerCase())) return false;
       if (filters.version && !plugin.versions.includes(filters.version)) return false;
       if (filters.platform && !plugin.platforms.some((platform) => platform.toLowerCase() === filters.platform.toLowerCase())) return false;
       if (filters.verification === "Verified" && !plugin.verified) return false;

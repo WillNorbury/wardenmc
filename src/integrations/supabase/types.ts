@@ -3823,6 +3823,14 @@ export type Database = {
           total: number
         }[]
       }
+      get_plugin_rating_summaries: {
+        Args: { _plugin_ids: string[] }
+        Returns: {
+          avg_rating: number
+          plugin_id: string
+          review_count: number
+        }[]
+      }
       get_popular_store_items: {
         Args: { _limit?: number }
         Returns: {

@@ -136,6 +136,22 @@ const CATEGORY_ALIASES: Record<string, (typeof PLUGIN_CATEGORIES)[number]> = {
   proxy: "Networking",
   library: "Developer Tools",
   "developer tools": "Developer Tools",
+  pvp: "Gameplay",
+  combat: "Gameplay",
+  "world generation": "Gameplay",
+  worldgen: "Gameplay",
+  world: "Gameplay",
+  survival: "Gameplay",
+  protection: "Moderation",
+  "anti-cheat": "Moderation",
+  anticheat: "Moderation",
+  security: "Moderation",
+  permissions: "Administration",
+  tools: "Utility",
+  tool: "Utility",
+  discord: "Integration",
+  api: "Developer Tools",
+  cosmetic: "Cosmetics",
 };
 
 export type PluginStatus = "verified" | "featured" | "beta" | "archived" | "unverified";
@@ -276,7 +292,7 @@ export async function loadPluginDirectory(userId?: string | null) {
     favoritesResult,
     myFavoritesResult,
     rolesResult,
-    ...reviewResults
+    ratingsResult,
   ] = await Promise.all([
     orgIds.length
       ? supabase
@@ -302,10 +318,16 @@ export async function loadPluginDirectory(userId?: string | null) {
     userIds.length
       ? supabase.from("user_roles").select("user_id, role").in("user_id", userIds)
       : Promise.resolve({ data: [], error: null }),
-    ...pluginIds.map((pluginId) =>
-      supabase.rpc("get_public_item_reviews", { _target_type: "plugin", _target_id: pluginId }),
-    ),
+    pluginIds.length
+      ? (supabase.rpc as any)("get_plugin_rating_summaries", { _plugin_ids: pluginIds })
+      : Promise.resolve({ data: [], error: null }),
   ]);
+  const ratingMap = new Map(
+    ((ratingsResult?.data ?? []) as { plugin_id: string; avg_rating: number; review_count: number }[]).map((r) => [
+      r.plugin_id,
+      { avg: Number(r.avg_rating) || 0, count: Number(r.review_count) || 0 },
+    ]),
+  );
 
   const profiles = new Map(((profilesResult.data ?? []) as RawProfile[]).map((profile) => [profile.id, profile]));
   const orgs = new Map(((orgsResult.data ?? []) as RawOrg[]).map((org) => [org.id, org]));
@@ -330,8 +352,7 @@ export async function loadPluginDirectory(userId?: string | null) {
 
   const items = rows.map((row, index): PluginDirectoryItem => {
     const profile = row.user_id ? profiles.get(row.user_id) : undefined;
-    const reviewRows = (reviewResults[index]?.data ?? []) as { rating: number }[];
-    const reviewTotal = reviewRows.reduce((sum, review) => sum + Number(review.rating), 0);
+    const ratingInfo = ratingMap.get(row.id) ?? { avg: 0, count: 0 };
     const verified = Boolean(profile?.verified || (row.user_id && staffIds.has(row.user_id)));
     const developerName = profile?.display_name || profile?.mc_username || row.author || "WardenMC Community";
     const platforms = [
@@ -374,8 +395,8 @@ export async function loadPluginDirectory(userId?: string | null) {
       versions: row.mc_versions ?? [],
       platforms,
       downloads: downloadMap.get(row.id) ?? 0,
-      rating: reviewRows.length ? reviewTotal / reviewRows.length : 0,
-      reviews: reviewRows.length,
+      rating: ratingInfo.avg,
+      reviews: ratingInfo.count,
       favorites: favoriteMap.get(row.id) ?? 0,
       status: row.featured ? "featured" : verified ? "verified" : "unverified",
       featured: row.featured,
