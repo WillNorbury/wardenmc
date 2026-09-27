@@ -469,7 +469,7 @@ const UserProfile = () => {
             ) : user ? (
               <Button
                 size="sm"
-                className="rounded-full"
+                className="rounded-full group"
                 variant={isFollowing ? "outline" : "default"}
                 onClick={toggleFollow}
                 disabled={followBusy}
@@ -477,7 +477,7 @@ const UserProfile = () => {
                 {followBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : isFollowing ? (
-                  <><UserCheck className="h-4 w-4 mr-1" /> Following</>
+                  <><UserCheck className="h-4 w-4 mr-1" /><span className="group-hover:hidden">Following</span><span className="hidden group-hover:inline">Unfollow</span></>
                 ) : (
                   <><UserPlus className="h-4 w-4 mr-1" /> Follow</>
                 )}
