@@ -29,8 +29,8 @@ const emptyAuthor = (id: string): PostAuthor => ({
   verified: false,
 });
 
-export async function fetchPosts(opts: { replyTo?: string | null; viewerId?: string | null } = {}) {
-  const { replyTo = null, viewerId = null } = opts;
+export async function fetchPosts(opts: { replyTo?: string | null; viewerId?: string | null; authorId?: string | null } = {}) {
+  const { replyTo = null, viewerId = null, authorId = null } = opts;
 
   let query = supabase
     .from("posts")
@@ -39,6 +39,7 @@ export async function fetchPosts(opts: { replyTo?: string | null; viewerId?: str
     .limit(100);
 
   query = replyTo ? query.eq("reply_to", replyTo) : query.is("reply_to", null);
+  if (authorId) query = query.eq("user_id", authorId);
 
   const { data, error } = await query;
   if (error) throw error;

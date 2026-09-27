@@ -56,6 +56,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import ReportDialog from "@/components/site/ReportDialog";
+import { PostCard } from "@/components/site/PostCard";
+import { fetchPosts, toggleLike, type Post } from "@/lib/posts";
 
 type Profile = {
   id: string;
@@ -125,6 +127,8 @@ const UserProfile = () => {
   const [orgs, setOrgs] = useState<{ id: string; slug: string; name: string; avatar_url: string | null; role: string }[]>([]);
   const [followerCount, setFollowerCount] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [followBusy, setFollowBusy] = useState(false);
 
   const [editOpen, setEditOpen] = useState(false);
@@ -279,6 +283,9 @@ const UserProfile = () => {
       const { data: followers } = await supabase
         .rpc("get_follower_count", { _user_id: p.id });
       setFollowerCount((followers as number | null) ?? 0);
+      const { data: following } = await supabase.rpc("get_following_count", { _user_id: p.id });
+      setFollowingCount((following as number | null) ?? 0);
+      fetchPosts({ authorId: p.id, viewerId: user?.id ?? null }).then(setPosts).catch(() => setPosts([]));
       if (user?.id && user.id !== p.id) {
         const { data: a } = await supabase
           .from("user_follows").select("follower_id")
@@ -462,7 +469,7 @@ const UserProfile = () => {
             ) : user ? (
               <Button
                 size="sm"
-                className="rounded-full"
+                className="rounded-full group"
                 variant={isFollowing ? "outline" : "default"}
                 onClick={toggleFollow}
                 disabled={followBusy}
@@ -470,7 +477,7 @@ const UserProfile = () => {
                 {followBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : isFollowing ? (
-                  <><UserCheck className="h-4 w-4 mr-1" /> Following</>
+                  <><UserCheck className="h-4 w-4 mr-1" /><span className="group-hover:hidden">Following</span><span className="hidden group-hover:inline">Unfollow</span></>
                 ) : (
                   <><UserPlus className="h-4 w-4 mr-1" /> Follow</>
                 )}
@@ -550,6 +557,7 @@ const UserProfile = () => {
             </div>
 
             <div className="flex items-center gap-5 mt-3 text-sm">
+              <span><strong className="text-foreground">{followingCount}</strong> <span className="text-muted-foreground">Following</span></span>
               <span><strong className="text-foreground">{followerCount}</strong> <span className="text-muted-foreground">Followers</span></span>
               <span><strong className="text-foreground">{projects.length}</strong> <span className="text-muted-foreground">Projects</span></span>
               <span><strong className="text-foreground">{orgs.length}</strong> <span className="text-muted-foreground">Organizations</span></span>
@@ -557,8 +565,9 @@ const UserProfile = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="projects" className="mt-4">
+        <Tabs defaultValue="posts" className="mt-4">
           <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent p-0 h-auto">
+            <TabsTrigger value="posts" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Posts</TabsTrigger>
             <TabsTrigger value="projects" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Projects</TabsTrigger>
             {stats && (
               <TabsTrigger value="stats" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Stats</TabsTrigger>
@@ -593,6 +602,23 @@ const UserProfile = () => {
             )}
           </TabsContent>
         )}
+
+          <TabsContent value="posts" className="p-4 md:p-6 mt-0 space-y-3">
+            {posts.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-10">No posts yet.</p>
+            ) : posts.map((p) => (
+              <PostCard
+                key={p.id}
+                post={p}
+                onLike={user ? async (post: Post) => {
+                  try {
+                    await toggleLike(post.id, user.id, post.likedByMe);
+                    setPosts((ps) => ps.map((x) => x.id === post.id ? { ...x, likedByMe: !x.likedByMe, likes: x.likes + (x.likedByMe ? -1 : 1) } : x));
+                  } catch (e: any) { toast.error(e.message); }
+                } : undefined}
+              />
+            ))}
+          </TabsContent>
 
           <TabsContent value="projects" className="p-4 md:p-6 mt-0">
           <div className="space-y-3">
