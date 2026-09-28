@@ -33,7 +33,6 @@ import { ALL_ROLES, roleLabel, isVerifiedRole, type AppRole } from "@/lib/roles"
 import { matchesUserSlug, userProfileSlug, userProfilePath } from "@/lib/userSlug";
 import {
   Loader2,
-  Package,
   Download,
   Heart,
   Calendar,
@@ -44,8 +43,6 @@ import {
   Globe,
   Flag,
   Link as LinkIcon,
-  UserPlus,
-  UserCheck,
   Boxes,
   Building2,
   Swords,
@@ -460,7 +457,7 @@ const UserProfile = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
-      <main className="flex-1 w-full max-w-[640px] mx-auto lg:ml-[max(160px,calc((100vw-640px)/2))] border-x border-border min-w-0 pt-14 md:pt-16">
+      <main className="flex-1 w-full max-w-[640px] mx-auto border-x border-border min-w-0 pt-14 md:pt-16">
         <div className="min-w-0">
         <div className="h-14 px-3 flex items-center gap-5 bg-background/95 border-b border-border sticky top-0 z-20 backdrop-blur-sm">
           <Button variant="ghost" size="icon" aria-label="Back" onClick={() => navigate(-1)} className="shrink-0 rounded-full"><ArrowLeft className="h-5 w-5" /></Button>
