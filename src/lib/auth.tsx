@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq("id", u.id)
         .maybeSingle();
       if (!profile) return;
-      const patch: Record<string, string> = {};
+      const patch: { display_name?: string; avatar_url?: string } = {};
       if (!profile.display_name && name) patch.display_name = name;
       if (!profile.avatar_url && avatar) patch.avatar_url = avatar;
       if (Object.keys(patch).length > 0) {
