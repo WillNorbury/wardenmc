@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_ROLES, roleLabel, type AppRole } from "@/lib/roles";
-import { userProfilePath } from "@/lib/userSlug";
+import { userProfilePath, userProfileSlug } from "@/lib/userSlug";
 import { Link } from "react-router-dom";
 import { GlassCard, PageHero, Reveal } from "@/components/site/ui-kit";
 import { ShieldCheck } from "lucide-react";
