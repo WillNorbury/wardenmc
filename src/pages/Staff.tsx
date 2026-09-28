@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { ALL_ROLES, roleLabel, type AppRole } from "@/lib/roles";
-import { userProfilePath } from "@/lib/userSlug";
+import { userProfilePath, userProfileSlug } from "@/lib/userSlug";
 import { Link } from "react-router-dom";
 import { GlassCard, PageHero, Reveal } from "@/components/site/ui-kit";
 import { ShieldCheck } from "lucide-react";
@@ -17,6 +17,7 @@ type StaffMember = {
   display_name: string | null;
   avatar_url: string | null;
   mc_username: string | null;
+  affiliate_count: number;
 };
 
 const STAFF_ROLES: AppRole[] = [
@@ -52,6 +53,14 @@ const Staff = () => {
         .select("id,display_name,avatar_url,mc_username")
         .in("id", ids);
       const profMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+      const { data: affiliates } = await supabase
+        .from("user_affiliates")
+        .select("owner_id")
+        .in("owner_id", ids);
+      const affiliateCounts = new Map<string, number>();
+      (affiliates ?? []).forEach((a) => {
+        affiliateCounts.set(a.owner_id, (affiliateCounts.get(a.owner_id) ?? 0) + 1);
+      });
       // For each user, pick their highest-ranked staff role
       const byUser = new Map<string, StaffMember>();
       (roles ?? []).forEach((r) => {
@@ -65,6 +74,7 @@ const Staff = () => {
             display_name: prof?.display_name ?? null,
             avatar_url: prof?.avatar_url ?? null,
             mc_username: prof?.mc_username ?? null,
+            affiliate_count: affiliateCounts.get(r.user_id) ?? 0,
           });
         }
       });
@@ -135,22 +145,31 @@ const Staff = () => {
                       const skin = m.mc_username
                         ? `https://mc-heads.net/avatar/${m.mc_username}/96`
                         : null;
+                      const slug = userProfileSlug({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username });
                       return (
                         <Reveal key={m.user_id} delay={i * 45}>
                           <GlassCard interactive className="h-full">
-                            <Link
-                              to={userProfilePath({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username })}
-                              className="flex items-center gap-4 p-5"
-                            >
-                              <Avatar className="h-14 w-14 ring-2 ring-primary/30">
-                                <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
-                                <AvatarFallback>{initials}</AvatarFallback>
-                              </Avatar>
-                              <div className="min-w-0">
-                                <p className="font-semibold truncate">{name}</p>
-                                <p className="text-xs text-primary/90 truncate">{roleLabel(m.role)}</p>
-                              </div>
-                            </Link>
+                            <div className="p-5">
+                              <Link
+                                to={userProfilePath({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username })}
+                                className="flex items-center gap-4"
+                              >
+                                <Avatar className="h-14 w-14 ring-2 ring-primary/30">
+                                  <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
+                                  <AvatarFallback>{initials}</AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                  <p className="font-semibold truncate">{name}</p>
+                                  <p className="text-xs text-primary/90 truncate">{roleLabel(m.role)}</p>
+                                </div>
+                              </Link>
+                              <Link
+                                to={`/user/${slug}/affiliates`}
+                                className="mt-3 inline-block text-sm text-muted-foreground hover:underline"
+                              >
+                                <strong className="text-foreground">{m.affiliate_count}</strong> Affiliate{m.affiliate_count === 1 ? "" : "s"}
+                              </Link>
+                            </div>
                           </GlassCard>
                         </Reveal>
                       );
