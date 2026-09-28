@@ -237,7 +237,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "roles") {
-      const channelId = body.channelId || cfg.rolesChannelId || "1498961753457954847";
+      const channelId = cfg.rolesChannelId || "1498961753457954847";
       if (!channelId) return json({ ok: false, error: "No roles channel configured" });
 
       const lines = SITE_ROLES.map((r) => `**${r.label}** — ${r.description}`).join("\n");

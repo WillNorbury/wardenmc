@@ -168,8 +168,21 @@ Deno.serve(async (req) => {
       list = [...emails]
     }
 
-    // BCC recipients get their own hidden copy
-    if (bccList.length > 0) list = [...new Set([...list, ...bccList])]
+    // BCC recipients get their own hidden copy — restricted to confirmed site accounts
+    if (bccList.length > 0) {
+      const known = new Set<string>()
+      let page = 1
+      while (true) {
+        const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
+        if (error) return json({ ok: false, error: 'Could not verify BCC recipients' }, 500)
+        const users = data?.users ?? []
+        for (const u of users) if (u.email && u.email_confirmed_at) known.add(u.email.toLowerCase())
+        if (users.length < 1000 || ++page > 50) break
+      }
+      const unknown = bccList.find((e) => !known.has(e))
+      if (unknown) return json({ ok: false, error: `BCC address is not a registered account: ${unknown}` }, 400)
+      list = [...new Set([...list, ...bccList])]
+    }
 
     // Drop suppressed
     if (list.length > 0) {

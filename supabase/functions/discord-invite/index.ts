@@ -74,6 +74,7 @@ async function resolveVanity(start: URL): Promise<string | null> {
   for (let hop = 0; hop < 4; hop++) {
     const u = new URL(current);
     if (u.protocol !== "https:") return null;
+    if (!ALLOWED_FETCH_HOSTS.has(u.hostname.toLowerCase())) return null;
     if (!(await resolvesToPublicHost(u.hostname))) return null;
     const r = await fetch(current, {
       redirect: "manual",
@@ -102,6 +103,7 @@ async function extractCode(input: string): Promise<string | null> {
     try {
       const parsed = new URL(trimmed);
       if (parsed.protocol !== "https:") return null;
+      if (!ALLOWED_FETCH_HOSTS.has(parsed.hostname.toLowerCase())) return null;
       const finalUrl = await resolveVanity(parsed);
       if (!finalUrl) return null;
       const final = new URL(finalUrl);
