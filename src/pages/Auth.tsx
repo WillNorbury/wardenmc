@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import logo from "@/assets/warden-network-icon.png";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/site/SEO";
-import { Mail, Loader2, ShieldCheck, KeyRound } from "lucide-react";
+import { Mail, Loader2, ShieldCheck, KeyRound, User, Briefcase } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { trackFunnelEvent } from "@/lib/funnel";
 
@@ -336,6 +336,31 @@ const Auth = () => {
                 <div>
                   <Label htmlFor="dn">Display name</Label>
                   <Input id="dn" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Steve" />
+                </div>
+                <div>
+                  <Label>Account type</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setAccountType("personal")}
+                      aria-pressed={accountType === "personal"}
+                      className={`rounded-md border p-3 text-left transition-colors ${accountType === "personal" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
+                    >
+                      <User className="h-4 w-4 mb-1 text-primary" />
+                      <div className="text-sm font-medium">Personal</div>
+                      <div className="text-xs text-muted-foreground">For players and community members</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAccountType("business")}
+                      aria-pressed={accountType === "business"}
+                      className={`rounded-md border p-3 text-left transition-colors ${accountType === "business" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
+                    >
+                      <Briefcase className="h-4 w-4 mb-1 text-primary" />
+                      <div className="text-sm font-medium">Business</div>
+                      <div className="text-xs text-muted-foreground">For brands, servers and creators</div>
+                    </button>
+                  </div>
                 </div>
               </TabsContent>
               <div>
