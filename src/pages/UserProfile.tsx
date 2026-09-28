@@ -118,7 +118,9 @@ const timeAgo = (iso: string | null) => {
 };
 
 const UserProfile = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, tab } = useParams<{ slug: string; tab?: string }>();
+  const validTabs = ["posts", "projects", "stats", "affiliates", "organizations"];
+  const activeTab = tab && validTabs.includes(tab) ? tab : "posts";
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -626,12 +628,16 @@ const UserProfile = () => {
             <div className="flex items-center gap-x-5 gap-y-1 flex-wrap mt-3 text-sm">
               <span><strong className="text-foreground">{followingCount}</strong> <span className="text-muted-foreground">Following</span></span>
               <span><strong className="text-foreground">{followerCount}</strong> <span className="text-muted-foreground">Followers</span></span>
-              <span><strong className="text-foreground">{affiliateCount}</strong> <span className="text-muted-foreground">Affiliates</span></span>
+              <Link to={`/user/${slug}/affiliates`} className="hover:underline"><strong className="text-foreground">{affiliateCount}</strong> <span className="text-muted-foreground">Affiliates</span></Link>
             </div>
           </div>
         </div>
 
-        <Tabs defaultValue="posts" className="mt-5">
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => navigate(v === "posts" ? `/user/${slug}` : `/user/${slug}/${v}`)}
+          className="mt-5"
+        >
           <TabsList className="w-full justify-start overflow-x-auto rounded-none border-b border-border bg-transparent p-0 h-auto">
             <TabsTrigger value="posts" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Posts</TabsTrigger>
             <TabsTrigger value="projects" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Projects</TabsTrigger>
