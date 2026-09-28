@@ -53,7 +53,6 @@ Deno.serve(async (req) => {
   }
   const sql: string = String(body?.sql ?? "").trim();
   const params: unknown[] = Array.isArray(body?.params) ? body.params : [];
-  const allowMulti: boolean = body?.allowMulti === true;
   if (!sql) return json(400, { error: "sql required" });
   if (sql.length > 20000) return json(400, { error: "sql too long" });
   const stripped = sql.replace(/;\s*$/, "");
