@@ -480,7 +480,7 @@ const UserProfile = () => {
         <div className="h-14 px-3 flex items-center gap-5 bg-background/95 border-b border-border sticky top-0 z-20 backdrop-blur-sm">
           <Button variant="ghost" size="icon" aria-label="Back" onClick={() => navigate(-1)} className="shrink-0 rounded-full"><ArrowLeft className="h-5 w-5" /></Button>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 font-bold text-lg leading-tight truncate">{profile.display_name ?? "Unnamed Player"}{((profile as any).verified || roles.some(isVerifiedRole)) && <VerifiedBadge className="h-4 w-4 shrink-0" />}</div>
+            <div className="flex items-center gap-1.5 font-bold text-lg leading-tight truncate">{profile.display_name ?? "Unnamed Player"}{((profile as any).verified || roles.some(isVerifiedRole) || followerCount >= 1000) && <VerifiedBadge className="h-4 w-4 shrink-0" />}</div>
             <div className="text-xs text-muted-foreground">{posts.length} post{posts.length === 1 ? "" : "s"}</div>
           </div>
           <Button asChild variant="ghost" size="icon" className="rounded-full" aria-label="Search"><Link to="/search"><Search className="h-5 w-5" /></Link></Button>
@@ -561,7 +561,7 @@ const UserProfile = () => {
           {/* Name, handle, bio */}
           <div className="mt-3">
             {(() => {
-              const isVerified = !!((profile as any).verified || roles.some(isVerifiedRole));
+              const isVerified = !!((profile as any).verified || roles.some(isVerifiedRole) || followerCount >= 1000);
               const affName = affiliateOf ? (affiliateOf.display_name ?? affiliateOf.mc_username ?? "Player") : "";
               const affAvatar = affiliateOf ? (affiliateOf.avatar_url || (affiliateOf.mc_username ? `https://mc-heads.net/avatar/${affiliateOf.mc_username}/64` : undefined)) : undefined;
               const joined = new Date(profile.created_at).toLocaleDateString(undefined, { month: "long", year: "numeric" });
