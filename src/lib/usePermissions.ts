@@ -84,6 +84,7 @@ export const usePermissions = () => {
   const can = (key: string) => {
     // Owner of the system: DB-level admin always has full client access too.
     if (roles.includes("founder") || roles.includes("star")) return true;
+    if (roles.includes("founder") || roles.includes("star")) return true;
     if (isAdmin && (key === "admin.access" || key === "permissions.edit")) return true;
     return allowedSet.has(key);
   };
