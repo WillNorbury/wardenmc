@@ -53,6 +53,14 @@ const Staff = () => {
         .select("id,display_name,avatar_url,mc_username")
         .in("id", ids);
       const profMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+      const { data: affiliates } = await supabase
+        .from("user_affiliates")
+        .select("owner_id")
+        .in("owner_id", ids);
+      const affiliateCounts = new Map<string, number>();
+      (affiliates ?? []).forEach((a) => {
+        affiliateCounts.set(a.owner_id, (affiliateCounts.get(a.owner_id) ?? 0) + 1);
+      });
       // For each user, pick their highest-ranked staff role
       const byUser = new Map<string, StaffMember>();
       (roles ?? []).forEach((r) => {
@@ -66,6 +74,7 @@ const Staff = () => {
             display_name: prof?.display_name ?? null,
             avatar_url: prof?.avatar_url ?? null,
             mc_username: prof?.mc_username ?? null,
+            affiliate_count: affiliateCounts.get(r.user_id) ?? 0,
           });
         }
       });
