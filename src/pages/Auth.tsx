@@ -42,6 +42,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [accountType, setAccountType] = useState<"personal" | "business">("personal");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -118,7 +119,7 @@ const Auth = () => {
           email, password,
           options: {
             emailRedirectTo: `${window.location.origin}${safeNext}`,
-            data: { display_name: displayName },
+            data: { display_name: displayName, account_type: accountType },
           },
         });
         if (error) throw error;
