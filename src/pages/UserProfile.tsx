@@ -118,7 +118,9 @@ const timeAgo = (iso: string | null) => {
 };
 
 const UserProfile = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, tab } = useParams<{ slug: string; tab?: string }>();
+  const validTabs = ["posts", "projects", "stats", "affiliates", "organizations"];
+  const activeTab = tab && validTabs.includes(tab) ? tab : "posts";
   const { user } = useAuth();
   const navigate = useNavigate();
 
