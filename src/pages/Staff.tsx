@@ -145,22 +145,31 @@ const Staff = () => {
                       const skin = m.mc_username
                         ? `https://mc-heads.net/avatar/${m.mc_username}/96`
                         : null;
+                      const slug = userProfileSlug({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username });
                       return (
                         <Reveal key={m.user_id} delay={i * 45}>
                           <GlassCard interactive className="h-full">
-                            <Link
-                              to={userProfilePath({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username })}
-                              className="flex items-center gap-4 p-5"
-                            >
-                              <Avatar className="h-14 w-14 ring-2 ring-primary/30">
-                                <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
-                                <AvatarFallback>{initials}</AvatarFallback>
-                              </Avatar>
-                              <div className="min-w-0">
-                                <p className="font-semibold truncate">{name}</p>
-                                <p className="text-xs text-primary/90 truncate">{roleLabel(m.role)}</p>
-                              </div>
-                            </Link>
+                            <div className="p-5">
+                              <Link
+                                to={userProfilePath({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username })}
+                                className="flex items-center gap-4"
+                              >
+                                <Avatar className="h-14 w-14 ring-2 ring-primary/30">
+                                  <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
+                                  <AvatarFallback>{initials}</AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                  <p className="font-semibold truncate">{name}</p>
+                                  <p className="text-xs text-primary/90 truncate">{roleLabel(m.role)}</p>
+                                </div>
+                              </Link>
+                              <Link
+                                to={`/user/${slug}/affiliates`}
+                                className="mt-3 inline-block text-sm text-muted-foreground hover:underline"
+                              >
+                                <strong className="text-foreground">{m.affiliate_count}</strong> Affiliate{m.affiliate_count === 1 ? "" : "s"}
+                              </Link>
+                            </div>
                           </GlassCard>
                         </Reveal>
                       );
