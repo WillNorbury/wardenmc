@@ -20,6 +20,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // For OAuth sign-ins (e.g. Google), backfill the profile's display name
+    // and photo from the provider when they aren't set yet.
+    const syncProviderProfile = async (u: User | undefined) => {
+      if (!u) return;
+      const meta = u.user_metadata ?? {};
+      const name = meta.full_name ?? meta.name ?? meta.display_name;
+      const avatar = meta.avatar_url ?? meta.picture;
+      if (!name && !avatar) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name, avatar_url")
+        .eq("id", u.id)
+        .maybeSingle();
+      if (!profile) return;
+      const patch: { display_name?: string; avatar_url?: string } = {};
+      if (!profile.display_name && name) patch.display_name = name;
+      if (!profile.avatar_url && avatar) patch.avatar_url = avatar;
+      if (Object.keys(patch).length > 0) {
+        await supabase.from("profiles").update(patch).eq("id", u.id);
+      }
+    };
+
     const checkRole = async (uid: string | undefined, ctx: string) => {
       if (!uid) { setIsAdmin(false); return; }
       const { data, error } = await supabase.rpc("check_is_admin_logged", {
@@ -33,12 +55,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((e, s) => {
       setSession(s);
-      setTimeout(() => { checkRole(s?.user?.id, `auth-event:${e}`); }, 0);
+      setTimeout(() => {
+        checkRole(s?.user?.id, `auth-event:${e}`);
+        if (e === "SIGNED_IN") syncProviderProfile(s?.user);
+      }, 0);
     });
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       await checkRole(session?.user?.id, "init");
+      await syncProviderProfile(session?.user);
       setLoading(false);
     });
 
