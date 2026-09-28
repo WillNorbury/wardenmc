@@ -33,17 +33,16 @@ import { ALL_ROLES, roleLabel, isVerifiedRole, type AppRole } from "@/lib/roles"
 import { matchesUserSlug, userProfileSlug, userProfilePath } from "@/lib/userSlug";
 import {
   Loader2,
-  Package,
   Download,
   Heart,
   Calendar,
   Pencil,
-  MoreVertical,
+  MoreHorizontal,
+  ArrowLeft,
+  Search,
   Globe,
   Flag,
   Link as LinkIcon,
-  UserPlus,
-  UserCheck,
   Boxes,
   Building2,
   Swords,
@@ -55,7 +54,6 @@ import {
   Coins,
   Bug,
   BadgeCheck,
-  Handshake,
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -132,6 +130,7 @@ const UserProfile = () => {
   const [followerCount, setFollowerCount] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followingCount, setFollowingCount] = useState(0);
+  const [affiliateCount, setAffiliateCount] = useState(0);
   const [affiliateOf, setAffiliateOf] = useState<{ id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null } | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [followBusy, setFollowBusy] = useState(false);
@@ -290,6 +289,8 @@ const UserProfile = () => {
       setFollowerCount((followers as number | null) ?? 0);
       const { data: following } = await supabase.rpc("get_following_count", { _user_id: p.id });
       setFollowingCount((following as number | null) ?? 0);
+      const { count: affiliatesTotal } = await (supabase as any).from("user_affiliates").select("affiliate_id", { count: "exact", head: true }).eq("owner_id", p.id);
+      setAffiliateCount(affiliatesTotal ?? 0);
       const { data: affRows } = await (supabase as any).from("user_affiliates").select("owner_id").eq("affiliate_id", p.id).limit(1);
       const ownerId = affRows?.[0]?.owner_id as string | undefined;
       if (ownerId) {
@@ -456,26 +457,57 @@ const UserProfile = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 pt-24 pb-16 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-        <div className="min-w-0 rounded-xl border border-border overflow-hidden bg-card/40">
-        {/* Banner */}
-        <div className="h-36 md:h-48 bg-gradient-to-br from-primary/40 via-primary/15 to-accent/30 relative">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,hsl(var(--primary)/0.35),transparent_60%)]" />
+      <main className="flex-1 w-full max-w-[640px] mx-auto border-x border-border min-w-0 pt-14 md:pt-16">
+        <div className="min-w-0">
+        <div className="h-14 px-3 flex items-center gap-5 bg-background/95 border-b border-border sticky top-0 z-20 backdrop-blur-sm">
+          <Button variant="ghost" size="icon" aria-label="Back" onClick={() => navigate(-1)} className="shrink-0 rounded-full"><ArrowLeft className="h-5 w-5" /></Button>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 font-bold text-lg leading-tight truncate">{profile.display_name ?? "Unnamed Player"}{((profile as any).verified || roles.some(isVerifiedRole)) && <VerifiedBadge className="h-4 w-4 shrink-0" />}</div>
+            <div className="text-xs text-muted-foreground">{posts.length} post{posts.length === 1 ? "" : "s"}</div>
+          </div>
+          <Button asChild variant="ghost" size="icon" className="rounded-full" aria-label="Search"><Link to="/search"><Search className="h-5 w-5" /></Link></Button>
         </div>
 
-        <div className="px-4 md:px-6">
+        {/* Open cover area, as on a social profile */}
+        <div className="h-32 sm:h-44 bg-card" />
+
+        <div className="px-4">
           {/* Avatar + actions */}
-          <div className="flex items-end justify-between -mt-12 md:-mt-16">
-            <Avatar className="h-24 w-24 md:h-32 md:w-32 rounded-full border-4 border-background shrink-0 bg-background">
+          <div className="flex items-end justify-between gap-2 -mt-12 sm:-mt-16">
+            <Avatar className="h-24 w-24 sm:h-32 sm:w-32 rounded-md border-4 border-background shrink-0 bg-background">
               <AvatarImage src={avatar} />
               <AvatarFallback className="text-3xl">{initials}</AvatarFallback>
             </Avatar>
 
-          <div className="flex items-center gap-2 shrink-0 pb-2">
+          <div className="flex items-center gap-2 shrink-0 pb-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full h-9 w-9" aria-label="More options">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={copyLink}>
+                  <LinkIcon className="h-4 w-4 mr-2" /> Copy profile link
+                </DropdownMenuItem>
+                {profile.mc_username && <DropdownMenuItem onSelect={() => navigate(`/punishments/${encodeURIComponent(profile.mc_username ?? "")}`)}><Flag className="h-4 w-4 mr-2" /> Punishment history</DropdownMenuItem>}
+                {isOwn ? (
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <Pencil className="h-4 w-4 mr-2" /> Account settings
+                  </DropdownMenuItem>
+                ) : (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setReportOpen(true); }} className="text-destructive focus:text-destructive">
+                      <Flag className="h-4 w-4 mr-2" /> Report user
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
             {isOwn ? (
               <Button variant="outline" size="sm" className="rounded-full" onClick={openEdit}>
-                <Pencil className="h-4 w-4 mr-1.5" /> Edit profile
+                Edit profile
               </Button>
             ) : user ? (
               <Button
@@ -488,49 +520,14 @@ const UserProfile = () => {
                 {followBusy ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : isFollowing ? (
-                  <><UserCheck className="h-4 w-4 mr-1" /><span className="group-hover:hidden">Following</span><span className="hidden group-hover:inline">Unfollow</span></>
+                  <><span className="group-hover:hidden">Following</span><span className="hidden group-hover:inline">Unfollow</span></>
                 ) : (
-                  <><UserPlus className="h-4 w-4 mr-1" /> Follow</>
+                  <>Follow</>
                 )}
               </Button>
-            ) : null}
-
-            {profile.mc_username && (
-              <Button asChild variant="outline" size="sm" className="rounded-full">
-                <Link to={`/punishments/${encodeURIComponent(profile.mc_username)}`}>Punishments</Link>
-              </Button>
+            ) : (
+              <Button asChild size="sm" className="rounded-full"><Link to="/auth">Follow</Link></Button>
             )}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="rounded-full h-9 w-9" aria-label="More">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={copyLink}>
-                  <LinkIcon className="h-4 w-4 mr-2" /> Copy profile link
-                </DropdownMenuItem>
-                {isOwn ? (
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
-                    <Pencil className="h-4 w-4 mr-2" /> Account settings
-                  </DropdownMenuItem>
-                ) : (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        setReportOpen(true);
-                      }}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Flag className="h-4 w-4 mr-2" /> Report user
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
             {profile && (
               <ReportDialog
                 targetType="user"
@@ -554,7 +551,7 @@ const UserProfile = () => {
                 <HoverCard openDelay={200}>
                   <HoverCardTrigger asChild>
                     <div className="inline-block cursor-default">
-                      <h1 className="text-xl md:text-2xl font-display font-bold leading-tight flex items-center gap-1.5">
+                      <h1 className="text-xl font-bold leading-tight flex items-center gap-1.5 flex-wrap">
                         {profile.display_name ?? "Unnamed Player"}
                         {isVerified && <VerifiedBadge className="h-5 w-5" />}
                         {affiliateOf && (
@@ -601,31 +598,32 @@ const UserProfile = () => {
               <p className="text-sm text-muted-foreground/70 italic mt-3">Add a bio to tell people about yourself.</p>
             ) : null}
 
-            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-x-4 gap-y-1 mt-3 text-sm text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4" /> Joined {timeAgo(profile.created_at)}
+                <Calendar className="h-4 w-4" /> Joined {new Date(profile.created_at).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
               </span>
               {roles.slice(0, 3).map((r) => (
                 <Badge key={r} variant="secondary" className="rounded-full">{roleLabel(r)}</Badge>
               ))}
             </div>
 
-            <div className="flex items-center gap-5 mt-3 text-sm">
+            <div className="flex items-center gap-x-5 gap-y-1 flex-wrap mt-3 text-sm">
               <span><strong className="text-foreground">{followingCount}</strong> <span className="text-muted-foreground">Following</span></span>
               <span><strong className="text-foreground">{followerCount}</strong> <span className="text-muted-foreground">Followers</span></span>
-              <span><strong className="text-foreground">{projects.length}</strong> <span className="text-muted-foreground">Projects</span></span>
-              <span><strong className="text-foreground">{orgs.length}</strong> <span className="text-muted-foreground">Organizations</span></span>
+              <span><strong className="text-foreground">{affiliateCount}</strong> <span className="text-muted-foreground">Affiliates</span></span>
             </div>
           </div>
         </div>
 
-        <Tabs defaultValue="posts" className="mt-4">
-          <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent p-0 h-auto">
-            <TabsTrigger value="posts" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Posts</TabsTrigger>
-            <TabsTrigger value="projects" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Projects</TabsTrigger>
+        <Tabs defaultValue="posts" className="mt-5">
+          <TabsList className="w-full justify-start overflow-x-auto rounded-none border-b border-border bg-transparent p-0 h-auto">
+            <TabsTrigger value="posts" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Posts</TabsTrigger>
+            <TabsTrigger value="projects" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Projects</TabsTrigger>
             {stats && (
-              <TabsTrigger value="stats" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-5 py-3">Stats</TabsTrigger>
+              <TabsTrigger value="stats" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Stats</TabsTrigger>
             )}
+            <TabsTrigger value="affiliates" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Affiliates</TabsTrigger>
+            <TabsTrigger value="organizations" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Organizations</TabsTrigger>
           </TabsList>
 
         {stats && (
@@ -657,7 +655,7 @@ const UserProfile = () => {
           </TabsContent>
         )}
 
-          <TabsContent value="posts" className="p-4 md:p-6 mt-0 space-y-3">
+          <TabsContent value="posts" className="p-4 mt-0 space-y-3 min-h-40">
             {posts.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-10">No posts yet.</p>
             ) : posts.map((p) => (
@@ -674,7 +672,7 @@ const UserProfile = () => {
             ))}
           </TabsContent>
 
-          <TabsContent value="projects" className="p-4 md:p-6 mt-0">
+          <TabsContent value="projects" className="p-4 mt-0">
           <div className="space-y-3">
             {projects.length === 0 ? (
               <Card className="p-10 text-center">
@@ -732,12 +730,11 @@ const UserProfile = () => {
             )}
           </div>
           </TabsContent>
-        </Tabs>
-        </div>
-
-          <aside className="space-y-4">
+          <TabsContent value="affiliates" className="p-4 mt-0">
             <AffiliatesCard profileId={profile.id} isOwn={isOwn} viewerId={user?.id} />
-            <Card className="p-5">
+          </TabsContent>
+          <TabsContent value="organizations" className="p-4 mt-0">
+            <div className="space-y-3">
               <h3 className="font-bold mb-3 flex items-center gap-2">
                 <Building2 className="h-4 w-4" /> Organizations
               </h3>
@@ -769,9 +766,9 @@ const UserProfile = () => {
                   })}
                 </ul>
               )}
-            </Card>
-
-          </aside>
+            </div>
+          </TabsContent>
+        </Tabs>
         </div>
       </main>
 
