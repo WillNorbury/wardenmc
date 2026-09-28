@@ -17,6 +17,7 @@ type StaffMember = {
   display_name: string | null;
   avatar_url: string | null;
   mc_username: string | null;
+  affiliate_count: number;
 };
 
 const STAFF_ROLES: AppRole[] = [
