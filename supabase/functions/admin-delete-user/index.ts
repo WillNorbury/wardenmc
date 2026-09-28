@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     }
 
     const { user_id } = (await req.json()) ?? {};
-    if (!user_id || typeof user_id !== "string") {
+    if (!user_id || typeof user_id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user_id)) {
       return new Response(JSON.stringify({ error: "user_id required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -78,7 +78,8 @@ Deno.serve(async (req) => {
     }
 
     // Cleanup app data (profiles + roles + follows); auth deletion cascades on user_id refs.
-    await admin.from("user_follows").delete().or(`follower_id.eq.${user_id},followee_id.eq.${user_id}`);
+    await admin.from("user_follows").delete().eq("follower_id", user_id);
+    await admin.from("user_follows").delete().eq("followee_id", user_id);
     await admin.from("user_roles").delete().eq("user_id", user_id);
     await admin.from("profiles").delete().eq("id", user_id);
 

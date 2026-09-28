@@ -56,6 +56,14 @@ Deno.serve(async (req) => {
   const allowMulti: boolean = body?.allowMulti === true;
   if (!sql) return json(400, { error: "sql required" });
   if (sql.length > 20000) return json(400, { error: "sql too long" });
+  const stripped = sql.replace(/;\s*$/, "");
+  if (stripped.includes(";")) return json(400, { error: "only a single statement is allowed" });
+  if (!/^(select|show|describe|desc|explain)\s/i.test(stripped)) {
+    return json(400, { error: "only read-only queries (SELECT/SHOW/DESCRIBE/EXPLAIN) are allowed" });
+  }
+  if (/\b(into\s+(out|dump)file|load_file|sleep|benchmark|for\s+update|lock\s+in\s+share)\b/i.test(stripped)) {
+    return json(400, { error: "query contains a disallowed clause" });
+  }
 
   // --- Load MySQL connection from server-side secrets only ---
   const host = Deno.env.get("LITEBANS_MYSQL_HOST");
@@ -77,10 +85,13 @@ Deno.serve(async (req) => {
       password,
       database,
       connectTimeout: 8000,
-      multipleStatements: allowMulti,
+      multipleStatements: false,
       dateStrings: true,
     });
-    const [result, fields] = await conn.query(sql, params);
+    await conn.query("SET SESSION TRANSACTION READ ONLY");
+    await conn.query("START TRANSACTION READ ONLY");
+    const [result, fields] = await conn.query(stripped, params);
+    await conn.query("ROLLBACK");
     const durationMs = Date.now() - started;
 
     // SELECT → array of row objects; write → OkPacket

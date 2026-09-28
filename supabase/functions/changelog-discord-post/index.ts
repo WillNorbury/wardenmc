@@ -36,16 +36,10 @@ Deno.serve(async (req) => {
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
     if (!token) return json({ ok: false, error: 'Unauthorized' }, 401)
 
-    let callerRole = ''
-    try {
-      callerRole = JSON.parse(
-        atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
-      )?.role ?? ''
-    } catch {
-      callerRole = ''
-    }
+    // Only an exact match with the real service key counts as an internal call.
+    const isServiceCall = !!SERVICE_KEY && token === SERVICE_KEY
 
-    if (callerRole !== 'service_role') {
+    if (!isServiceCall) {
       const userClient = createClient(SUPABASE_URL, ANON_KEY, {
         global: { headers: { Authorization: authHeader } },
       })
