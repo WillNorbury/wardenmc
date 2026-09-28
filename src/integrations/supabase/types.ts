@@ -2329,6 +2329,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_type: string
           avatar_url: string | null
           bio: string | null
           created_at: string
@@ -2339,6 +2340,7 @@ export type Database = {
           verified: boolean
         }
         Insert: {
+          account_type?: string
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
@@ -2349,6 +2351,7 @@ export type Database = {
           verified?: boolean
         }
         Update: {
+          account_type?: string
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
