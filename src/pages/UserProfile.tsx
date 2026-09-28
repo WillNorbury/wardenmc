@@ -628,7 +628,7 @@ const UserProfile = () => {
             <div className="flex items-center gap-x-5 gap-y-1 flex-wrap mt-3 text-sm">
               <span><strong className="text-foreground">{followingCount}</strong> <span className="text-muted-foreground">Following</span></span>
               <span><strong className="text-foreground">{followerCount}</strong> <span className="text-muted-foreground">Followers</span></span>
-              <span><strong className="text-foreground">{affiliateCount}</strong> <span className="text-muted-foreground">Affiliates</span></span>
+              <Link to={`/user/${slug}/affiliates`} className="hover:underline"><strong className="text-foreground">{affiliateCount}</strong> <span className="text-muted-foreground">Affiliates</span></Link>
             </div>
           </div>
         </div>
