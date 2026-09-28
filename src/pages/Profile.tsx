@@ -33,6 +33,8 @@ import OrganizationsCard from "@/components/site/OrganizationsCard";
 import AffiliatesCard from "@/components/site/AffiliatesCard";
 import TwoFactorCard from "@/components/profile/TwoFactorCard";
 import MyPluginsPanel from "@/components/dashboard/MyPluginsPanel";
+import AvatarFilePicker from "@/components/profile/AvatarFilePicker";
+import { uploadAvatar } from "@/lib/avatarUpload";
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -40,6 +42,8 @@ const Profile = () => {
   const [displayName, setDisplayName] = useState("");
   const [mcUsername, setMcUsername] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [prefs, setPrefs] = useState<Required<UserPreferences>>(DEFAULT_PREFS);
   const [savedMc, setSavedMc] = useState<string | null>(null);
@@ -141,18 +145,31 @@ const Profile = () => {
     }
     const trimmedMc = mcUsername.trim();
     setSaving(true);
+    let nextAvatar = avatarUrl;
+    if (avatarFile) {
+      try {
+        nextAvatar = await uploadAvatar(user.id, avatarFile);
+      } catch (error) {
+        setSaving(false);
+        toast.error(error instanceof Error ? error.message : "Could not upload photo.");
+        return;
+      }
+    }
     const { error } = await supabase
       .from("profiles")
       .update({
         display_name: displayName || null,
         mc_username: trimmedMc,
-        avatar_url: avatarUrl || null,
+        avatar_url: nextAvatar || null,
       })
       .eq("id", user.id);
     const { error: prefError } = await (supabase as any).rpc("set_my_preferences", { _prefs: prefs });
     setSaving(false);
     if (error) return toast.error(error.message);
     if (prefError) return toast.error(prefError.message);
+    setAvatarUrl(nextAvatar);
+    setAvatarFile(null);
+    setAvatarPreview(null);
     setSavedMc(trimmedMc);
     setMcUsername(trimmedMc);
     toast.success("Profile saved");
@@ -229,7 +246,7 @@ const Profile = () => {
         <Card className="p-6 space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={avatarUrl || (mcUsername ? `https://mc-heads.net/avatar/${mcUsername}/128` : undefined)} />
+              <AvatarImage src={avatarPreview || avatarUrl || (mcUsername ? `https://mc-heads.net/avatar/${mcUsername}/128` : undefined)} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
@@ -294,8 +311,8 @@ const Profile = () => {
               )}
             </div>
             <div>
-              <Label htmlFor="avatar_url">Custom avatar URL (optional)</Label>
-              <Input id="avatar_url" value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://..." />
+              <Label>Profile photo</Label>
+              <div className="mt-2"><AvatarFilePicker disabled={saving} onChange={(file, preview) => { setAvatarFile(file); setAvatarPreview(preview); }} /></div>
             </div>
           </div>
 

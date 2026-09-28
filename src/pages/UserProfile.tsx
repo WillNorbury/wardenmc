@@ -60,6 +60,8 @@ import { toast } from "sonner";
 import ReportDialog from "@/components/site/ReportDialog";
 import { PostCard } from "@/components/site/PostCard";
 import { fetchPosts, toggleLike, type Post } from "@/lib/posts";
+import AvatarFilePicker from "@/components/profile/AvatarFilePicker";
+import { uploadAvatar } from "@/lib/avatarUpload";
 
 type Profile = {
   id: string;
@@ -139,6 +141,8 @@ const UserProfile = () => {
   const [editDisplay, setEditDisplay] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
+  const [editAvatarFile, setEditAvatarFile] = useState<File | null>(null);
+  const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(null);
   const [editBusy, setEditBusy] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
@@ -316,23 +320,35 @@ const UserProfile = () => {
     setEditDisplay(profile.display_name ?? "");
     setEditBio(profile.bio ?? "");
     setEditAvatar(profile.avatar_url ?? "");
+    setEditAvatarFile(null);
+    setEditAvatarPreview(null);
     setEditOpen(true);
   };
 
   const saveEdit = async () => {
     if (!profile) return;
     setEditBusy(true);
+    let nextAvatar = editAvatar;
+    if (editAvatarFile) {
+      try {
+        nextAvatar = await uploadAvatar(profile.id, editAvatarFile);
+      } catch (error) {
+        setEditBusy(false);
+        toast.error(error instanceof Error ? error.message : "Could not upload photo.");
+        return;
+      }
+    }
     const { error } = await supabase
       .from("profiles")
       .update({
         display_name: editDisplay.trim() || null,
         bio: editBio.trim() || null,
-        avatar_url: editAvatar.trim() || null,
+        avatar_url: nextAvatar || null,
       })
       .eq("id", profile.id);
     setEditBusy(false);
     if (error) { toast.error(error.message); return; }
-    setProfile({ ...profile, display_name: editDisplay.trim() || null, bio: editBio.trim() || null, avatar_url: editAvatar.trim() || null });
+    setProfile({ ...profile, display_name: editDisplay.trim() || null, bio: editBio.trim() || null, avatar_url: nextAvatar || null });
     setEditOpen(false);
     toast.success("Profile updated");
   };
@@ -784,8 +800,11 @@ const UserProfile = () => {
               <Input id="dn" value={editDisplay} onChange={(e) => setEditDisplay(e.target.value)} />
             </div>
             <div>
-              <Label htmlFor="av">Avatar URL</Label>
-              <Input id="av" value={editAvatar} onChange={(e) => setEditAvatar(e.target.value)} placeholder="https://…" />
+              <Label>Profile photo</Label>
+              <div className="flex items-center gap-3 mt-2">
+                <Avatar className="h-12 w-12 shrink-0"><AvatarImage src={editAvatarPreview || editAvatar || undefined} /><AvatarFallback>{initials}</AvatarFallback></Avatar>
+                <AvatarFilePicker disabled={editBusy} onChange={(file, preview) => { setEditAvatarFile(file); setEditAvatarPreview(preview); }} />
+              </div>
             </div>
             <div>
               <Label htmlFor="bio">Bio</Label>
