@@ -55,12 +55,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((e, s) => {
       setSession(s);
-      setTimeout(() => { checkRole(s?.user?.id, `auth-event:${e}`); }, 0);
+      setTimeout(() => {
+        checkRole(s?.user?.id, `auth-event:${e}`);
+        if (e === "SIGNED_IN") syncProviderProfile(s?.user);
+      }, 0);
     });
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       await checkRole(session?.user?.id, "init");
+      await syncProviderProfile(session?.user);
       setLoading(false);
     });
 
