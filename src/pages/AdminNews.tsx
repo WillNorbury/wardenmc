@@ -372,7 +372,7 @@ export const NewsAnnouncementsTab = () => {
 const AdminNews = () => {
   const { user, loading } = useAuth();
   const { roles, loading: permsLoading } = usePermissions();
-  const isAdmin = roles.includes("admin") || roles.includes("owner");
+  const isAdmin = ["admin", "owner", "founder", "star"].some((r) => roles.includes(r));
   const isOwner = roles.includes("owner");
 
   if (loading || permsLoading) return null;
