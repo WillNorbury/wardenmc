@@ -45,6 +45,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [accountType, setAccountType] = useState<"personal" | "business">("personal");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [otp, setOtp] = useState("");
