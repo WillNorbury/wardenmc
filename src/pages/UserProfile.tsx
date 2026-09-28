@@ -633,7 +633,11 @@ const UserProfile = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="posts" className="mt-5">
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => navigate(v === "posts" ? `/user/${slug}` : `/user/${slug}/${v}`)}
+          className="mt-5"
+        >
           <TabsList className="w-full justify-start overflow-x-auto rounded-none border-b border-border bg-transparent p-0 h-auto">
             <TabsTrigger value="posts" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Posts</TabsTrigger>
             <TabsTrigger value="projects" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 py-3">Projects</TabsTrigger>
