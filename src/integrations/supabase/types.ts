@@ -2332,6 +2332,9 @@ export type Database = {
           account_type: string
           avatar_url: string | null
           bio: string | null
+          business_category: string | null
+          business_contact: string | null
+          business_website: string | null
           created_at: string
           display_name: string | null
           id: string
@@ -2343,6 +2346,9 @@ export type Database = {
           account_type?: string
           avatar_url?: string | null
           bio?: string | null
+          business_category?: string | null
+          business_contact?: string | null
+          business_website?: string | null
           created_at?: string
           display_name?: string | null
           id: string
@@ -2354,6 +2360,9 @@ export type Database = {
           account_type?: string
           avatar_url?: string | null
           bio?: string | null
+          business_category?: string | null
+          business_contact?: string | null
+          business_website?: string | null
           created_at?: string
           display_name?: string | null
           id?: string

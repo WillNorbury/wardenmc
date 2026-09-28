@@ -161,7 +161,7 @@ const UserProfile = () => {
       setNotFound(false);
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name, avatar_url, mc_username, bio, created_at, verified");
+        .select("id, display_name, avatar_url, mc_username, bio, created_at, verified, account_type, business_website, business_contact, business_category");
       const match = (profiles ?? []).find((p) => matchesUserSlug(p, slug))
         ?? (user?.id.toLowerCase().startsWith(slug.trim().toLowerCase())
           ? (profiles ?? []).find((p) => p.id === user.id)
@@ -610,11 +610,33 @@ const UserProfile = () => {
                 </HoverCard>
               );
             })()}
+            {(profile as any).account_type === "business" && (
+              <div className="flex items-center gap-1.5 mt-2 text-sm text-muted-foreground">
+                <Building2 className="h-4 w-4" /> {(profile as any).business_category || "Business"}
+              </div>
+            )}
             {profile.bio ? (
               <p className="text-sm mt-3 whitespace-pre-line">{profile.bio}</p>
             ) : isOwn ? (
               <p className="text-sm text-muted-foreground/70 italic mt-3">Add a bio to tell people about yourself.</p>
             ) : null}
+            {(profile as any).account_type === "business" && ((profile as any).business_website || (profile as any).business_contact) && (
+              <div className="flex items-center gap-x-4 gap-y-1 mt-3 text-sm flex-wrap">
+                {(profile as any).business_website && /^https?:\/\//i.test((profile as any).business_website) && (
+                  <a href={(profile as any).business_website} target="_blank" rel="noopener noreferrer nofollow" className="flex items-center gap-1.5 text-primary hover:underline">
+                    <LinkIcon className="h-4 w-4" /> {(profile as any).business_website.replace(/^https?:\/\//i, "").replace(/\/$/, "")}
+                  </a>
+                )}
+                {(profile as any).business_contact && (
+                  <span className="flex items-center gap-1.5 text-muted-foreground break-all">
+                    <Globe className="h-4 w-4 shrink-0" /> {(profile as any).business_contact}
+                  </span>
+                )}
+              </div>
+            )}
+            {isOwn && (profile as any).account_type === "business" && (
+              <Link to="/profile" className="text-xs text-primary hover:underline mt-2 inline-block">Edit business details</Link>
+            )}
 
             <div className="flex items-center gap-x-4 gap-y-1 mt-3 text-sm text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1.5">

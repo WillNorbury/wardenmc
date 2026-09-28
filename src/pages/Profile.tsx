@@ -35,6 +35,7 @@ import TwoFactorCard from "@/components/profile/TwoFactorCard";
 import MyPluginsPanel from "@/components/dashboard/MyPluginsPanel";
 import AvatarFilePicker from "@/components/profile/AvatarFilePicker";
 import { uploadAvatar } from "@/lib/avatarUpload";
+import BusinessProfileCard from "@/components/profile/BusinessProfileCard";
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -326,6 +327,8 @@ const Profile = () => {
             </Button>
           </div>
         </Card>
+
+        <BusinessProfileCard userId={user!.id} displayName={displayName} />
 
         <Card className="p-6 mt-6 space-y-4">
           <div className="flex items-center gap-2">
