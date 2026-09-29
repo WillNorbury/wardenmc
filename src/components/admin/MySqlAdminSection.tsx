@@ -65,18 +65,9 @@ const SNIPPETS: { title: string; sql: string }[] = [
     sql: "SELECT id, name, reason, banned_by_name, time, until, active\nFROM litebans_bans\nWHERE uuid = '<UUID>' AND active = 1\nORDER BY time DESC;",
   },
   {
-    title: "Soft-unban a ban by id",
-    sql: "UPDATE litebans_bans\nSET active = 0,\n    removed_by_uuid = 'CONSOLE',\n    removed_by_name = 'CONSOLE',\n    removed_by_reason = 'Unbanned via web',\n    removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE id = <BAN_ID> AND active = 1;",
-  },
-  {
-    title: "Unmute a player",
-    sql: "UPDATE litebans_mutes\nSET active = 0,\n    removed_by_uuid = 'CONSOLE',\n    removed_by_name = 'CONSOLE',\n    removed_by_reason = 'Unmuted via web',\n    removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE uuid = '<UUID>' AND active = 1;",
-  },
-  {
     title: "Recent 25 punishments",
     sql: "(SELECT 'ban' AS type, id, name, reason, time FROM litebans_bans)\nUNION ALL\n(SELECT 'mute', id, name, reason, time FROM litebans_mutes)\nUNION ALL\n(SELECT 'kick', id, name, reason, time FROM litebans_kicks)\nUNION ALL\n(SELECT 'warn', id, name, reason, time FROM litebans_warnings)\nORDER BY time DESC\nLIMIT 25;",
   },
-  { title: "Delete a warning", sql: "DELETE FROM litebans_warnings WHERE id = <WARN_ID>;" },
 ];
 
 const isReadOnly = (sql: string) => {
