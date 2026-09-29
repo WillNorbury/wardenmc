@@ -76,7 +76,6 @@ export const MySqlAdminSection = () => {
   const [sql, setSql] = useState<string>("SHOW TABLES LIKE 'litebans_%';");
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
 
   useEffect(() => {
@@ -117,11 +116,7 @@ export const MySqlAdminSection = () => {
         setResult(data as RunResult);
         if ((data as any)?.ok) {
           pushHistory(query);
-          toast.success(
-            (data as any).kind === "rows"
-              ? `${(data as any).rowCount} rows in ${(data as any).durationMs}ms`
-              : `${(data as any).affectedRows} affected in ${(data as any).durationMs}ms`,
-          );
+          toast.success(`${(data as any).rowCount} rows in ${(data as any).durationMs}ms`);
         } else {
           toast.error("MySQL error");
         }
@@ -251,15 +246,6 @@ export const MySqlAdminSection = () => {
                 </div>
               );
             })()}
-            {result?.ok && result.kind === "write" && (
-              <div className="border rounded-md p-3 text-sm space-y-1">
-                <div className="font-semibold">Write OK ({result.durationMs}ms)</div>
-                <div>Affected rows: <code>{result.affectedRows}</code></div>
-                <div>Changed rows: <code>{result.changedRows}</code></div>
-                {result.insertId ? <div>Insert id: <code>{result.insertId}</code></div> : null}
-                {result.info && <div className="text-muted-foreground">{result.info}</div>}
-              </div>
-            )}
             {result?.ok && result.kind === "rows" && (
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
