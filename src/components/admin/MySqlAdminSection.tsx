@@ -3,16 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -44,15 +34,6 @@ type RunResult =
       fields: { name: string }[];
       durationMs: number;
     }
-  | {
-      ok: true;
-      kind: "write";
-      affectedRows: number;
-      changedRows: number;
-      insertId: number;
-      info: string | null;
-      durationMs: number;
-    }
   | { ok: false; error: string; code?: string | null; sqlState?: string | null };
 
 const HISTORY_KEY = "litebans_sql_history_v1";
@@ -65,18 +46,9 @@ const SNIPPETS: { title: string; sql: string }[] = [
     sql: "SELECT id, name, reason, banned_by_name, time, until, active\nFROM litebans_bans\nWHERE uuid = '<UUID>' AND active = 1\nORDER BY time DESC;",
   },
   {
-    title: "Soft-unban a ban by id",
-    sql: "UPDATE litebans_bans\nSET active = 0,\n    removed_by_uuid = 'CONSOLE',\n    removed_by_name = 'CONSOLE',\n    removed_by_reason = 'Unbanned via web',\n    removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE id = <BAN_ID> AND active = 1;",
-  },
-  {
-    title: "Unmute a player",
-    sql: "UPDATE litebans_mutes\nSET active = 0,\n    removed_by_uuid = 'CONSOLE',\n    removed_by_name = 'CONSOLE',\n    removed_by_reason = 'Unmuted via web',\n    removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE uuid = '<UUID>' AND active = 1;",
-  },
-  {
     title: "Recent 25 punishments",
     sql: "(SELECT 'ban' AS type, id, name, reason, time FROM litebans_bans)\nUNION ALL\n(SELECT 'mute', id, name, reason, time FROM litebans_mutes)\nUNION ALL\n(SELECT 'kick', id, name, reason, time FROM litebans_kicks)\nUNION ALL\n(SELECT 'warn', id, name, reason, time FROM litebans_warnings)\nORDER BY time DESC\nLIMIT 25;",
   },
-  { title: "Delete a warning", sql: "DELETE FROM litebans_warnings WHERE id = <WARN_ID>;" },
 ];
 
 const isReadOnly = (sql: string) => {
@@ -104,7 +76,6 @@ export const MySqlAdminSection = () => {
   const [sql, setSql] = useState<string>("SHOW TABLES LIKE 'litebans_%';");
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
 
   useEffect(() => {
@@ -145,11 +116,7 @@ export const MySqlAdminSection = () => {
         setResult(data as RunResult);
         if ((data as any)?.ok) {
           pushHistory(query);
-          toast.success(
-            (data as any).kind === "rows"
-              ? `${(data as any).rowCount} rows in ${(data as any).durationMs}ms`
-              : `${(data as any).affectedRows} affected in ${(data as any).durationMs}ms`,
-          );
+          toast.success(`${(data as any).rowCount} rows in ${(data as any).durationMs}ms`);
         } else {
           toast.error("MySQL error");
         }
@@ -165,7 +132,7 @@ export const MySqlAdminSection = () => {
   const onRun = () => {
     if (!sql.trim()) return;
     if (!isReadOnly(sql)) {
-      setConfirmOpen(true);
+      toast.error("This console is read-only. Use in-game commands (e.g. /unban, /unmute) to change punishments.");
       return;
     }
     void runNow();
@@ -179,10 +146,11 @@ export const MySqlAdminSection = () => {
         <div className="flex gap-3">
           <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
           <div className="text-sm space-y-1">
-            <p className="font-medium">You are connected directly to the LiteBans database.</p>
+            <p className="font-medium">You are connected directly to the LiteBans database (read-only).</p>
             <p className="text-muted-foreground">
-              Writes are irreversible. Prefer soft-unbans (set <code className="bg-muted px-1 rounded">active = 0</code>)
-              over <code className="bg-muted px-1 rounded">DELETE</code>. Time columns are epoch milliseconds.
+              This console can only look up data — it can't change or remove punishments. To lift a ban or mute,
+              use the in-game commands (<code className="bg-muted px-1 rounded">/unban</code>,{" "}
+              <code className="bg-muted px-1 rounded">/unmute</code>). Time columns are epoch milliseconds.
               Owner-only.
             </p>
           </div>
@@ -278,15 +246,6 @@ export const MySqlAdminSection = () => {
                 </div>
               );
             })()}
-            {result?.ok && result.kind === "write" && (
-              <div className="border rounded-md p-3 text-sm space-y-1">
-                <div className="font-semibold">Write OK ({result.durationMs}ms)</div>
-                <div>Affected rows: <code>{result.affectedRows}</code></div>
-                <div>Changed rows: <code>{result.changedRows}</code></div>
-                {result.insertId ? <div>Insert id: <code>{result.insertId}</code></div> : null}
-                {result.info && <div className="text-muted-foreground">{result.info}</div>}
-              </div>
-            )}
             {result?.ok && result.kind === "rows" && (
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
@@ -365,29 +324,6 @@ export const MySqlAdminSection = () => {
         </Tabs>
       </Card>
 
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Run {verb} against LiteBans?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This is a write query. It will change or delete data in the live LiteBans database.
-              There is no automatic backup or undo.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <pre className="text-xs bg-muted/40 rounded p-2 max-h-40 overflow-auto"><code>{sql}</code></pre>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setConfirmOpen(false);
-                void runNow();
-              }}
-            >
-              Yes, run it
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
