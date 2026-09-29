@@ -3,16 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -42,15 +32,6 @@ type RunResult =
       rows: Record<string, unknown>[];
       rowCount: number;
       fields: { name: string }[];
-      durationMs: number;
-    }
-  | {
-      ok: true;
-      kind: "write";
-      affectedRows: number;
-      changedRows: number;
-      insertId: number;
-      info: string | null;
       durationMs: number;
     }
   | { ok: false; error: string; code?: string | null; sqlState?: string | null };
@@ -357,29 +338,6 @@ export const MySqlAdminSection = () => {
         </Tabs>
       </Card>
 
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Run {verb} against LiteBans?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This is a write query. It will change or delete data in the live LiteBans database.
-              There is no automatic backup or undo.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <pre className="text-xs bg-muted/40 rounded p-2 max-h-40 overflow-auto"><code>{sql}</code></pre>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setConfirmOpen(false);
-                void runNow();
-              }}
-            >
-              Yes, run it
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
