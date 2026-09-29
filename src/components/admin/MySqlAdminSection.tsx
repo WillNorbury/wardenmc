@@ -156,7 +156,7 @@ export const MySqlAdminSection = () => {
   const onRun = () => {
     if (!sql.trim()) return;
     if (!isReadOnly(sql)) {
-      setConfirmOpen(true);
+      toast.error("This console is read-only. Use in-game commands (e.g. /unban, /unmute) to change punishments.");
       return;
     }
     void runNow();
@@ -170,10 +170,11 @@ export const MySqlAdminSection = () => {
         <div className="flex gap-3">
           <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
           <div className="text-sm space-y-1">
-            <p className="font-medium">You are connected directly to the LiteBans database.</p>
+            <p className="font-medium">You are connected directly to the LiteBans database (read-only).</p>
             <p className="text-muted-foreground">
-              Writes are irreversible. Prefer soft-unbans (set <code className="bg-muted px-1 rounded">active = 0</code>)
-              over <code className="bg-muted px-1 rounded">DELETE</code>. Time columns are epoch milliseconds.
+              This console can only look up data — it can't change or remove punishments. To lift a ban or mute,
+              use the in-game commands (<code className="bg-muted px-1 rounded">/unban</code>,{" "}
+              <code className="bg-muted px-1 rounded">/unmute</code>). Time columns are epoch milliseconds.
               Owner-only.
             </p>
           </div>
