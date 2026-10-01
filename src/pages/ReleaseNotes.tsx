@@ -13,7 +13,7 @@ type Note = {
 };
 
 // Older release-note snapshots retain the former public name until the next successful generation.
-const currentBrand = (text: string) => text.replaceAll("CarnageMC", "WardenMC");
+const currentBrand = (text: string) => text.replace(/CarnageMC/g, "WardenMC");
 
 const ReleaseNotes = () => {
   const [notes, setNotes] = useState<Note[]>([]);
