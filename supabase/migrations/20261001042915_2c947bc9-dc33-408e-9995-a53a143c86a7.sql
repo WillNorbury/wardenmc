@@ -1,0 +1,1 @@
+UPDATE public.changelog_entries SET content = replace(content, 'Updated remaining CarnageMC references', 'Updated remaining old-brand references') WHERE title = 'WardenMC branding across the site' AND content LIKE '%Updated remaining CarnageMC references%';

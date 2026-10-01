@@ -1,0 +1,1 @@
+INSERT INTO public.changelog_entries (title, content, category, published) VALUES ('WardenMC branding across the site', 'Updated remaining CarnageMC references in public pages, the status page, release notes and earlier changelog entries to WardenMC. Existing links and technical identifiers remain unchanged.', 'update', true);

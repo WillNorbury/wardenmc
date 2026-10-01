@@ -12,6 +12,9 @@ type Note = {
   breaking: { title: string; content: string }[];
 };
 
+// Older release-note snapshots retain the former public name until the next successful generation.
+const currentBrand = (text: string) => text.replace(/CarnageMC/g, "WardenMC");
+
 const ReleaseNotes = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
@@ -88,8 +91,8 @@ const ReleaseNotes = () => {
                   <ul className="space-y-1.5 text-sm">
                     {n.breaking.map((b, i) => (
                       <li key={i}>
-                        <span className="font-medium">{b.title}</span>
-                        <span className="text-muted-foreground"> — {b.content}</span>
+                        <span className="font-medium">{currentBrand(b.title)}</span>
+                        <span className="text-muted-foreground"> — {currentBrand(b.content)}</span>
                       </li>
                     ))}
                   </ul>
@@ -103,8 +106,8 @@ const ReleaseNotes = () => {
                       {e.category}
                     </Badge>
                     <div>
-                      <span className="font-medium">{e.title}</span>
-                      <span className="text-muted-foreground"> — {e.content}</span>
+                          <span className="font-medium">{currentBrand(e.title)}</span>
+                          <span className="text-muted-foreground"> — {currentBrand(e.content)}</span>
                     </div>
                   </li>
                 ))}
