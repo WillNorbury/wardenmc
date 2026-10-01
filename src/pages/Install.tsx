@@ -27,20 +27,48 @@ type BrowserInfo = { name: string; steps: string; icon: React.ReactNode };
 const detectBrowser = (): BrowserInfo => {
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
   if (/edg\//i.test(ua))
-    return { name: "Microsoft Edge", steps: 'Open the ⋯ menu → Apps → "Install this site as an app".', icon: <Globe className="h-4 w-4" /> };
+    return {
+      name: "Microsoft Edge",
+      steps: 'Open the ⋯ menu → Apps → "Install this site as an app".',
+      icon: <Globe className="h-4 w-4" />,
+    };
   if (/opr\/|opera/i.test(ua))
     return { name: "Opera", steps: "Open the menu → Install Warden Network.", icon: <Globe className="h-4 w-4" /> };
   if (/samsungbrowser/i.test(ua))
-    return { name: "Samsung Internet", steps: "Open the menu → Add page to → Home screen.", icon: <Smartphone className="h-4 w-4" /> };
+    return {
+      name: "Samsung Internet",
+      steps: "Open the menu → Add page to → Home screen.",
+      icon: <Smartphone className="h-4 w-4" />,
+    };
   if (/firefox|fxios/i.test(ua))
-    return { name: "Firefox", steps: "Open the menu → Install / Add to Home screen.", icon: <Globe className="h-4 w-4" /> };
+    return {
+      name: "Firefox",
+      steps: "Open the menu → Install / Add to Home screen.",
+      icon: <Globe className="h-4 w-4" />,
+    };
   if (/crios/i.test(ua))
-    return { name: "Chrome on iOS", steps: "iOS only installs from Safari — open this page in Safari, then Share → Add to Home Screen.", icon: <Apple className="h-4 w-4" /> };
+    return {
+      name: "Chrome on iOS",
+      steps: "iOS only installs from Safari — open this page in Safari, then Share → Add to Home Screen.",
+      icon: <Apple className="h-4 w-4" />,
+    };
   if (/safari/i.test(ua) && !/chrome|chromium/i.test(ua))
-    return { name: "Safari", steps: "Tap the Share button → Add to Home Screen → Add.", icon: <Apple className="h-4 w-4" /> };
+    return {
+      name: "Safari",
+      steps: "Tap the Share button → Add to Home Screen → Add.",
+      icon: <Apple className="h-4 w-4" />,
+    };
   if (/chrome|chromium/i.test(ua))
-    return { name: "Chrome", steps: 'Open the ⋮ menu → Cast, save & share → "Install page as app" (or the install icon in the address bar).', icon: <Chrome className="h-4 w-4" /> };
-  return { name: "your browser", steps: "Open the browser menu and choose Install app or Add to Home Screen.", icon: <MonitorSmartphone className="h-4 w-4" /> };
+    return {
+      name: "Chrome",
+      steps: 'Open the ⋮ menu → Cast, save & share → "Install page as app" (or the install icon in the address bar).',
+      icon: <Chrome className="h-4 w-4" />,
+    };
+  return {
+    name: "your browser",
+    steps: "Open the browser menu and choose Install app or Add to Home Screen.",
+    icon: <MonitorSmartphone className="h-4 w-4" />,
+  };
 };
 
 export default function Install() {
@@ -80,12 +108,14 @@ export default function Install() {
     setPromptEvt(null);
   };
 
-
   return (
     <>
       <Helmet>
         <title>Install Warden Network — Add to Home Screen</title>
-        <meta name="description" content="Install the Warden Network web app to your phone or desktop for a fullscreen, app-like experience." />
+        <meta
+          name="description"
+          content="Install the Warden Network web app to your phone or desktop for a fullscreen, app-like experience."
+        />
         <link rel="canonical" href="/install" />
       </Helmet>
 
@@ -96,7 +126,8 @@ export default function Install() {
             Install <span className="text-gradient">Warden Network</span>
           </h1>
           <p className="text-muted-foreground mt-2">
-            Get the full Warden Network experience as an installable web app — fullscreen, fast, and right on your home screen.
+            Get the full Warden Network experience as an installable web app — fullscreen, fast, and right on your home
+            screen.
           </p>
         </div>
 
@@ -117,7 +148,7 @@ export default function Install() {
                 <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" />
                 <div className="ml-2 flex flex-1 items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1 text-xs text-muted-foreground">
                   {browser.icon}
-                  <span className="truncate">wardennetwork.net</span>
+                  <span className="truncate">https://warden.rip</span>
                 </div>
                 <span className="hidden sm:inline text-[11px] text-muted-foreground">{browser.name}</span>
               </div>
@@ -125,9 +156,7 @@ export default function Install() {
                 <div className="flex items-center gap-3">
                   <Download className="h-6 w-6 text-primary" />
                   <div className="text-left">
-                    <p className="font-semibold">
-                      {promptEvt ? "One-click install" : `Install with ${browser.name}`}
-                    </p>
+                    <p className="font-semibold">{promptEvt ? "One-click install" : `Install with ${browser.name}`}</p>
                     <p className="text-sm text-muted-foreground">
                       {promptEvt ? "Add Warden Network to your device now." : browser.steps}
                     </p>
@@ -138,7 +167,6 @@ export default function Install() {
                 </Button>
               </CardContent>
             </Card>
-
 
             <div className="grid gap-4 md:grid-cols-2">
               <Card>
