@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { userProfilePath } from "@/lib/userSlug";
+import { confirm } from "@/lib/confirm";
 import { toast } from "sonner";
 import {
   Boxes,
@@ -98,6 +100,11 @@ export default function OrgProfile() {
   const [isOwner, setIsOwner] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [addMemberOpen, setAddMemberOpen] = useState(false);
+  const [memberSearch, setMemberSearch] = useState("");
+  const [memberResults, setMemberResults] = useState<NonNullable<Member["profile"]>[]>([]);
+  const [searchingMembers, setSearchingMembers] = useState(false);
+  const [savingMember, setSavingMember] = useState<string | null>(null);
 
   const [attachOpen, setAttachOpen] = useState(false);
   const [attachLoading, setAttachLoading] = useState(false);
@@ -135,6 +142,82 @@ export default function OrgProfile() {
     ]);
   };
 
+  const loadMembers = async (orgId: string) => {
+    const { data: rows, error } = await supabase.from("organization_members")
+      .select("user_id, role").eq("org_id", orgId);
+    if (error) {
+      toast.error("Could not load members");
+      return;
+    }
+    const ids = (rows ?? []).map((row) => row.user_id);
+    const { data: profiles } = ids.length
+      ? await supabase.from("profiles").select("id, display_name, mc_username, avatar_url").in("id", ids)
+      : { data: [] as NonNullable<Member["profile"]>[] };
+    const profileMap = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+    setMembers((rows ?? []).map((row) => ({
+      user_id: row.user_id,
+      role: row.role,
+      profile: profileMap.get(row.user_id) ?? null,
+    })));
+  };
+
+  useEffect(() => {
+    const query = memberSearch.trim();
+    if (!addMemberOpen || query.length < 2) {
+      setMemberResults([]);
+      setSearchingMembers(false);
+      return;
+    }
+    let active = true;
+    const timer = window.setTimeout(async () => {
+      setSearchingMembers(true);
+      // Search fields separately so the input cannot alter an OR filter expression.
+      const escaped = query.replace(/[\\%_]/g, "\\$&");
+      const [byName, byMinecraft] = await Promise.all([
+        supabase.from("profiles").select("id, display_name, mc_username, avatar_url")
+          .ilike("display_name", `%${escaped}%`).limit(8),
+        supabase.from("profiles").select("id, display_name, mc_username, avatar_url")
+          .ilike("mc_username", `%${escaped}%`).limit(8),
+      ]);
+      if (!active) return;
+      setSearchingMembers(false);
+      if (byName.error || byMinecraft.error) {
+        toast.error("Could not search members");
+        return;
+      }
+      setMemberResults(Array.from(new Map([...(byName.data ?? []), ...(byMinecraft.data ?? [])]
+        .map((profile) => [profile.id, profile])).values()).slice(0, 8));
+    }, 300);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [addMemberOpen, memberSearch]);
+
+  const addMember = async (profile: NonNullable<Member["profile"]>) => {
+    if (!org || !isOwner || !user) return;
+    setSavingMember(profile.id);
+    const { error } = await supabase.from("organization_members").insert({
+      org_id: org.id, user_id: profile.id, role: "member",
+    });
+    setSavingMember(null);
+    if (error) return toast.error(error.code === "23505" ? "Already a member" : error.message);
+    toast.success("Member added");
+    setAddMemberOpen(false);
+    setMemberSearch("");
+    await loadMembers(org.id);
+  };
+
+  const removeMember = async (member: Member) => {
+    if (!org || !isOwner || member.role === "owner") return;
+    const name = member.profile?.display_name || member.profile?.mc_username || "this member";
+    if (!(await confirm({ title: `Remove ${name}?`, description: `Remove this person from ${org.name}?`, confirmText: "Remove member", destructive: true }))) return;
+    setSavingMember(member.user_id);
+    const { error } = await supabase.from("organization_members").delete()
+      .eq("org_id", org.id).eq("user_id", member.user_id);
+    setSavingMember(null);
+    if (error) return toast.error(error.message);
+    toast.success("Member removed");
+    await loadMembers(org.id);
+  };
+
   useEffect(() => {
     if (!slug) return;
     (async () => {
@@ -153,25 +236,7 @@ export default function OrgProfile() {
       setOrg(o);
       document.title = `${o.name} — Warden Network`;
 
-      const { data: m } = await supabase
-        .from("organization_members")
-        .select("user_id, role")
-        .eq("org_id", o.id);
-      const ids = (m ?? []).map((x) => x.user_id);
-      const { data: profs } = ids.length
-        ? await supabase
-            .from("profiles")
-            .select("id, display_name, mc_username, avatar_url")
-            .in("id", ids)
-        : { data: [] as any[] };
-      const profMap = new Map((profs ?? []).map((p: any) => [p.id, p]));
-      setMembers(
-        (m ?? []).map((x: any) => ({
-          user_id: x.user_id,
-          role: x.role,
-          profile: profMap.get(x.user_id) ?? null,
-        }))
-      );
+      await loadMembers(o.id);
 
       if (user) {
         const { data: ownerFlag } = await supabase.rpc("is_org_owner", { _org_id: o.id });
@@ -507,7 +572,36 @@ export default function OrgProfile() {
 
           <aside className="space-y-4">
             <Card className="p-5">
-              <h3 className="font-bold mb-3">Members</h3>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <h3 className="font-bold">Members</h3>
+                {isOwner && (
+                  <Dialog open={addMemberOpen} onOpenChange={(open) => { setAddMemberOpen(open); if (!open) setMemberSearch(""); }}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm"><Plus className="h-4 w-4 mr-1" /> Add member</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add a member</DialogTitle>
+                        <DialogDescription>Find a WardenMC account to add to {org.name}.</DialogDescription>
+                      </DialogHeader>
+                      <Input aria-label="Search members" placeholder="Search display or Minecraft name" value={memberSearch} maxLength={80} onChange={(e) => setMemberSearch(e.target.value)} />
+                      <div className="max-h-72 overflow-y-auto space-y-1">
+                        {searchingMembers && <p className="text-sm text-muted-foreground py-3">Searching…</p>}
+                        {!searchingMembers && memberSearch.trim().length >= 2 && memberResults.length === 0 && <p className="text-sm text-muted-foreground py-3">No matching accounts.</p>}
+                        {!searchingMembers && memberResults.filter((p) => !members.some((m) => m.user_id === p.id)).map((profile) => (
+                          <div key={profile.id} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
+                            <Avatar className="h-9 w-9"><AvatarImage src={profile.avatar_url ?? undefined} /><AvatarFallback>{(profile.display_name || profile.mc_username || "?").slice(0, 2).toUpperCase()}</AvatarFallback></Avatar>
+                            <div className="flex-1 min-w-0"><div className="font-semibold text-sm truncate">{profile.display_name || profile.mc_username}</div>{profile.mc_username && <div className="text-xs text-muted-foreground truncate">{profile.mc_username}</div>}</div>
+                            <Button size="sm" onClick={() => addMember(profile)} disabled={!!savingMember} aria-label={`Add ${profile.display_name || profile.mc_username}`}>
+                              {savingMember === profile.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
               {sortedMembers.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No members yet.</p>
               ) : (
@@ -521,10 +615,8 @@ export default function OrgProfile() {
                       : `/user/${m.user_id.slice(0, 8)}`;
                     return (
                       <li key={m.user_id}>
-                        <Link
-                          to={path}
-                          className="flex items-center gap-3 rounded-md p-2 -mx-2 hover:bg-muted transition-colors"
-                        >
+                        <div className="flex items-center gap-2">
+                        <Link to={path} className="flex items-center gap-3 rounded-md p-2 -mx-2 hover:bg-muted transition-colors min-w-0 flex-1">
                           <Avatar className="h-9 w-9 rounded-md">
                             <AvatarImage
                               src={p?.avatar_url ?? (p?.mc_username ? `https://mc-heads.net/avatar/${p.mc_username}/64` : undefined)}
@@ -542,6 +634,8 @@ export default function OrgProfile() {
                             <div className="text-xs text-muted-foreground capitalize">{m.role}</div>
                           </div>
                         </Link>
+                        {isOwner && m.role !== "owner" && <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label={`Remove ${name}`} title={`Remove ${name}`} disabled={!!savingMember} onClick={() => removeMember(m)}><X className="h-4 w-4" /></Button>}
+                        </div>
                       </li>
                     );
                   })}
