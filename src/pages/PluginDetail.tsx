@@ -748,6 +748,7 @@ const PluginDetail = () => {
             </div>
           </>
         )}
+        </div>
       </main>
       <Footer />
       <Dialog open={!!lightbox} onOpenChange={(o) => !o && setLightbox(null)}>
