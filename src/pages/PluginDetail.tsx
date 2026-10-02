@@ -28,6 +28,7 @@ import ItemReviews from "@/components/site/ItemReviews";
 import ReportDialog from "@/components/site/ReportDialog";
 import FoliaBanner from "@/components/site/FoliaBanner";
 import PluginSupportBadges from "@/components/site/PluginSupportBadges";
+import { DirectoryNav } from "@/components/plugins/PluginDirectoryComponents";
 import {
   ArrowLeft,
   Bookmark,
