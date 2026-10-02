@@ -28,6 +28,7 @@ import ItemReviews from "@/components/site/ItemReviews";
 import ReportDialog from "@/components/site/ReportDialog";
 import FoliaBanner from "@/components/site/FoliaBanner";
 import PluginSupportBadges from "@/components/site/PluginSupportBadges";
+import { DirectoryNav } from "@/components/plugins/PluginDirectoryComponents";
 import {
   ArrowLeft,
   Bookmark,
@@ -346,13 +347,20 @@ const PluginDetail = () => {
     <div className="min-h-screen bg-background text-foreground">
       <PageLoader loading={loading} label="Loading plugin" />
       <Navbar />
-      <main className="container pt-28 pb-16 max-w-6xl">
-        <Button variant="ghost" size="sm" asChild className="mb-4">
-          <Link to="/plugins">
-            <ArrowLeft className="h-4 w-4 mr-1" /> Back to plugins
-          </Link>
-        </Button>
+      <main className="pb-20 pt-24">
+        <section className="border-b border-border/70 bg-card/30">
+          <div className="container max-w-[1400px] py-10 md:py-14">
+            <DirectoryNav active="plugins" />
+            <Button variant="ghost" size="sm" asChild className="mb-4 -ml-3">
+              <Link to="/plugins">
+                <ArrowLeft className="h-4 w-4 mr-1" /> Back to plugins
+              </Link>
+            </Button>
+            <div className="mb-3 text-xs font-semibold uppercase text-primary">WARDENMC • PLUGIN DIRECTORY</div>
+          </div>
+        </section>
 
+        <div className="container max-w-[1400px] pt-8">
         {notFound && !loading && (
           <Card className="p-10 text-center">
             <h1 className="text-2xl font-bold mb-2">Plugin not found</h1>
@@ -740,6 +748,7 @@ const PluginDetail = () => {
             </div>
           </>
         )}
+        </div>
       </main>
       <Footer />
       <Dialog open={!!lightbox} onOpenChange={(o) => !o && setLightbox(null)}>
