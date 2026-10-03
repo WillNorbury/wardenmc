@@ -446,27 +446,34 @@ export const AdminLayout = ({
         </Sheet>
 
         <ScrollArea className="h-screen flex-1 w-full">
-          <main className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8">
-            {/* Mobile top bar */}
-            <div className="flex md:hidden items-center justify-between -mx-4 px-4 py-2 border-b -mt-2 sticky top-2 z-30 bg-background/95 backdrop-blur rounded-b-lg mx-0 mt-2 mb-2 shadow-sm">
-              <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)}>
-                <Menu className="h-5 w-5" />
-              </Button>
-              <LiveClock />
-              <ThemeToggle />
-            </div>
+          {/* Header band — matches the Plugin Directory shell */}
+          <section className="border-b border-border/70 bg-card/30">
+            <div className="container max-w-[1400px] py-8 md:py-12">
+              {/* Mobile top bar */}
+              <div className="flex md:hidden items-center justify-between mb-5">
+                <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)}>
+                  <Menu className="h-5 w-5" />
+                </Button>
+                <LiveClock />
+                <ThemeToggle />
+              </div>
 
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="min-w-0">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight truncate">{title}</h1>
-                {description && <p className="mt-1.5 text-sm md:text-base text-muted-foreground">{description}</p>}
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <LiveClock className="hidden md:inline-flex" />
-                {actions}
-                <ThemeToggle className="hidden md:inline-flex" />
+              <div className="mb-3 text-xs font-semibold uppercase text-primary">WARDENMC • ADMIN CONSOLE</div>
+              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div className="min-w-0">
+                  <h1 className="font-display text-4xl font-black tracking-tight md:text-5xl">{title}</h1>
+                  {description && <p className="mt-3 text-base text-muted-foreground md:text-lg">{description}</p>}
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <LiveClock className="hidden md:inline-flex" />
+                  {actions}
+                  <ThemeToggle className="hidden md:inline-flex" />
+                </div>
               </div>
             </div>
+          </section>
+
+          <main className="container max-w-[1400px] py-6 md:py-8 space-y-6 md:space-y-8">
             <div className="min-w-0 overflow-x-auto">{children}</div>
           </main>
         </ScrollArea>
