@@ -135,7 +135,7 @@ const UserProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followingCount, setFollowingCount] = useState(0);
   const [affiliateCount, setAffiliateCount] = useState(0);
-  const [affiliateOf, setAffiliateOf] = useState<{ id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null } | null>(null);
+  const [affiliateOf, setAffiliateOf] = useState<{ id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [followBusy, setFollowBusy] = useState(false);
 
@@ -297,12 +297,12 @@ const UserProfile = () => {
       setFollowingCount((following as number | null) ?? 0);
       const { count: affiliatesTotal } = await (supabase as any).from("user_affiliates").select("affiliate_id", { count: "exact", head: true }).eq("owner_id", p.id);
       setAffiliateCount(affiliatesTotal ?? 0);
-      const { data: affRows } = await (supabase as any).from("user_affiliates").select("owner_id").eq("affiliate_id", p.id).limit(1);
-      const ownerId = affRows?.[0]?.owner_id as string | undefined;
-      if (ownerId) {
-        const { data: op } = await supabase.from("profiles").select("id, display_name, mc_username, avatar_url").eq("id", ownerId).maybeSingle();
-        setAffiliateOf((op as any) ?? null);
-      } else setAffiliateOf(null);
+      const { data: affRows } = await (supabase as any).from("user_affiliates").select("owner_id").eq("affiliate_id", p.id);
+      const ownerIds = (affRows ?? []).map((r: any) => r.owner_id as string).filter(Boolean);
+      if (ownerIds.length > 0) {
+        const { data: ops } = await supabase.from("profiles").select("id, display_name, mc_username, avatar_url").in("id", ownerIds);
+        setAffiliateOf((ops as any) ?? []);
+      } else setAffiliateOf([]);
       fetchPosts({ authorId: p.id, viewerId: user?.id ?? null }).then(setPosts).catch(() => setPosts([]));
       if (user?.id && user.id !== p.id) {
         const { data: a } = await supabase
