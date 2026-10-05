@@ -562,8 +562,10 @@ const UserProfile = () => {
           <div className="mt-3">
             {(() => {
               const isVerified = !!((profile as any).verified || roles.some(isVerifiedRole) || followerCount >= 1000);
-              const affName = affiliateOf ? (affiliateOf.display_name ?? affiliateOf.mc_username ?? "Player") : "";
-              const affAvatar = affiliateOf ? (affiliateOf.avatar_url || (affiliateOf.mc_username ? `https://mc-heads.net/avatar/${affiliateOf.mc_username}/64` : undefined)) : undefined;
+              const affInfo = (a: { display_name: string | null; mc_username: string | null; avatar_url: string | null }) => ({
+                name: a.display_name ?? a.mc_username ?? "Player",
+                avatar: a.avatar_url || (a.mc_username ? `https://mc-heads.net/avatar/${a.mc_username}/64` : undefined),
+              });
               const joined = new Date(profile.created_at).toLocaleDateString(undefined, { month: "long", year: "numeric" });
               return (
                 <HoverCard openDelay={200}>
