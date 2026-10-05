@@ -135,7 +135,7 @@ const UserProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followingCount, setFollowingCount] = useState(0);
   const [affiliateCount, setAffiliateCount] = useState(0);
-  const [affiliateOf, setAffiliateOf] = useState<{ id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null } | null>(null);
+  const [affiliateOf, setAffiliateOf] = useState<{ id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null }[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [followBusy, setFollowBusy] = useState(false);
 
@@ -297,12 +297,12 @@ const UserProfile = () => {
       setFollowingCount((following as number | null) ?? 0);
       const { count: affiliatesTotal } = await (supabase as any).from("user_affiliates").select("affiliate_id", { count: "exact", head: true }).eq("owner_id", p.id);
       setAffiliateCount(affiliatesTotal ?? 0);
-      const { data: affRows } = await (supabase as any).from("user_affiliates").select("owner_id").eq("affiliate_id", p.id).limit(1);
-      const ownerId = affRows?.[0]?.owner_id as string | undefined;
-      if (ownerId) {
-        const { data: op } = await supabase.from("profiles").select("id, display_name, mc_username, avatar_url").eq("id", ownerId).maybeSingle();
-        setAffiliateOf((op as any) ?? null);
-      } else setAffiliateOf(null);
+      const { data: affRows } = await (supabase as any).from("user_affiliates").select("owner_id").eq("affiliate_id", p.id);
+      const ownerIds = (affRows ?? []).map((r: any) => r.owner_id as string).filter(Boolean);
+      if (ownerIds.length > 0) {
+        const { data: ops } = await supabase.from("profiles").select("id, display_name, mc_username, avatar_url").in("id", ownerIds);
+        setAffiliateOf((ops as any) ?? []);
+      } else setAffiliateOf([]);
       fetchPosts({ authorId: p.id, viewerId: user?.id ?? null }).then(setPosts).catch(() => setPosts([]));
       if (user?.id && user.id !== p.id) {
         const { data: a } = await supabase
@@ -562,8 +562,10 @@ const UserProfile = () => {
           <div className="mt-3">
             {(() => {
               const isVerified = !!((profile as any).verified || roles.some(isVerifiedRole) || followerCount >= 1000);
-              const affName = affiliateOf ? (affiliateOf.display_name ?? affiliateOf.mc_username ?? "Player") : "";
-              const affAvatar = affiliateOf ? (affiliateOf.avatar_url || (affiliateOf.mc_username ? `https://mc-heads.net/avatar/${affiliateOf.mc_username}/64` : undefined)) : undefined;
+              const affInfo = (a: { display_name: string | null; mc_username: string | null; avatar_url: string | null }) => ({
+                name: a.display_name ?? a.mc_username ?? "Player",
+                avatar: a.avatar_url || (a.mc_username ? `https://mc-heads.net/avatar/${a.mc_username}/64` : undefined),
+              });
               const joined = new Date(profile.created_at).toLocaleDateString(undefined, { month: "long", year: "numeric" });
               return (
                 <HoverCard openDelay={200}>
@@ -572,14 +574,17 @@ const UserProfile = () => {
                       <h1 className="text-xl font-bold leading-tight flex items-center gap-1.5 flex-wrap">
                         {profile.display_name ?? "Unnamed Player"}
                         {isVerified && <VerifiedBadge className="h-5 w-5" />}
-                        {affiliateOf && (
-                          <Link to={userProfilePath(affiliateOf as any)} aria-label={`Affiliate of ${affName}`}>
-                            <Avatar className="h-5 w-5 rounded-sm border border-border">
-                              <AvatarImage src={affAvatar} />
-                              <AvatarFallback className="text-[8px] rounded-sm">{affName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                          </Link>
-                        )}
+                        {affiliateOf.map((a) => {
+                          const info = affInfo(a);
+                          return (
+                            <Link key={a.id} to={userProfilePath(a as any)} aria-label={`Affiliate of ${info.name}`}>
+                              <Avatar className="h-5 w-5 rounded-sm border border-border">
+                                <AvatarImage src={info.avatar} />
+                                <AvatarFallback className="text-[8px] rounded-sm">{info.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                            </Link>
+                          );
+                        })}
                       </h1>
                       {profile.mc_username && (
                         <p className="text-sm text-muted-foreground">@{profile.mc_username}</p>
@@ -596,12 +601,15 @@ const UserProfile = () => {
                       {roles.length > 0 && (
                         <li className="flex items-center gap-4"><ShieldCheck className="h-5 w-5 text-foreground shrink-0" /> {roles.slice(0, 3).map(roleLabel).join(", ")}</li>
                       )}
-                      {affiliateOf && (
-                        <li className="flex items-center gap-4">
-                          <Avatar className="h-5 w-5 rounded-sm shrink-0"><AvatarImage src={affAvatar} /><AvatarFallback className="text-[8px] rounded-sm">{affName.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar>
-                          <span>An affiliate of <Link to={userProfilePath(affiliateOf as any)} className="text-primary hover:underline">@{affiliateOf.mc_username ?? affName}</Link></span>
-                        </li>
-                      )}
+                      {affiliateOf.map((a) => {
+                        const info = affInfo(a);
+                        return (
+                          <li key={a.id} className="flex items-center gap-4">
+                            <Avatar className="h-5 w-5 rounded-sm shrink-0"><AvatarImage src={info.avatar} /><AvatarFallback className="text-[8px] rounded-sm">{info.name.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar>
+                            <span>An affiliate of <Link to={userProfilePath(a as any)} className="text-primary hover:underline">@{a.mc_username ?? info.name}</Link></span>
+                          </li>
+                        );
+                      })}
                       {profile.mc_username && (
                         <li className="flex items-center gap-4"><Globe className="h-5 w-5 text-foreground shrink-0" /> Connected via Minecraft</li>
                       )}
