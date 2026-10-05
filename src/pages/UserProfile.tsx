@@ -574,14 +574,17 @@ const UserProfile = () => {
                       <h1 className="text-xl font-bold leading-tight flex items-center gap-1.5 flex-wrap">
                         {profile.display_name ?? "Unnamed Player"}
                         {isVerified && <VerifiedBadge className="h-5 w-5" />}
-                        {affiliateOf && (
-                          <Link to={userProfilePath(affiliateOf as any)} aria-label={`Affiliate of ${affName}`}>
-                            <Avatar className="h-5 w-5 rounded-sm border border-border">
-                              <AvatarImage src={affAvatar} />
-                              <AvatarFallback className="text-[8px] rounded-sm">{affName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                          </Link>
-                        )}
+                        {affiliateOf.map((a) => {
+                          const info = affInfo(a);
+                          return (
+                            <Link key={a.id} to={userProfilePath(a as any)} aria-label={`Affiliate of ${info.name}`}>
+                              <Avatar className="h-5 w-5 rounded-sm border border-border">
+                                <AvatarImage src={info.avatar} />
+                                <AvatarFallback className="text-[8px] rounded-sm">{info.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                            </Link>
+                          );
+                        })}
                       </h1>
                       {profile.mc_username && (
                         <p className="text-sm text-muted-foreground">@{profile.mc_username}</p>
@@ -598,12 +601,15 @@ const UserProfile = () => {
                       {roles.length > 0 && (
                         <li className="flex items-center gap-4"><ShieldCheck className="h-5 w-5 text-foreground shrink-0" /> {roles.slice(0, 3).map(roleLabel).join(", ")}</li>
                       )}
-                      {affiliateOf && (
-                        <li className="flex items-center gap-4">
-                          <Avatar className="h-5 w-5 rounded-sm shrink-0"><AvatarImage src={affAvatar} /><AvatarFallback className="text-[8px] rounded-sm">{affName.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar>
-                          <span>An affiliate of <Link to={userProfilePath(affiliateOf as any)} className="text-primary hover:underline">@{affiliateOf.mc_username ?? affName}</Link></span>
-                        </li>
-                      )}
+                      {affiliateOf.map((a) => {
+                        const info = affInfo(a);
+                        return (
+                          <li key={a.id} className="flex items-center gap-4">
+                            <Avatar className="h-5 w-5 rounded-sm shrink-0"><AvatarImage src={info.avatar} /><AvatarFallback className="text-[8px] rounded-sm">{info.name.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar>
+                            <span>An affiliate of <Link to={userProfilePath(a as any)} className="text-primary hover:underline">@{a.mc_username ?? info.name}</Link></span>
+                          </li>
+                        );
+                      })}
                       {profile.mc_username && (
                         <li className="flex items-center gap-4"><Globe className="h-5 w-5 text-foreground shrink-0" /> Connected via Minecraft</li>
                       )}
