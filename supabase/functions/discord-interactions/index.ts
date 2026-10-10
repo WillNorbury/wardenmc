@@ -3,6 +3,7 @@
 //   https://<project-ref>.functions.supabase.co/discord-interactions
 import nacl from "https://esm.sh/tweetnacl@1.0.3";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { buildRulesEmbed as formatRulesEmbed } from "../_shared/rules-embed.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -41,19 +42,7 @@ async function buildRulesEmbed() {
     .eq("published", true)
     .order("sort_order", { ascending: true });
 
-  const fields = (rows ?? []).map((s: any, idx: number) => ({
-    name: `${idx + 1}. ${s.title}`,
-    value: (s.items ?? []).map((it: string) => `• ${it}`).join("\n") || "—",
-  }));
-
-  return {
-    title: "📜 Warden Network Rules",
-    description: "Please read and follow these rules.",
-    color: 0xef4444,
-    fields: fields.length > 0 ? fields : [{ name: "No rules", value: "No rules configured." }],
-    footer: { text: "Warden Network · Updated regularly" },
-    timestamp: new Date().toISOString(),
-  };
+  return formatRulesEmbed(rows ?? []);
 }
 
 Deno.serve(async (req) => {

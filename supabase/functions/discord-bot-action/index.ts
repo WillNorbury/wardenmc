@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { getDiscordBotToken } from "../_shared/discord-token.ts";
+import { buildRulesEmbed } from "../_shared/rules-embed.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -363,20 +364,8 @@ Deno.serve(async (req) => {
           .eq("published", true)
           .order("sort_order", { ascending: true });
 
-        const fields = (ruleRows ?? []).map((s: any, idx: number) => ({
-          name: `${idx + 1}. ${s.title}`,
-          value: (s.items ?? []).map((it: string) => `• ${it}`).join("\n") || "—",
-        }));
-
-        embed = applyOverride({
-          title: "📜 Warden Network Rules",
-          description:
-            "Please read and follow these rules. Violations may result in mutes, kicks, or bans at staff discretion.",
-          color: 0xef4444,
-          fields: fields.length > 0 ? fields : [{ name: "No rules", value: "No rules configured." }],
-          footer: { text: "Warden Network · Updated regularly" },
-          timestamp: new Date().toISOString(),
-        }, "rules");
+        embed = applyOverride(buildRulesEmbed(ruleRows ?? []), "rules");
+        content = body.mention === false ? undefined : "@everyone";
       }
 
       if (body.preview) {
@@ -391,7 +380,7 @@ Deno.serve(async (req) => {
       let result;
       if (existingId && sameChannel) {
         // PATCH cannot change content+mentions reliably; just patch embeds
-        result = await discordPatch(channelId, existingId, token, { embeds: [embed] });
+        result = await discordPatch(channelId, existingId, token, payload);
         if (!result.ok && result.status === 404) {
           result = await discordPost(channelId, token, payload);
           if (result.ok) {
