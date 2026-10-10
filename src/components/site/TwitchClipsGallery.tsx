@@ -45,10 +45,10 @@ export default function TwitchClipsGallery({ login, parents }: { login: string; 
 
   return (
     <section className="space-y-4">
-      <div className="flex items-baseline justify-between border-b border-white/5 pb-3">
+      <div className="flex items-baseline justify-between border-b border-border pb-3">
         <div>
-          <span className="text-[#9146ff] font-mono text-xs tracking-widest uppercase">Recent</span>
-          <h2 className="text-2xl md:text-3xl font-bold font-['Space_Grotesk'] tracking-tighter italic">
+          <span className="text-primary font-mono text-xs tracking-widest uppercase">Recent</span>
+          <h2 className="text-2xl md:text-3xl font-bold font-display tracking-tighter italic">
             CLIPS
           </h2>
         </div>
@@ -56,7 +56,7 @@ export default function TwitchClipsGallery({ login, parents }: { login: string; 
           href={`https://www.twitch.tv/${login}/clips`}
           target="_blank"
           rel="noreferrer"
-          className="text-[10px] font-mono tracking-widest uppercase text-[#9ca3af] hover:text-[#c8a2ff] transition"
+          className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:text-primary transition"
         >
           View all →
         </a>
@@ -65,17 +65,17 @@ export default function TwitchClipsGallery({ login, parents }: { login: string; 
       {clips === null && !error && (
         <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="aspect-video bg-white/5 animate-pulse border border-white/5" />
+            <div key={i} className="aspect-video bg-white/5 animate-pulse border border-border" />
           ))}
         </div>
       )}
 
       {error && (
-        <p className="text-sm text-[#9ca3af] font-mono">Clips unavailable right now.</p>
+        <p className="text-sm text-muted-foreground font-mono">Clips unavailable right now.</p>
       )}
 
       {clips && clips.length === 0 && (
-        <p className="text-sm text-[#9ca3af] font-mono">No recent clips.</p>
+        <p className="text-sm text-muted-foreground font-mono">No recent clips.</p>
       )}
 
       {clips && clips.length > 0 && (
@@ -85,7 +85,7 @@ export default function TwitchClipsGallery({ login, parents }: { login: string; 
               key={c.id}
               type="button"
               onClick={() => setActive(c)}
-              className="group text-left border border-white/10 hover:border-[#9146ff] transition bg-black overflow-hidden focus:outline-none focus:border-[#9146ff]"
+              className="group text-left border border-border hover:border-primary transition bg-black overflow-hidden focus:outline-none focus:border-primary"
             >
               <div className="relative aspect-video overflow-hidden">
                 <img
@@ -95,15 +95,15 @@ export default function TwitchClipsGallery({ login, parents }: { login: string; 
                   className="w-full h-full object-cover group-hover:scale-105 transition"
                 />
                 <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                  <Play className="w-10 h-10 text-white" strokeWidth={1.25} />
+                  <Play className="w-10 h-10 text-foreground" strokeWidth={1.25} />
                 </div>
-                <div className="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 text-[10px] font-mono text-white">
+                <div className="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 text-[10px] font-mono text-foreground">
                   {Math.round(c.duration)}s
                 </div>
               </div>
               <div className="p-2 space-y-1">
-                <div className="text-xs text-slate-100 line-clamp-2 leading-tight">{c.title}</div>
-                <div className="flex items-center justify-between text-[10px] text-[#9ca3af] font-mono">
+                <div className="text-xs text-foreground line-clamp-2 leading-tight">{c.title}</div>
+                <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono">
                   <span className="truncate">{c.creatorName}</span>
                   <span className="inline-flex items-center gap-1">
                     <Eye className="w-3 h-3" /> {c.viewCount}
@@ -123,15 +123,15 @@ export default function TwitchClipsGallery({ login, parents }: { login: string; 
           onClick={() => setActive(null)}
         >
           <div
-            className="relative w-full max-w-4xl bg-black border border-white/10"
+            className="relative w-full max-w-4xl bg-black border border-border"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10">
-              <div className="text-sm text-slate-100 truncate">{active.title}</div>
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+              <div className="text-sm text-foreground truncate">{active.title}</div>
               <button
                 type="button"
                 onClick={() => setActive(null)}
-                className="text-[#9ca3af] hover:text-white text-xs font-mono tracking-widest uppercase"
+                className="text-muted-foreground hover:text-foreground text-xs font-mono tracking-widest uppercase"
               >
                 Close
               </button>

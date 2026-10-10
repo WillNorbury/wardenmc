@@ -67,7 +67,7 @@ export default function WikiMore() {
   const current = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b0d10] text-neutral-100">
+    <div className="min-h-screen flex flex-col bg-background text-neutral-100">
       <Helmet>
         <title>More Wiki — Warden Network Archive</title>
         <meta name="description" content="Full searchable index of every Warden Network wiki article." />
@@ -76,7 +76,7 @@ export default function WikiMore() {
 
       <main className="flex-1">
         {/* Header */}
-        <section className="border-b border-neutral-800 bg-gradient-to-b from-[#141618] to-[#0b0d10]">
+        <section className="border-b border-neutral-800 bg-gradient-to-b from-card to-background">
           <div className="container mx-auto px-4 py-10 md:py-14 max-w-6xl">
             <Link to="/wiki" className="inline-flex items-center gap-1 text-xs uppercase tracking-widest text-neutral-400 hover:text-neutral-200">
               <ChevronLeft className="w-3 h-3" /> Back to Wiki
@@ -104,7 +104,7 @@ export default function WikiMore() {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Search articles, slugs, categories…"
-                  className="w-full pl-10 pr-3 py-3 bg-[#141618] border border-neutral-800 focus:border-[#ff5722] outline-none text-sm rounded-none"
+                  className="w-full pl-10 pr-3 py-3 bg-card border border-neutral-800 focus:border-primary outline-none text-sm rounded-none"
                 />
               </div>
               <div className="flex gap-2 overflow-x-auto md:flex-wrap">
@@ -114,7 +114,7 @@ export default function WikiMore() {
                     onClick={() => setCategory(c)}
                     className={`px-3 py-2 text-xs uppercase tracking-widest whitespace-nowrap border transition ${
                       category === c
-                        ? "border-[#ff5722] text-[#ff5722] bg-[#ff5722]/10"
+                        ? "border-primary text-primary bg-primary/10"
                         : "border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:border-neutral-700"
                     }`}
                   >
@@ -144,7 +144,7 @@ export default function WikiMore() {
                   <li key={a.id}>
                     <Link
                       to={`/wiki/${a.slug}`}
-                      className="group grid grid-cols-[auto_1fr_auto] gap-4 items-center py-4 px-2 hover:bg-[#141618] transition"
+                      className="group grid grid-cols-[auto_1fr_auto] gap-4 items-center py-4 px-2 hover:bg-card transition"
                     >
                       <span className="text-neutral-600 font-mono text-xs w-10 text-right">
                         {String((page - 1) * PAGE_SIZE + i + 1).padStart(3, "0")}
@@ -157,14 +157,14 @@ export default function WikiMore() {
                           <span className="text-neutral-700">·</span>
                           <span className="text-[10px] font-mono text-neutral-600">/{a.slug}</span>
                         </div>
-                        <h3 className="mt-1 text-base md:text-lg font-semibold text-neutral-100 group-hover:text-[#ff5722] transition truncate">
+                        <h3 className="mt-1 text-base md:text-lg font-semibold text-neutral-100 group-hover:text-primary transition truncate">
                           {a.title}
                         </h3>
                         {a.excerpt && (
                           <p className="text-sm text-neutral-500 line-clamp-1">{a.excerpt}</p>
                         )}
                       </div>
-                      <FileText className="w-4 h-4 text-neutral-700 group-hover:text-[#ff5722] transition" />
+                      <FileText className="w-4 h-4 text-neutral-700 group-hover:text-primary transition" />
                     </Link>
                   </li>
                 ))}
@@ -176,7 +176,7 @@ export default function WikiMore() {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="inline-flex items-center gap-1 px-4 py-2 text-xs uppercase tracking-widest border border-neutral-800 hover:border-[#ff5722] hover:text-[#ff5722] disabled:opacity-40 disabled:hover:border-neutral-800 disabled:hover:text-current"
+                    className="inline-flex items-center gap-1 px-4 py-2 text-xs uppercase tracking-widest border border-neutral-800 hover:border-primary hover:text-primary disabled:opacity-40 disabled:hover:border-neutral-800 disabled:hover:text-current"
                   >
                     <ChevronLeft className="w-3 h-3" /> Prev
                   </button>
@@ -198,7 +198,7 @@ export default function WikiMore() {
                           onClick={() => setPage(n)}
                           className={`w-9 h-9 text-xs font-mono border ${
                             n === page
-                              ? "border-[#ff5722] text-[#ff5722] bg-[#ff5722]/10"
+                              ? "border-primary text-primary bg-primary/10"
                               : "border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:border-neutral-700"
                           }`}
                         >
@@ -210,7 +210,7 @@ export default function WikiMore() {
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="inline-flex items-center gap-1 px-4 py-2 text-xs uppercase tracking-widest border border-neutral-800 hover:border-[#ff5722] hover:text-[#ff5722] disabled:opacity-40 disabled:hover:border-neutral-800 disabled:hover:text-current"
+                    className="inline-flex items-center gap-1 px-4 py-2 text-xs uppercase tracking-widest border border-neutral-800 hover:border-primary hover:text-primary disabled:opacity-40 disabled:hover:border-neutral-800 disabled:hover:text-current"
                   >
                     Next <ChevronRight className="w-3 h-3" />
                   </button>

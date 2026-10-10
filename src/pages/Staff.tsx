@@ -115,7 +115,7 @@ const Staff = () => {
           )}
         </PageHero>
 
-        <div className="container pb-24">
+        <div className="container pb-24 max-w-[1400px]">
           {loading ? (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (

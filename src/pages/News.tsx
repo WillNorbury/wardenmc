@@ -93,7 +93,7 @@ const NewsPage = () => {
           description="Updates, patch notes and announcements straight from the Warden Network team."
         />
 
-        <section className="container pb-24 max-w-6xl">
+        <section className="container pb-24 max-w-[1400px]">
           {/* Controls */}
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between mb-10">
             <div className="relative w-full sm:max-w-xs">

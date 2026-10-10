@@ -99,7 +99,7 @@ export default function TwitchLiveWidget({
     return (
       <div
         className={cn(
-          "flex items-center gap-2 border border-white/10 bg-[#1a1a24] px-3 py-2 text-xs text-[#9ca3af]",
+          "flex items-center gap-2 border border-border bg-card px-3 py-2 text-xs text-muted-foreground",
           className,
         )}
       >
@@ -115,7 +115,7 @@ export default function TwitchLiveWidget({
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
-          "inline-flex items-center gap-2 border border-white/10 bg-[#1a1a24] px-3 py-2 text-xs text-[#9ca3af] hover:text-white",
+          "inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-xs text-muted-foreground hover:text-foreground",
           className,
         )}
       >
@@ -132,10 +132,10 @@ export default function TwitchLiveWidget({
       <Link
         to="/live"
         className={cn(
-          "group inline-flex items-center gap-3 border px-3 py-2 bg-[#1a1a24] transition min-w-0",
+          "group inline-flex items-center gap-3 border px-3 py-2 bg-card transition min-w-0",
           live
-            ? "border-[#9146ff]/50 hover:border-[#9146ff]"
-            : "border-white/10 hover:border-white/20",
+            ? "border-primary/50 hover:border-primary"
+            : "border-border hover:border-border",
           className,
         )}
       >
@@ -146,34 +146,34 @@ export default function TwitchLiveWidget({
           <span
             className={cn(
               "relative inline-flex h-2.5 w-2.5 rounded-full",
-              live ? "bg-red-500" : "bg-[#5f6472]",
+              live ? "bg-red-500" : "bg-muted-foreground",
             )}
           />
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest">
-            <span className={live ? "text-red-400" : "text-[#9ca3af]"}>
+            <span className={live ? "text-red-400" : "text-muted-foreground"}>
               {live ? "Live now" : "Offline"}
             </span>
-            <span className="text-[#5f6472]">·</span>
-            <span className="text-[#9146ff]">Twitch</span>
+            <span className="text-muted-foreground">·</span>
+            <span className="text-primary">Twitch</span>
           </span>
-          <span className="block truncate text-sm font-semibold text-white">
+          <span className="block truncate text-sm font-semibold text-foreground">
             {status.displayName}
           </span>
           {live && status.title && (
-            <span className="block truncate text-xs text-[#9ca3af]">{status.title}</span>
+            <span className="block truncate text-xs text-muted-foreground">{status.title}</span>
           )}
         </span>
         {live && (
-          <span className="hidden sm:flex flex-col items-end text-[10px] font-mono uppercase tracking-widest text-[#9ca3af]">
+          <span className="hidden sm:flex flex-col items-end text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             <span className="flex items-center gap-1 text-red-400">
               <Users className="h-3 w-3" /> {fmtViewers(status.viewerCount ?? 0)}
             </span>
             {uptime && <span>{uptime}</span>}
           </span>
         )}
-        <ArrowUpRight className="h-4 w-4 shrink-0 text-[#9ca3af] group-hover:text-white transition" />
+        <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-foreground transition" />
       </Link>
     );
   }
@@ -181,8 +181,8 @@ export default function TwitchLiveWidget({
   return (
     <div
       className={cn(
-        "border p-5 bg-[#1a1a24] flex flex-col gap-4",
-        live ? "border-[#9146ff]/40" : "border-white/10",
+        "border p-5 bg-card flex flex-col gap-4",
+        live ? "border-primary/40" : "border-border",
         className,
       )}
     >
@@ -192,7 +192,7 @@ export default function TwitchLiveWidget({
             src={status.profileImage}
             alt={status.displayName}
             loading="lazy"
-            className="h-14 w-14 rounded-full border border-white/10 object-cover"
+            className="h-14 w-14 rounded-full border border-border object-cover"
           />
         )}
         <div className="min-w-0 flex-1">
@@ -202,30 +202,30 @@ export default function TwitchLiveWidget({
                 "inline-flex items-center gap-1.5 border px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest",
                 live
                   ? "border-red-500/40 text-red-400 bg-red-500/10"
-                  : "border-white/10 text-[#9ca3af]",
+                  : "border-border text-muted-foreground",
               )}
             >
               <span
                 className={cn(
                   "h-1.5 w-1.5 rounded-full",
-                  live ? "bg-red-500 animate-pulse" : "bg-[#5f6472]",
+                  live ? "bg-red-500 animate-pulse" : "bg-muted-foreground",
                 )}
               />
               {live ? "Live" : "Offline"}
             </span>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#9146ff]">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-primary">
               twitch.tv/{status.login}
             </span>
           </div>
-          <div className="mt-1 font-['Space_Grotesk'] text-xl font-bold text-white">
+          <div className="mt-1 font-display text-xl font-bold text-foreground">
             {status.displayName}
           </div>
           {live ? (
-            <div className="mt-1 text-sm text-[#e5e7eb] line-clamp-2">
+            <div className="mt-1 text-sm text-foreground line-clamp-2">
               {status.title || "Streaming now"}
             </div>
           ) : (
-            <div className="mt-1 text-sm text-[#9ca3af]">
+            <div className="mt-1 text-sm text-muted-foreground">
               Not streaming right now — follow for a heads up.
             </div>
           )}
@@ -234,7 +234,7 @@ export default function TwitchLiveWidget({
           href={channelUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 inline-flex items-center gap-1.5 border border-[#9146ff]/50 bg-[#9146ff]/10 px-3 py-2 text-[10px] font-mono uppercase tracking-widest text-[#c8a2ff] hover:bg-[#9146ff] hover:text-white transition"
+          className="shrink-0 inline-flex items-center gap-1.5 border border-primary/50 bg-primary/10 px-3 py-2 text-[10px] font-mono uppercase tracking-widest text-primary hover:bg-primary hover:text-primary-foreground transition"
         >
           Open <ArrowUpRight className="h-3.5 w-3.5" />
         </a>
@@ -243,8 +243,8 @@ export default function TwitchLiveWidget({
       {live && (
         <div className="grid grid-cols-3 gap-2 text-xs">
           <Stat icon={<Users className="h-3.5 w-3.5 text-red-400" />} label="Viewers" value={fmtViewers(status.viewerCount ?? 0)} />
-          <Stat icon={<Gamepad2 className="h-3.5 w-3.5 text-[#9146ff]" />} label="Game" value={status.gameName ?? "—"} />
-          <Stat icon={<Radio className="h-3.5 w-3.5 text-[#ff5722]" />} label="Uptime" value={uptime ?? "—"} />
+          <Stat icon={<Gamepad2 className="h-3.5 w-3.5 text-primary" />} label="Game" value={status.gameName ?? "—"} />
+          <Stat icon={<Radio className="h-3.5 w-3.5 text-primary" />} label="Uptime" value={uptime ?? "—"} />
         </div>
       )}
     </div>
@@ -253,12 +253,12 @@ export default function TwitchLiveWidget({
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="border border-white/5 bg-[#0a0a0f] p-2.5 min-w-0">
-      <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-[#9ca3af]">
+    <div className="border border-border bg-background p-2.5 min-w-0">
+      <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
         {icon}
         <span className="truncate">{label}</span>
       </div>
-      <div className="mt-1 truncate font-['Space_Grotesk'] text-base font-bold text-white">
+      <div className="mt-1 truncate font-display text-base font-bold text-foreground">
         {value}
       </div>
     </div>
