@@ -59,23 +59,23 @@ export default function Live() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0f] text-slate-100">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap"
         rel="stylesheet"
       />
       <Navbar />
-      <main className="flex-1 w-full font-['Inter']">
+      <main className="flex-1 w-full">
         <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-10 md:py-14 flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-white/5 pb-6">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-border pb-6">
             <div className="min-w-0">
-              <span className="font-mono text-sm tracking-widest uppercase text-[#9146ff]">
+              <span className="font-mono text-sm tracking-widest uppercase text-primary">
                 Twitch · Live
               </span>
-              <h1 className="text-5xl md:text-7xl font-bold font-['Space_Grotesk'] tracking-tighter italic break-words">
+              <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tighter italic break-words">
                 {active.label.toUpperCase()}
               </h1>
-              <p className="text-[#9ca3af] max-w-xl mt-1">
+              <p className="text-muted-foreground max-w-xl mt-1">
                 Watch the stream without leaving the site. Status updates every minute.
               </p>
             </div>
@@ -90,8 +90,8 @@ export default function Live() {
                     className={
                       "inline-flex items-center gap-2 border px-3 py-2 text-[10px] font-mono tracking-widest uppercase transition " +
                       (isActive
-                        ? "border-[#9146ff] text-white bg-[#9146ff]/10"
-                        : "border-white/10 text-[#9ca3af] hover:border-white/30 hover:text-white")
+                        ? "border-primary text-foreground bg-primary/10"
+                        : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground")
                     }
                   >
                     <Tv className="h-3.5 w-3.5" />
@@ -102,7 +102,7 @@ export default function Live() {
               <button
                 type="button"
                 onClick={() => setShowChat((v) => !v)}
-                className="inline-flex items-center gap-2 border border-white/10 px-3 py-2 text-[10px] font-mono tracking-widest uppercase text-[#9ca3af] hover:border-white/30 hover:text-white transition"
+                className="inline-flex items-center gap-2 border border-border px-3 py-2 text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:border-primary/50 hover:text-foreground transition"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 {showChat ? "Hide chat" : "Show chat"}
@@ -119,7 +119,7 @@ export default function Live() {
                 : "grid gap-4"
             }
           >
-            <div className="relative w-full overflow-hidden border border-white/10 bg-black" style={{ aspectRatio: "16 / 9" }}>
+            <div className="relative w-full overflow-hidden border border-border bg-black" style={{ aspectRatio: "16 / 9" }}>
               {twitchPlayerSrc ? (
                 <iframe
                   key={twitchPlayerSrc}
@@ -130,14 +130,14 @@ export default function Live() {
                   className="absolute inset-0 h-full w-full"
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-[#9ca3af]">
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <Tv className="h-6 w-6 mr-2" /> Loading player…
                 </div>
               )}
             </div>
 
             {showChat && (
-              <div className="border border-white/10 bg-black min-h-[420px] lg:min-h-0">
+              <div className="border border-border bg-black min-h-[420px] lg:min-h-0">
                 {twitchChatSrc && (
                   <iframe
                     key={twitchChatSrc}

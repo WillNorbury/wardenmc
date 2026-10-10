@@ -355,7 +355,7 @@ export default function Store() {
             }
           }}
           placeholder="COUPON CODE"
-          className="bg-muted border border-white/10 focus:border-primary focus:outline-none px-3 py-2 text-xs font-mono tracking-widest uppercase text-foreground placeholder:text-muted-foreground w-48"
+          className="bg-muted border border-border focus:border-primary focus:outline-none px-3 py-2 text-xs font-mono tracking-widest uppercase text-foreground placeholder:text-muted-foreground w-48"
         />
         <button
           type="button"
@@ -367,7 +367,7 @@ export default function Store() {
             }
           }}
           disabled={cart.applyingCoupon || !code.trim()}
-          className="px-4 py-2 text-[10px] font-mono tracking-widest uppercase border border-white/10 text-muted-foreground hover:border-primary hover:text-primary transition disabled:opacity-50"
+          className="px-4 py-2 text-[10px] font-mono tracking-widest uppercase border border-border text-muted-foreground hover:border-primary hover:text-primary transition disabled:opacity-50"
         >
           {cart.applyingCoupon ? "…" : "Apply"}
         </button>
@@ -394,13 +394,13 @@ export default function Store() {
             if (e.key === "Enter") apply();
           }}
           placeholder="CREATOR CODE"
-          className="bg-muted border border-white/10 focus:border-cyan-400 focus:outline-none px-3 py-2 text-xs font-mono tracking-widest uppercase text-foreground placeholder:text-muted-foreground w-48"
+          className="bg-muted border border-border focus:border-cyan-400 focus:outline-none px-3 py-2 text-xs font-mono tracking-widest uppercase text-foreground placeholder:text-muted-foreground w-48"
         />
         <button
           type="button"
           onClick={apply}
           disabled={cart.applyingCreatorCode || !code.trim()}
-          className="px-4 py-2 text-[10px] font-mono tracking-widest uppercase border border-white/10 text-muted-foreground hover:border-cyan-400 hover:text-cyan-300 transition disabled:opacity-50"
+          className="px-4 py-2 text-[10px] font-mono tracking-widest uppercase border border-border text-muted-foreground hover:border-cyan-400 hover:text-cyan-300 transition disabled:opacity-50"
         >
           {cart.applyingCreatorCode ? "…" : "Apply"}
         </button>
@@ -427,15 +427,15 @@ export default function Store() {
         />
       </Helmet>
       <Navbar />
-      <main className="flex-1 w-full font-['Inter']">
+      <main className="flex-1 w-full">
         <div className="max-w-6xl w-full mx-auto px-4 md:px-8 py-10 md:py-14 flex flex-col gap-12">
           {/* Header & Search */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
             <div className="space-y-2">
               <span className="text-primary font-mono text-sm tracking-widest uppercase">
                 Marketplace
               </span>
-              <h1 className="text-6xl md:text-8xl font-bold font-['Space_Grotesk'] tracking-tighter italic">
+              <h1 className="text-6xl md:text-8xl font-bold font-display tracking-tighter italic">
                 STORE
               </h1>
             </div>
@@ -461,7 +461,7 @@ export default function Store() {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Search the store..."
-                  className="relative w-full bg-muted border border-white/10 px-6 py-4 rounded-none focus:outline-none focus:border-primary text-lg font-['Space_Grotesk'] tracking-wide text-foreground placeholder:text-muted-foreground"
+                  className="relative w-full bg-muted border border-border px-6 py-4 rounded-none focus:outline-none focus:border-primary text-lg font-display tracking-wide text-foreground placeholder:text-muted-foreground"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-primary font-mono text-xs opacity-50 hidden sm:block">
                   [/]
@@ -483,7 +483,7 @@ export default function Store() {
                 className={`px-4 py-2 text-xs font-mono tracking-widest uppercase border transition ${
                   activeCat === "all"
                     ? "bg-primary border-primary text-primary-foreground"
-                    : "border-white/10 text-muted-foreground hover:border-primary hover:text-primary"
+                    : "border-border text-muted-foreground hover:border-primary hover:text-primary"
                 }`}
               >
                 All
@@ -497,7 +497,7 @@ export default function Store() {
                     className={`px-4 py-2 text-xs font-mono tracking-widest uppercase border transition inline-flex items-center gap-2 ${
                       activeCat === c.id
                         ? "bg-primary border-primary text-primary-foreground"
-                        : "border-white/10 text-muted-foreground hover:border-primary hover:text-primary"
+                        : "border-border text-muted-foreground hover:border-primary hover:text-primary"
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -509,7 +509,7 @@ export default function Store() {
           )}
 
           {popularItems.length > 0 && (
-            <section className="mb-10 border border-white/5 bg-card p-5">
+            <section className="mb-10 border border-border bg-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Flame className="w-3.5 h-3.5 text-primary" strokeWidth={1.5} />
                 <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
@@ -520,7 +520,7 @@ export default function Store() {
                 {popularItems.map((it, idx) => (
                   <div
                     key={it.id}
-                    className="group relative bg-background border border-white/5 hover:border-primary/40 transition overflow-hidden"
+                    className="group relative bg-background border border-border hover:border-primary/40 transition overflow-hidden"
                   >
                     <Link to={`/store/package/${it.id}`} className="block">
                       <span className="absolute top-2 left-2 z-10 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 tracking-widest">
@@ -561,7 +561,7 @@ export default function Store() {
                       className={`absolute top-2 right-2 z-10 w-7 h-7 grid place-items-center border transition ${
                         justAdded === it.id
                           ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
-                          : "bg-background/80 border-white/10 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-primary hover:border-primary hover:text-primary-foreground"
+                          : "bg-background/80 border-border text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-primary hover:border-primary hover:text-primary-foreground"
                       }`}
                     >
                       {justAdded === it.id ? (
@@ -579,7 +579,7 @@ export default function Store() {
 
 
           {recentItems.length > 0 && (
-            <section className="mb-10 border border-white/5 bg-card p-5">
+            <section className="mb-10 border border-border bg-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
                   Recently viewed
@@ -596,7 +596,7 @@ export default function Store() {
                 {recentItems.map((it) => (
                   <div
                     key={it.id}
-                    className="group relative bg-background border border-white/5 hover:border-primary/40 transition overflow-hidden"
+                    className="group relative bg-background border border-border hover:border-primary/40 transition overflow-hidden"
                   >
                     <Link to={`/store/package/${it.id}`} className="block">
                       <div className="aspect-square bg-muted relative overflow-hidden">
@@ -634,7 +634,7 @@ export default function Store() {
                       className={`absolute top-2 right-2 z-10 w-7 h-7 grid place-items-center border transition ${
                         justAdded === it.id
                           ? "bg-emerald-500/20 border-emerald-400/60 text-emerald-300"
-                          : "bg-background/80 border-white/10 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-primary hover:border-primary hover:text-primary-foreground"
+                          : "bg-background/80 border-border text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-primary hover:border-primary hover:text-primary-foreground"
                       }`}
                     >
                       {justAdded === it.id ? (
@@ -661,7 +661,7 @@ export default function Store() {
               {heroItem && (
                 <ItemLink
                   it={heroItem}
-                  className="md:col-span-8 group relative bg-muted overflow-hidden min-h-[320px] md:min-h-[380px] flex flex-col justify-end p-8 border border-white/5 hover:border-primary/40 transition-colors"
+                  className="md:col-span-8 group relative bg-muted overflow-hidden min-h-[320px] md:min-h-[380px] flex flex-col justify-end p-8 border border-border hover:border-primary/40 transition-colors"
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10" />
                   {heroItem.image_url ? (
@@ -686,7 +686,7 @@ export default function Store() {
                     </span>
                   </div>
                   <div className="relative z-20 space-y-4">
-                    <h2 className="text-4xl md:text-5xl font-bold font-['Space_Grotesk'] leading-none group-hover:text-primary transition-colors">
+                    <h2 className="text-4xl md:text-5xl font-bold font-display leading-none group-hover:text-primary transition-colors">
                       {heroItem.name}
                     </h2>
                     {heroItem.description && (
@@ -695,7 +695,7 @@ export default function Store() {
                       </p>
                     )}
                     <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-primary uppercase tracking-widest">
-                      <span className="text-2xl md:text-3xl font-bold font-['Space_Grotesk'] not-italic normal-case tracking-normal text-primary-foreground">
+                      <span className="text-2xl md:text-3xl font-bold font-display not-italic normal-case tracking-normal text-primary-foreground">
                         {formatPrice(heroItem.price, heroItem.currency)}
                       </span>
                       <AddToCartButton it={heroItem} size="lg" />
@@ -714,11 +714,11 @@ export default function Store() {
                       className={`bg-muted p-6 border-l-4 flex flex-col justify-between min-h-[180px] hover:bg-accent transition-all group ${
                         i === 0
                           ? "border-primary"
-                          : "border-white/10 hover:border-primary"
+                          : "border-border hover:border-primary"
                       }`}
                     >
                       <div>
-                        <h3 className="text-xl font-bold font-['Space_Grotesk'] group-hover:text-primary transition-colors">
+                        <h3 className="text-xl font-bold font-display group-hover:text-primary transition-colors">
                           {it.name}
                         </h3>
                         {it.description && (
@@ -728,7 +728,7 @@ export default function Store() {
                         )}
                       </div>
                       <div className="flex items-center justify-between mt-4 gap-3">
-                        <span className="text-lg font-bold font-['Space_Grotesk']">
+                        <span className="text-lg font-bold font-display">
                           {formatPrice(it.price, it.currency)}
                         </span>
                         <AddToCartButton it={it} />
@@ -759,11 +759,11 @@ export default function Store() {
                         <ItemLink
                           key={it.id}
                           it={it}
-                          className="p-6 bg-muted border border-white/5 hover:border-primary/30 transition group flex flex-col justify-between"
+                          className="p-6 bg-muted border border-border hover:border-primary/30 transition group flex flex-col justify-between"
                         >
                           <div>
                             <div className="flex items-start justify-between gap-2">
-                              <h4 className="font-bold font-['Space_Grotesk'] group-hover:text-primary transition-colors">
+                              <h4 className="font-bold font-display group-hover:text-primary transition-colors">
                                 {it.name}
                               </h4>
                               {it.badge && (
@@ -778,8 +778,8 @@ export default function Store() {
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5 gap-3">
-                            <span className="font-bold font-['Space_Grotesk']">
+                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border gap-3">
+                            <span className="font-bold font-display">
                               {formatPrice(it.price, it.currency)}
                             </span>
                             <AddToCartButton it={it} />
@@ -801,9 +801,9 @@ export default function Store() {
               <section
                 id="cart"
                 ref={cartRef}
-                className="md:col-span-12 mt-8 scroll-mt-24 bg-card border border-white/10"
+                className="md:col-span-12 mt-8 scroll-mt-24 bg-card border border-border"
               >
-                <div className="flex items-center gap-4 px-6 py-4 border-b border-white/5">
+                <div className="flex items-center gap-4 px-6 py-4 border-b border-border">
                   <ShoppingCart className="w-4 h-4 text-primary" strokeWidth={1.75} />
                   <h2 className="text-sm font-mono text-primary uppercase tracking-[0.3em]">
                     Your Cart
@@ -834,7 +834,7 @@ export default function Store() {
                           key={ci.id}
                           className="flex items-center gap-4 px-6 py-4"
                         >
-                          <div className="w-12 h-12 shrink-0 bg-muted border border-white/5 overflow-hidden flex items-center justify-center">
+                          <div className="w-12 h-12 shrink-0 bg-muted border border-border overflow-hidden flex items-center justify-center">
                             {ci.image_url ? (
                               <img
                                 src={ci.image_url}
@@ -847,14 +847,14 @@ export default function Store() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-bold font-['Space_Grotesk'] truncate">
+                            <div className="font-bold font-display truncate">
                               {ci.name}
                             </div>
                             <div className="text-xs text-muted-foreground font-mono">
                               {formatPrice(ci.price, ci.currency)} each
                             </div>
                           </div>
-                          <div className="inline-flex items-center border border-white/10">
+                          <div className="inline-flex items-center border border-border">
                             <button
                               type="button"
                               aria-label={`Decrease ${ci.name}`}
@@ -875,7 +875,7 @@ export default function Store() {
                               <Plus className="w-3.5 h-3.5" />
                             </button>
                           </div>
-                          <div className="w-24 text-right font-bold font-['Space_Grotesk'] tabular-nums">
+                          <div className="w-24 text-right font-bold font-display tabular-nums">
                             {formatMoney(
                               (Number(ci.price) || 0) * ci.quantity,
                               (ci.currency || "USD").toUpperCase(),
@@ -892,7 +892,7 @@ export default function Store() {
                         </li>
                       ))}
                     </ul>
-                    <div className="flex flex-col gap-4 px-6 py-5 border-t border-white/5 bg-card">
+                    <div className="flex flex-col gap-4 px-6 py-5 border-t border-border bg-card">
                       {/* Coupon row */}
                       <div className="flex flex-col md:flex-row md:items-center gap-3">
                         {cart.coupon ? (
@@ -1007,7 +1007,7 @@ export default function Store() {
                             <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground w-24">
                               Total
                             </span>
-                            <span className="text-2xl font-bold font-['Space_Grotesk'] tabular-nums">
+                            <span className="text-2xl font-bold font-display tabular-nums">
                               {formatMoney(cart.total, cart.currency)}
                             </span>
                           </div>
@@ -1028,7 +1028,7 @@ export default function Store() {
 
 
               {/* Footer strip */}
-              <div className="md:col-span-12 flex flex-col md:flex-row gap-4 items-center justify-between mt-6 pt-6 border-t border-white/5">
+              <div className="md:col-span-12 flex flex-col md:flex-row gap-4 items-center justify-between mt-6 pt-6 border-t border-border">
                 <div className="flex flex-wrap gap-6 md:gap-8">
                   <Link
                     to="/support"
