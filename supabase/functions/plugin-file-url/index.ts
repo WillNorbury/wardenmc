@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
             .from("user_roles")
             .select("role")
             .eq("user_id", userId)
-            .in("role", ["admin", "owner"])
+            .in("role", ["admin", "owner", "founder", "star"])
             .maybeSingle(),
           plugin.org_id
             ? admin
