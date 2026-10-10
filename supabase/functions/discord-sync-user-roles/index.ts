@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getDiscordBotToken } from "../_shared/discord-token.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,7 +43,7 @@ Deno.serve(async (req) => {
     if (!roleRows || roleRows.length === 0) return json({ ok: false, error: "Forbidden — admin only" }, 403);
 
 
-    const discordBotToken = Deno.env.get("DISCORD_BOT_TOKEN");
+    const discordBotToken = await getDiscordBotToken();
     if (!discordBotToken) return json({ ok: false, error: "DISCORD_BOT_TOKEN not configured" }, 500);
 
     const { user_id } = await req.json().catch(() => ({}));

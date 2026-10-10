@@ -1,6 +1,7 @@
 // One-shot helper to register the /rules slash command globally.
 // Invoke from the admin tab; admin-only.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getDiscordBotToken } from "../_shared/discord-token.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,7 +27,7 @@ Deno.serve(async (req) => {
     if (!role) return json({ ok: false, error: "Admin only" }, 403);
 
     const appId = Deno.env.get("DISCORD_APPLICATION_ID");
-    const token = Deno.env.get("DISCORD_BOT_TOKEN");
+    const token = await getDiscordBotToken();
     if (!appId || !token) return json({ ok: false, error: "Missing DISCORD_APPLICATION_ID or DISCORD_BOT_TOKEN" }, 400);
 
     // Commands are configured in the admin panel (site_content -> discord_commands).

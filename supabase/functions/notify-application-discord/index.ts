@@ -1,6 +1,7 @@
 // Sends a Discord DM about a new application to every staff member with role
 // owner, manager, or admin who has a linked Discord account.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getDiscordBotToken } from "../_shared/discord-token.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,7 +41,7 @@ async function dmUser(discordId: string, payload: unknown, token: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const token = Deno.env.get("DISCORD_BOT_TOKEN");
+    const token = await getDiscordBotToken();
     if (!token) return json({ ok: false, error: "DISCORD_BOT_TOKEN not configured" }, 500);
 
     // Caller must be signed in, and either own the application or be staff.
