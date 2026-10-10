@@ -60,6 +60,8 @@ export const DiscordConfigSection = () => {
   const [commands, setCommands] = useState<BotCommand[]>(DEFAULT_COMMANDS);
   const [channels, setChannels] = useState<ChannelEntry[]>(DEFAULT_CHANNELS);
   const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
+  const [botToken, setBotToken] = useState("");
+  const [botTokenSet, setBotTokenSet] = useState(false);
 
   useEffect(() => {
     (async () => {
