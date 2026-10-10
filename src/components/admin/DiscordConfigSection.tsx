@@ -100,6 +100,15 @@ export const DiscordConfigSection = () => {
         setChannels(
           DEFAULT_CHANNELS.map((c) => ({ ...c, channelId: cfg[`${c.key}ChannelId`] ?? "" })),
         );
+        setBotTokenSet(typeof cfg.botToken === "string" && cfg.botToken.trim().length > 0);
+      } else {
+        const { data: bot } = await supabase
+          .from("site_content")
+          .select("value")
+          .eq("key", "discord_bot")
+          .maybeSingle();
+        const cfg: any = bot?.value ?? {};
+        setBotTokenSet(typeof cfg.botToken === "string" && cfg.botToken.trim().length > 0);
       }
 
       const savedTpls = byKey[TEMPLATES_KEY]?.entries;
