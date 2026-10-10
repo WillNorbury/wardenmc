@@ -103,14 +103,14 @@ export default function Wiki() {
       </Helmet>
       <Navbar />
       <main className="flex-1 w-full">
-        <div className="max-w-6xl w-full mx-auto px-4 md:px-8 py-10 md:py-14 flex flex-col gap-12">
+        <div className="container max-w-[1400px] pt-28 pb-20 flex flex-col gap-12">
           {/* Header & Search */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
             <div className="space-y-2">
               <span className="text-primary font-mono text-sm tracking-widest uppercase">
                 Knowledge Hub
               </span>
-              <h1 className="text-6xl md:text-8xl font-bold font-display tracking-tighter italic">
+              <h1 className="font-display text-4xl md:text-5xl font-black tracking-tight">
                 WIKI
               </h1>
             </div>

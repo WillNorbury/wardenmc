@@ -66,13 +66,13 @@ export default function Live() {
       />
       <Navbar />
       <main className="flex-1 w-full">
-        <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-10 md:py-14 flex flex-col gap-8">
+        <div className="container max-w-[1400px] pt-28 pb-20 flex flex-col gap-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-border pb-6">
             <div className="min-w-0">
               <span className="font-mono text-sm tracking-widest uppercase text-primary">
                 Twitch · Live
               </span>
-              <h1 className="text-5xl md:text-7xl font-bold font-display tracking-tighter italic break-words">
+              <h1 className="font-display text-4xl md:text-5xl font-black tracking-tight break-words">
                 {active.label.toUpperCase()}
               </h1>
               <p className="text-muted-foreground max-w-xl mt-1">
