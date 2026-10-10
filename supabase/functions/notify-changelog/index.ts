@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       .from('user_roles')
       .select('role')
       .eq('user_id', userData.user.id)
-      .in('role', ['admin', 'owner'])
+      .in('role', ['admin', 'owner', 'founder', 'star'])
       .limit(1)
     if (!roleRows || roleRows.length === 0) {
       return json({ ok: false, error: 'Forbidden — admin only' }, 403)
