@@ -203,7 +203,37 @@ export const DiscordConfigSection = () => {
   if (loading) return <Card className="p-6 text-sm text-muted-foreground">Loading Discord configuration…</Card>;
 
   return (
-    <Tabs defaultValue="commands" className="space-y-6">
+    <div className="space-y-6">
+      <Card className="p-6 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-bold">Bot token</h2>
+            <p className="text-sm text-muted-foreground">
+              {botTokenSet
+                ? "A token is saved. Paste a new one below to replace it — it's stored securely and never shown back."
+                : "No token saved here yet — the bot is using the built-in one. Paste a token to override it."}
+            </p>
+          </div>
+          <Badge variant={botTokenSet ? "default" : "secondary"}>{botTokenSet ? "Custom token saved" : "Using built-in token"}</Badge>
+        </div>
+        <div className="flex flex-wrap gap-3 items-end">
+          <div className="flex-1 min-w-[240px]">
+            <Label>New bot token</Label>
+            <Input
+              type="password"
+              autoComplete="off"
+              value={botToken}
+              placeholder="Paste the token from the Discord Developer Portal"
+              onChange={(e) => setBotToken(e.target.value)}
+            />
+          </div>
+          <Button onClick={saveBotToken} disabled={saving === "bot_token" || !botToken.trim()}>
+            <Save className="h-4 w-4 mr-2" /> Save token
+          </Button>
+        </div>
+      </Card>
+
+      <Tabs defaultValue="commands" className="space-y-6">
       <TabsList>
         <TabsTrigger value="commands" className="gap-2">
           <Terminal className="h-4 w-4" /> Commands
