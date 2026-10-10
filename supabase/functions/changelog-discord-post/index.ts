@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.108.2'
+import { getDiscordBotToken } from '../_shared/discord-token.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +23,7 @@ Deno.serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const botToken = Deno.env.get('DISCORD_BOT_TOKEN')
+    const botToken = await getDiscordBotToken()
     if (!botToken) return json({ ok: false, error: 'DISCORD_BOT_TOKEN not set' }, 500)
 
     const body = await req.json().catch(() => ({}))

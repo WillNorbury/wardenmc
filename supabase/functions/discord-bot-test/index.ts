@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { getDiscordBotToken } from "../_shared/discord-token.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,7 +36,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const token = Deno.env.get("DISCORD_BOT_TOKEN");
+    const token = await getDiscordBotToken();
     if (!token) {
       return new Response(JSON.stringify({ ok: false, error: "DISCORD_BOT_TOKEN secret is not configured" }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },

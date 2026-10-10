@@ -60,6 +60,8 @@ export const DiscordConfigSection = () => {
   const [commands, setCommands] = useState<BotCommand[]>(DEFAULT_COMMANDS);
   const [channels, setChannels] = useState<ChannelEntry[]>(DEFAULT_CHANNELS);
   const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
+  const [botToken, setBotToken] = useState("");
+  const [botTokenSet, setBotTokenSet] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -79,6 +81,15 @@ export const DiscordConfigSection = () => {
         });
         setCommands(merged);
       }
+
+      // Whether a custom bot token is saved (never read the token itself back)
+      const { data: botCfg } = await supabase
+        .from("site_content")
+        .select("value")
+        .eq("key", "discord_bot")
+        .maybeSingle();
+      const botCfgValue: any = botCfg?.value ?? {};
+      setBotTokenSet(typeof botCfgValue.botToken === "string" && botCfgValue.botToken.trim().length > 0);
 
       const savedChans = byKey[CHANNELS_KEY]?.entries;
       if (Array.isArray(savedChans) && savedChans.length) {
@@ -119,6 +130,20 @@ export const DiscordConfigSection = () => {
     setSaving(null);
     if (error) return toast.error(error.message);
     toast.success(`${label} saved`);
+  };
+
+  const saveBotToken = async () => {
+    const token = botToken.trim();
+    if (!token) return toast.error("Paste the new bot token first");
+    setSaving("bot_token");
+    const { data } = await supabase.from("site_content").select("value").eq("key", "discord_bot").maybeSingle();
+    const cfg: any = data?.value ?? {};
+    const { error } = await supabase.from("site_content").upsert({ key: "discord_bot", value: { ...cfg, botToken: token } });
+    setSaving(null);
+    if (error) return toast.error(error.message);
+    setBotToken("");
+    setBotTokenSet(true);
+    toast.success("Bot token updated — the bot will use it from now on");
   };
 
   const saveCommands = () => {
@@ -178,7 +203,37 @@ export const DiscordConfigSection = () => {
   if (loading) return <Card className="p-6 text-sm text-muted-foreground">Loading Discord configuration…</Card>;
 
   return (
-    <Tabs defaultValue="commands" className="space-y-6">
+    <div className="space-y-6">
+      <Card className="p-6 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-bold">Bot token</h2>
+            <p className="text-sm text-muted-foreground">
+              {botTokenSet
+                ? "A token is saved. Paste a new one below to replace it — it's stored securely and never shown back."
+                : "No token saved here yet — the bot is using the built-in one. Paste a token to override it."}
+            </p>
+          </div>
+          <Badge variant={botTokenSet ? "default" : "secondary"}>{botTokenSet ? "Custom token saved" : "Using built-in token"}</Badge>
+        </div>
+        <div className="flex flex-wrap gap-3 items-end">
+          <div className="flex-1 min-w-[240px]">
+            <Label>New bot token</Label>
+            <Input
+              type="password"
+              autoComplete="off"
+              value={botToken}
+              placeholder="Paste the token from the Discord Developer Portal"
+              onChange={(e) => setBotToken(e.target.value)}
+            />
+          </div>
+          <Button onClick={saveBotToken} disabled={saving === "bot_token" || !botToken.trim()}>
+            <Save className="h-4 w-4 mr-2" /> Save token
+          </Button>
+        </div>
+      </Card>
+
+      <Tabs defaultValue="commands" className="space-y-6">
       <TabsList>
         <TabsTrigger value="commands" className="gap-2">
           <Terminal className="h-4 w-4" /> Commands
@@ -440,7 +495,8 @@ export const DiscordConfigSection = () => {
           </Button>
         </Card>
       </TabsContent>
-    </Tabs>
+      </Tabs>
+    </div>
   );
 };
 
