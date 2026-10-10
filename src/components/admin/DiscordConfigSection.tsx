@@ -109,7 +109,6 @@ export const DiscordConfigSection = () => {
         setChannels(
           DEFAULT_CHANNELS.map((c) => ({ ...c, channelId: cfg[`${c.key}ChannelId`] ?? "" })),
         );
-        setBotTokenSet(typeof cfg.botToken === "string" && cfg.botToken.trim().length > 0);
       }
 
       const savedTpls = byKey[TEMPLATES_KEY]?.entries;
