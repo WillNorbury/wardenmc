@@ -132,6 +132,20 @@ export const DiscordConfigSection = () => {
     toast.success(`${label} saved`);
   };
 
+  const saveBotToken = async () => {
+    const token = botToken.trim();
+    if (!token) return toast.error("Paste the new bot token first");
+    setSaving("bot_token");
+    const { data } = await supabase.from("site_content").select("value").eq("key", "discord_bot").maybeSingle();
+    const cfg: any = data?.value ?? {};
+    const { error } = await supabase.from("site_content").upsert({ key: "discord_bot", value: { ...cfg, botToken: token } });
+    setSaving(null);
+    if (error) return toast.error(error.message);
+    setBotToken("");
+    setBotTokenSet(true);
+    toast.success("Bot token updated — the bot will use it from now on");
+  };
+
   const saveCommands = () => {
     const clean = commands
       .map((c) => ({ ...c, name: slugCmd(c.name), description: c.description.trim().slice(0, 100) }))
