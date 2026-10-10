@@ -495,7 +495,8 @@ export const DiscordConfigSection = () => {
           </Button>
         </Card>
       </TabsContent>
-    </Tabs>
+      </Tabs>
+    </div>
   );
 };
 
