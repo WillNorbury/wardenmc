@@ -36,8 +36,17 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
         body: { action, device_id: getDeviceId() },
       });
       if (error) {
+        const statusCode = (error as any)?.context?.status;
+        if (statusCode === 401) {
+          // Expired sign-in: refresh it once; if that fails, sign out cleanly.
+          const { error: refreshErr } = await supabase.auth.refreshSession();
+          if (refreshErr) await supabase.auth.signOut();
+          else checkedFor.current = null;
+          setStatus("ok");
+          return;
+        }
         // Fail open so a backend hiccup can never lock members out.
-        console.error("[device-verify]", error);
+        console.warn("[device-verify]", error);
         setStatus("ok");
         return;
       }
