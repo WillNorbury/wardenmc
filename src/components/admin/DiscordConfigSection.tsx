@@ -82,6 +82,15 @@ export const DiscordConfigSection = () => {
         setCommands(merged);
       }
 
+      // Whether a custom bot token is saved (never read the token itself back)
+      const { data: botCfg } = await supabase
+        .from("site_content")
+        .select("value")
+        .eq("key", "discord_bot")
+        .maybeSingle();
+      const botCfgValue: any = botCfg?.value ?? {};
+      setBotTokenSet(typeof botCfgValue.botToken === "string" && botCfgValue.botToken.trim().length > 0);
+
       const savedChans = byKey[CHANNELS_KEY]?.entries;
       if (Array.isArray(savedChans) && savedChans.length) {
         const merged = [...savedChans] as ChannelEntry[];
