@@ -34,9 +34,16 @@ Deno.serve(async (req) => {
       .from('user_roles')
       .select('role')
       .eq('user_id', userData.user.id)
-      .in('role', ['admin', 'owner', 'founder', 'star'])
+      .in('role', ['admin', 'owner', 'star'])
       .limit(1)
-    if (!roleRows || roleRows.length === 0) {
+    // "founder" is a custom role, not part of the built-in role list.
+    const { data: customRows } = await userClient
+      .from('user_custom_roles')
+      .select('role_key')
+      .eq('user_id', userData.user.id)
+      .eq('role_key', 'founder')
+      .limit(1)
+    if ((!roleRows || roleRows.length === 0) && (!customRows || customRows.length === 0)) {
       return json({ ok: false, error: 'Forbidden — admin only' }, 403)
     }
 
@@ -118,7 +125,7 @@ Deno.serve(async (req) => {
       category: entry.category,
       version: entry.version,
       entryDate: entry.entry_date,
-      link: `${SITE_BASE}/changelog/${slug}`,
+      link: SITE_BASE, // public changelog page was retired
       siteName: 'Warden Network',
     }
 

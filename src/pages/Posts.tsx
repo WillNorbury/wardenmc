@@ -99,17 +99,18 @@ const Posts = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 container max-w-2xl pt-28 pb-16">
-        <div className="flex items-center justify-between gap-3 mb-6">
+      <main className="flex-1 container max-w-2xl pt-32 pb-16">
+        <div className="flex items-end justify-between gap-3 mb-8">
           <div>
-            <h1 className="font-display text-3xl md:text-4xl font-black">Posts</h1>
-            <p className="text-muted-foreground text-sm">What's happening across Warden Network.</p>
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.3em] text-accent">Community</p>
+            <h1 className="font-display text-7xl leading-none md:text-8xl">THE <span className="text-gradient">FEED</span></h1>
+            <p className="text-muted-foreground">What's happening across WardenMC.</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={load} aria-label="Refresh posts">
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button asChild>
+            <Button asChild className="rounded-full glow">
               <Link to="/post">
                 <PenSquare className="h-4 w-4 mr-2" /> New post
               </Link>
@@ -118,7 +119,7 @@ const Posts = () => {
         </div>
 
         {!user ? (
-          <Card className="p-10 text-center">
+          <Card className="glass rounded-2xl p-10 text-center">
             <p className="font-semibold mb-1">Sign in to view posts</p>
             <p className="text-muted-foreground text-sm mb-4">
               The community feed is only visible to members.
@@ -143,12 +144,12 @@ const Posts = () => {
             ))}
           </div>
         ) : error ? (
-          <Card className="p-8 text-center">
+          <Card className="glass rounded-2xl p-8 text-center">
             <p className="text-muted-foreground mb-4">{error}</p>
             <Button onClick={load}>Try again</Button>
           </Card>
         ) : posts.length === 0 ? (
-          <Card className="p-10 text-center">
+          <Card className="glass rounded-2xl p-10 text-center">
             <p className="font-semibold mb-1">No posts yet</p>
             <p className="text-muted-foreground text-sm mb-4">Be the first to say something.</p>
             <Button asChild>

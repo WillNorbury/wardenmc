@@ -31,7 +31,7 @@ export const PostCard = ({ post, canDelete, onLike, onReply, onDelete }: Props) 
     : null;
 
   return (
-    <Card className="p-4 border-border/70 hover:border-primary/40 transition-colors">
+    <Card className="glass rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:border-primary/50">
       <div className="flex gap-3">
         <Avatar className="h-10 w-10 shrink-0">
           {avatar && <AvatarImage src={avatar} alt={`${name} avatar`} />}
