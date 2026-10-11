@@ -89,6 +89,7 @@ export type AdminSection =
   | "punishments"
   | "console"
   | "mysql"
+  | "database"
   | "servers-status"
   | "store"
   | "orders"
@@ -116,7 +117,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   "features", "rules", "alerts", "maintenance", "faqs", "events",
   "ban-appeals", "wiki", "gallery", "contact", "email-test", "send-email",
   "email-diagnostics", "quizzes", "reports", "bot-dashboard", "bot-management",
-  "bot-config", "punishments", "console", "mysql", "servers-status", "store", "orders",
+  "bot-config", "punishments", "console", "mysql", "database", "servers-status", "store", "orders",
   "signup-funnel",
   "vote-links", "partners", "tiers", "memberships", "account-removals", "seasons", "tab-animations", "server-panel", "skripts", "game-modes", "site-pages",
   "mod-skripts", "mod-servers", "mod-mods", "mod-reviews",
@@ -245,6 +246,7 @@ const items: NavItem[] = [
   { kind: "link", id: "punishments", icon: ShieldCheck, label: "Punishments" },
   { kind: "link", id: "account-removals", icon: UserX, label: "Deleted / Banned Accounts" },
   { kind: "link", id: "mysql", icon: Database, label: "LiteBans MySQL" },
+  { kind: "link", id: "database", icon: Database, label: "Site database" },
   { kind: "link", id: "wiki", icon: FileText, label: "Wiki" },
   { kind: "link", id: "gallery", icon: Package, label: "Gallery" },
   { kind: "link", id: "contact", icon: HelpCircle, label: "Contact" },
@@ -297,7 +299,7 @@ export const AdminLayout = ({
       return canSee("bot-dashboard") || canSee("bot-management") || canSee("bot-config");
     }
     if (it.kind === "link") {
-      if (it.id === "permissions" || it.id === "bot-dashboard" || it.id === "bot-management" || it.id === "bot-config" || it.id === "console" || it.id === "mysql") {
+      if (it.id === "permissions" || it.id === "bot-dashboard" || it.id === "bot-management" || it.id === "bot-config" || it.id === "console" || it.id === "mysql" || it.id === "database") {
         // Owner-only sections (also gated by their permission key).
         if (!isOwner) return false;
       }
