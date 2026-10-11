@@ -95,7 +95,8 @@ const Shell = () => {
       </div>
     </SidebarProvider>
   </MaintenanceGate>
-);
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
