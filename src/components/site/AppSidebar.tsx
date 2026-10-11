@@ -83,7 +83,7 @@ const accountGroup: NavGroup = {
 
 export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
-  const collapsed = state === "collapsed";
+  const collapsed = state === "collapsed" && !isMobile;
   const { pathname } = useLocation();
   const { user, isAdmin } = useAuth();
   const nav = useNavigate();
