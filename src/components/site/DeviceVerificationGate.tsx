@@ -78,6 +78,22 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
       return;
     }
     setStatus("checking");
+
+    // Members with 2FA already proved who they are with their code — skip the email check.
+    void (async () => {
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal?.currentLevel === "aal2" || aal?.nextLevel === "aal2") {
+        if (aal.currentLevel === "aal2") {
+          sessionStorage.setItem(okKey(uid), "1");
+          setStatus("ok");
+        }
+        // aal1 with 2FA enrolled: the sign-in page asks for the 2FA code first.
+        else setStatus("ok");
+        return;
+      }
+      runCheck("check");
+    })();
+    return;
     runCheck("check");
   }, [uid, loading, runCheck]);
 
