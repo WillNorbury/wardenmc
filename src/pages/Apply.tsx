@@ -63,7 +63,7 @@ const getIcon = (name: string) => {
 const Shell = ({ children }: { children: React.ReactNode }) => (
   <div className="min-h-screen flex flex-col bg-background">
     <Navbar />
-    <main className="flex-1 container pt-28 pb-16 max-w-4xl">{children}</main>
+    <main className="flex-1 pt-24 pb-16">{children}</main>
     <Footer />
   </div>
 );
@@ -96,24 +96,25 @@ const Apply = () => {
         description="Apply to join the team. Pick a role and tell us about yourself."
         path="/apply"
       />
-      <header className="mb-8 text-center">
-        <Badge variant="secondary" className="mb-3 text-primary border-primary/40">
-          <ClipboardList className="h-3 w-3 mr-1" /> Applications
-        </Badge>
-        <h1 className="font-display text-4xl md:text-5xl font-black mb-2">
-          Join the <span className="text-gradient">Team</span>
-        </h1>
-        <p className="text-muted-foreground">Pick the role that fits you best.</p>
-      </header>
+      <section className="aurora border-b border-border/60 mb-10">
+        <div className="container max-w-4xl py-12 md:py-16">
+          <div className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">WardenMC · Applications</div>
+          <h1 className="font-display text-7xl leading-none md:text-8xl">
+            JOIN THE <span className="text-gradient">TEAM</span>
+          </h1>
+          <p className="mt-3 text-base text-muted-foreground md:text-lg">Pick the role that fits you best and tell us your story.</p>
+        </div>
+      </section>
+      <div className="container max-w-4xl">
 
       {!types && (
-        <div className="flex justify-center py-16">
+        <div className="container max-w-4xl flex justify-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
 
       {types && types.length === 0 && (
-        <Card className="p-10 text-center text-muted-foreground">
+        <Card className="container max-w-4xl p-10 text-center text-muted-foreground">
           No application types are currently available. Check back soon.
         </Card>
       )}
@@ -187,6 +188,7 @@ const Apply = () => {
           })}
         </div>
       )}
+      </div>
     </Shell>
   );
 };
@@ -344,7 +346,7 @@ const ApplyForm = ({
   if (authLoading || (!type && !typeError)) {
     return (
       <Shell>
-        <div className="flex justify-center py-20">
+        <div className="container max-w-4xl flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       </Shell>
@@ -354,7 +356,7 @@ const ApplyForm = ({
   if (typeError) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <h1 className="font-display text-2xl font-bold">Not found</h1>
           <p className="text-muted-foreground">{typeError}</p>
           <Button onClick={onBack}>Back to applications</Button>
@@ -369,7 +371,7 @@ const ApplyForm = ({
   if (!type.accepting) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <Icon className="h-10 w-10 mx-auto text-primary" />
           <h1 className="font-display text-2xl font-bold">{type.label} applications are closed</h1>
           <p className="text-muted-foreground">Check back later — we'll reopen soon.</p>
@@ -386,22 +388,22 @@ const ApplyForm = ({
         description={type.description}
         path={`/apply/${type.slug}`}
       />
-      <button
-        onClick={onBack}
-        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4"
-      >
-        <ArrowLeft className="h-4 w-4" /> All applications
-      </button>
-      <header className="mb-8">
-        <Badge variant="secondary" className="mb-3 text-primary border-primary/40">
-          <Icon className="h-3 w-3 mr-1" /> {type.label} Application
-        </Badge>
-        <h1 className="font-display text-3xl md:text-4xl font-black mb-2">
-          Apply as <span className="text-gradient">{type.label}</span>
-        </h1>
-        <p className="text-muted-foreground">{type.intro || type.description}</p>
-      </header>
-
+      <section className="aurora border-b border-border/60 mb-10">
+        <div className="container max-w-4xl py-10 md:py-14">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" /> All applications
+          </button>
+          <div className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">WardenMC · {type.label} Application</div>
+          <h1 className="font-display text-6xl leading-none md:text-7xl">
+            APPLY AS <span className="text-gradient">{type.label.toUpperCase()}</span>
+          </h1>
+          <p className="mt-3 text-base text-muted-foreground md:text-lg">{type.intro || type.description}</p>
+        </div>
+      </section>
+      <div className="container max-w-4xl">
       <ol className="flex items-center justify-between mb-8 gap-2">
         {STEPS.map((label, i) => {
           const done = i < step;
@@ -581,6 +583,7 @@ const ApplyForm = ({
           )}
         </div>
       </Card>
+      </div>
     </Shell>
   );
 };
@@ -721,7 +724,7 @@ const PartnerApplyForm = ({
   if (authLoading || (!type && !typeError)) {
     return (
       <Shell>
-        <div className="flex justify-center py-20">
+        <div className="container max-w-4xl flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       </Shell>
@@ -731,7 +734,7 @@ const PartnerApplyForm = ({
   if (typeError) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <h1 className="font-display text-2xl font-bold">Not available</h1>
           <p className="text-muted-foreground">{typeError}</p>
           <Button onClick={onBack}>Back to applications</Button>
@@ -745,7 +748,7 @@ const PartnerApplyForm = ({
   if (!type.accepting) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <Icon className="h-10 w-10 mx-auto text-primary" />
           <h1 className="font-display text-2xl font-bold">Partner applications are closed</h1>
           <p className="text-muted-foreground">Check back later — we'll reopen soon.</p>
@@ -762,24 +765,24 @@ const PartnerApplyForm = ({
         description="Apply to become an official partner server."
         path="/apply/partner"
       />
-      <button
-        onClick={onBack}
-        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4"
-      >
-        <ArrowLeft className="h-4 w-4" /> All applications
-      </button>
-      <header className="mb-8">
-        <Badge variant="secondary" className="mb-3 text-primary border-primary/40">
-          <Icon className="h-3 w-3 mr-1" /> Partner Application
-        </Badge>
-        <h1 className="font-display text-3xl md:text-4xl font-black mb-2">
-          Become a <span className="text-gradient">Partner</span>
-        </h1>
-        <p className="text-muted-foreground">
-          {type.intro || "Tell us about your server and how you'd like to partner with us."}
-        </p>
-      </header>
-
+      <section className="aurora border-b border-border/60 mb-10">
+        <div className="container max-w-4xl py-10 md:py-14">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" /> All applications
+          </button>
+          <div className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">WardenMC · Partner Application</div>
+          <h1 className="font-display text-6xl leading-none md:text-7xl">
+            BECOME A <span className="text-gradient">PARTNER</span>
+          </h1>
+          <p className="mt-3 text-base text-muted-foreground md:text-lg">
+            {type.intro || "Tell us about your server and how you'd like to partner with us."}
+          </p>
+        </div>
+      </section>
+      <div className="container max-w-4xl">
       <Card className="p-6 space-y-5">
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
@@ -850,6 +853,7 @@ const PartnerApplyForm = ({
           </Button>
         </div>
       </Card>
+      </div>
     </Shell>
   );
 };
