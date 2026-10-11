@@ -8,6 +8,13 @@
       "when": 1791699429892,
       "tag": "0000_admin_run_sql",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791699606816,
+      "tag": "0001_litebans_mysql_config",
+      "breakpoints": true
     }
   ]
 }
