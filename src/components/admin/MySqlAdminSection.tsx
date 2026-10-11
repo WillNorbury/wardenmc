@@ -122,6 +122,49 @@ export const MySqlAdminSection = () => {
   const [writeMode, setWriteMode] = useState(false);
   const [showEnableWrite, setShowEnableWrite] = useState(false);
   const [showConfirmWrite, setShowConfirmWrite] = useState(false);
+  const [cfg, setCfg] = useState({ host: "", port: "3306", username: "", password: "", database_name: "" });
+  const [cfgLoaded, setCfgLoaded] = useState(false);
+  const [cfgSaving, setCfgSaving] = useState(false);
+
+  useEffect(() => {
+    if (!canWrite) return;
+    supabase
+      .from("litebans_mysql_config")
+      .select("host, port, username, password, database_name")
+      .eq("id", true)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setCfg({
+            host: data.host ?? "",
+            port: String(data.port ?? 3306),
+            username: data.username ?? "",
+            password: data.password ?? "",
+            database_name: data.database_name ?? "",
+          });
+        }
+        setCfgLoaded(true);
+      });
+  }, [canWrite]);
+
+  const saveCfg = async () => {
+    setCfgSaving(true);
+    const { error } = await supabase.from("litebans_mysql_config").upsert({
+      id: true,
+      host: cfg.host.trim() || null,
+      port: Number(cfg.port) || 3306,
+      username: cfg.username.trim() || null,
+      password: cfg.password || null,
+      database_name: cfg.database_name.trim() || null,
+      updated_at: new Date().toISOString(),
+    });
+    setCfgSaving(false);
+    if (error) {
+      toast.error("Couldn't save connection settings");
+    } else {
+      toast.success("Connection settings saved — new queries will use them.");
+    }
+  };
 
   useEffect(() => {
     try {
