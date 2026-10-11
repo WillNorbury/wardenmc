@@ -107,10 +107,14 @@ Deno.serve(async (req) => {
       multipleStatements: false,
       dateStrings: true,
     });
-    await conn.query("SET SESSION TRANSACTION READ ONLY");
-    await conn.query("START TRANSACTION READ ONLY");
+    if (isRead) {
+      await conn.query("SET SESSION TRANSACTION READ ONLY");
+      await conn.query("START TRANSACTION READ ONLY");
+    }
     const [result, fields] = await conn.query(stripped, params);
-    await conn.query("ROLLBACK");
+    if (isRead) {
+      await conn.query("ROLLBACK");
+    }
     const durationMs = Date.now() - started;
 
     // SELECT → array of row objects; write → OkPacket
