@@ -139,14 +139,14 @@ export const MySqlAdminSection = () => {
     });
   };
 
-  const runNow = async () => {
+  const runNow = async (isWrite: boolean) => {
     const query = sql.trim();
     if (!query) return;
     setRunning(true);
     setResult(null);
     try {
       const { data, error } = await supabase.functions.invoke("litebans-mysql-query", {
-        body: { sql: query },
+        body: { sql: query, write: isWrite, confirm: isWrite },
       });
       if (error) {
         setResult({ ok: false, error: error.message });
@@ -155,7 +155,11 @@ export const MySqlAdminSection = () => {
         setResult(data as RunResult);
         if ((data as any)?.ok) {
           pushHistory(query);
-          toast.success(`${(data as any).rowCount} rows in ${(data as any).durationMs}ms`);
+          if ((data as any).kind === "write") {
+            toast.success(`Done — ${(data as any).affectedRows} row(s) affected in ${(data as any).durationMs}ms`);
+          } else {
+            toast.success(`${(data as any).rowCount} rows in ${(data as any).durationMs}ms`);
+          }
         } else {
           toast.error("MySQL error");
         }
@@ -171,10 +175,22 @@ export const MySqlAdminSection = () => {
   const onRun = () => {
     if (!sql.trim()) return;
     if (!isReadOnly(sql)) {
-      toast.error("This console is read-only. Use in-game commands (e.g. /unban, /unmute) to change punishments.");
+      if (!writeMode) {
+        toast.error("Turn on write mode to run INSERT/UPDATE/DELETE queries.");
+        return;
+      }
+      setShowConfirmWrite(true);
       return;
     }
-    void runNow();
+    void runNow(false);
+  };
+
+  const onWriteToggle = (next: boolean) => {
+    if (next) {
+      setShowEnableWrite(true);
+    } else {
+      setWriteMode(false);
+    }
   };
 
   const verb = useMemo(() => detectVerb(sql), [sql]);
