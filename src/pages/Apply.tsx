@@ -188,6 +188,7 @@ const Apply = () => {
           })}
         </div>
       )}
+      </div>
     </Shell>
   );
 };
@@ -387,22 +388,22 @@ const ApplyForm = ({
         description={type.description}
         path={`/apply/${type.slug}`}
       />
-      <button
-        onClick={onBack}
-        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4"
-      >
-        <ArrowLeft className="h-4 w-4" /> All applications
-      </button>
-      <header className="mb-8">
-        <Badge variant="secondary" className="mb-3 text-primary border-primary/40">
-          <Icon className="h-3 w-3 mr-1" /> {type.label} Application
-        </Badge>
-        <h1 className="font-display text-3xl md:text-4xl font-black mb-2">
-          Apply as <span className="text-gradient">{type.label}</span>
-        </h1>
-        <p className="text-muted-foreground">{type.intro || type.description}</p>
-      </header>
-
+      <section className="aurora border-b border-border/60 mb-10">
+        <div className="container max-w-4xl py-10 md:py-14">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
+          >
+            <ArrowLeft className="h-4 w-4" /> All applications
+          </button>
+          <div className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">WardenMC · {type.label} Application</div>
+          <h1 className="font-display text-6xl leading-none md:text-7xl">
+            APPLY AS <span className="text-gradient">{type.label.toUpperCase()}</span>
+          </h1>
+          <p className="mt-3 text-base text-muted-foreground md:text-lg">{type.intro || type.description}</p>
+        </div>
+      </section>
+      <div className="container max-w-4xl">
       <ol className="flex items-center justify-between mb-8 gap-2">
         {STEPS.map((label, i) => {
           const done = i < step;
