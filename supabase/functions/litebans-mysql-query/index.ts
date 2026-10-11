@@ -89,12 +89,17 @@ Deno.serve(async (req) => {
     return json(400, { error: "query contains a disallowed clause" });
   }
 
-  // --- Load MySQL connection from server-side secrets only ---
-  const host = Deno.env.get("LITEBANS_MYSQL_HOST");
-  const port = Number(Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
-  const user = Deno.env.get("LITEBANS_MYSQL_USER");
-  const password = Deno.env.get("LITEBANS_MYSQL_PASSWORD");
-  const database = Deno.env.get("LITEBANS_MYSQL_DATABASE");
+  // --- Load MySQL connection: DB-stored config first, env secrets as fallback ---
+  const { data: cfg } = await admin
+    .from("litebans_mysql_config")
+    .select("host, port, username, password, database_name")
+    .eq("id", true)
+    .maybeSingle();
+  const host = cfg?.host || Deno.env.get("LITEBANS_MYSQL_HOST");
+  const port = Number(cfg?.port ?? Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
+  const user = cfg?.username || Deno.env.get("LITEBANS_MYSQL_USER");
+  const password = cfg?.password || Deno.env.get("LITEBANS_MYSQL_PASSWORD");
+  const database = cfg?.database_name || Deno.env.get("LITEBANS_MYSQL_DATABASE");
   if (!host || !user || !password || !database) {
     return json(500, { error: "MySQL connection not configured" });
   }

@@ -1259,6 +1259,36 @@ export type Database = {
         }
         Relationships: []
       }
+      litebans_mysql_config: {
+        Row: {
+          database_name: string | null
+          host: string | null
+          id: boolean
+          password: string | null
+          port: number
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          database_name?: string | null
+          host?: string | null
+          id?: boolean
+          password?: string | null
+          port?: number
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          database_name?: string | null
+          host?: string | null
+          id?: boolean
+          password?: string | null
+          port?: number
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       login_verifications: {
         Row: {
           attempts: number

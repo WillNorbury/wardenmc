@@ -34,7 +34,9 @@ import {
   History,
   BookOpen,
   PencilLine,
+  Settings2,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -122,6 +124,49 @@ export const MySqlAdminSection = () => {
   const [writeMode, setWriteMode] = useState(false);
   const [showEnableWrite, setShowEnableWrite] = useState(false);
   const [showConfirmWrite, setShowConfirmWrite] = useState(false);
+  const [cfg, setCfg] = useState({ host: "", port: "3306", username: "", password: "", database_name: "" });
+  const [cfgLoaded, setCfgLoaded] = useState(false);
+  const [cfgSaving, setCfgSaving] = useState(false);
+
+  useEffect(() => {
+    if (!canWrite) return;
+    supabase
+      .from("litebans_mysql_config")
+      .select("host, port, username, password, database_name")
+      .eq("id", true)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setCfg({
+            host: data.host ?? "",
+            port: String(data.port ?? 3306),
+            username: data.username ?? "",
+            password: data.password ?? "",
+            database_name: data.database_name ?? "",
+          });
+        }
+        setCfgLoaded(true);
+      });
+  }, [canWrite]);
+
+  const saveCfg = async () => {
+    setCfgSaving(true);
+    const { error } = await supabase.from("litebans_mysql_config").upsert({
+      id: true,
+      host: cfg.host.trim() || null,
+      port: Number(cfg.port) || 3306,
+      username: cfg.username.trim() || null,
+      password: cfg.password || null,
+      database_name: cfg.database_name.trim() || null,
+      updated_at: new Date().toISOString(),
+    });
+    setCfgSaving(false);
+    if (error) {
+      toast.error("Couldn't save connection settings");
+    } else {
+      toast.success("Connection settings saved — new queries will use them.");
+    }
+  };
 
   useEffect(() => {
     try {
@@ -203,6 +248,43 @@ export const MySqlAdminSection = () => {
 
   return (
     <div className="space-y-6">
+      {canWrite && cfgLoaded && (
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Settings2 className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Connection settings</span>
+            <span className="text-xs text-muted-foreground">— only you can see or change these</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-muted-foreground">Host</label>
+              <Input value={cfg.host} onChange={(e) => setCfg({ ...cfg, host: e.target.value })} placeholder="e.g. 123.45.67.89" className="font-mono text-sm" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Port</label>
+              <Input value={cfg.port} onChange={(e) => setCfg({ ...cfg, port: e.target.value })} placeholder="3306" className="font-mono text-sm" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Username</label>
+              <Input value={cfg.username} onChange={(e) => setCfg({ ...cfg, username: e.target.value })} className="font-mono text-sm" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Password</label>
+              <Input type="password" value={cfg.password} onChange={(e) => setCfg({ ...cfg, password: e.target.value })} className="font-mono text-sm" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Database</label>
+              <Input value={cfg.database_name} onChange={(e) => setCfg({ ...cfg, database_name: e.target.value })} placeholder="litebans" className="font-mono text-sm" />
+            </div>
+          </div>
+          <div className="flex justify-end mt-3">
+            <Button onClick={saveCfg} disabled={cfgSaving}>
+              {cfgSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Save connection
+            </Button>
+          </div>
+        </Card>
+      )}
       <Card className={writeMode ? "p-4 border-destructive/40 bg-destructive/5" : "p-4 border-amber-500/30 bg-amber-500/5"}>
         <div className="flex gap-3">
           <ShieldAlert className={`h-5 w-5 shrink-0 mt-0.5 ${writeMode ? "text-destructive" : "text-amber-500"}`} />
