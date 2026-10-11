@@ -29,6 +29,8 @@ import PluginDetail from "./pages/PluginDetail.tsx";
 import PluginSettings from "./pages/PluginSettings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Apply from "./pages/Apply.tsx";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/site/AppSidebar";
 
 const queryClient = new QueryClient();
 
@@ -79,8 +81,10 @@ const Shell = () => (
         <Route path="/apply/:slug" element={<Apply />} />
 
         <Route path="*" element={<NotFound />} />
-      </Routes>
-    </div>
+          </Routes>
+        </div>
+      </div>
+    </SidebarProvider>
   </MaintenanceGate>
 );
 
