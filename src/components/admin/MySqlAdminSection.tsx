@@ -371,6 +371,20 @@ export const MySqlAdminSection = () => {
                 <Button size="sm" variant="outline" onClick={() => setSql(s.sql)}>Load</Button>
               </div>
             ))}
+            {writeMode && (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive pt-2">Write snippets</p>
+                {WRITE_SNIPPETS.map((s) => (
+                  <div key={s.title} className="border border-destructive/30 rounded-md p-2 flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium">{s.title}</div>
+                      <pre className="text-xs bg-muted/40 rounded p-2 mt-1 overflow-x-auto"><code>{s.sql}</code></pre>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => setSql(s.sql)}>Load</Button>
+                  </div>
+                ))}
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="history" className="mt-4 space-y-2">
