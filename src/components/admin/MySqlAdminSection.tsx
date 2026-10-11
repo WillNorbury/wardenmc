@@ -113,6 +113,9 @@ export const MySqlAdminSection = () => {
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
   const [history, setHistory] = useState<string[]>([]);
+  const [writeMode, setWriteMode] = useState(false);
+  const [showEnableWrite, setShowEnableWrite] = useState(false);
+  const [showConfirmWrite, setShowConfirmWrite] = useState(false);
 
   useEffect(() => {
     try {
