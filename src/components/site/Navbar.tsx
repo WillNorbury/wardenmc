@@ -27,8 +27,8 @@ export const NAV_LINKS = [
 const Navbar = () => {
   const { user, isAdmin, signOut } = useAuth();
   const nav = useNavigate();
+  const { state, isMobile } = useSidebar();
   const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -40,11 +40,17 @@ const Navbar = () => {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-40 transition-all duration-300",
+        "fixed right-0 top-0 z-40 transition-all duration-300",
+        isMobile ? "left-0" : state === "expanded" ? "left-64" : "left-12",
         scrolled ? "glass-strong border-b border-border/60" : "bg-transparent",
       )}
     >
-      <div className="container flex h-16 max-w-[1400px] items-center gap-6">
+      <div className="container flex h-16 max-w-[1400px] items-center gap-4">
+        <SidebarTrigger
+          aria-label="Toggle sidebar"
+          className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+        />
+
         <Link to="/" className="flex items-center gap-2" aria-label="WardenMC home">
           <img src={logo} alt="" aria-hidden className="h-8 w-8" />
           <span className="font-display text-2xl tracking-wider">
@@ -52,7 +58,7 @@ const Navbar = () => {
           </span>
         </Link>
 
-        <nav className="hidden flex-1 items-center gap-1 md:flex">
+        <nav className="hidden flex-1 items-center gap-1 lg:flex">
           {NAV_LINKS.map((l) => (
             <NavLink
               key={l.to}
@@ -104,39 +110,8 @@ const Navbar = () => {
               </Link>
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setOpen((o) => !o)}
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
         </div>
       </div>
-
-      {open && (
-        <nav className="glass-strong border-t border-border/60 md:hidden">
-          <div className="container flex flex-col py-3">
-            {NAV_LINKS.map((l) => (
-              <NavLink
-                key={l.to}
-                to={l.to}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "py-2.5 font-display text-xl tracking-wide",
-                    isActive ? "text-primary" : "text-foreground",
-                  )
-                }
-              >
-                {l.label}
-              </NavLink>
-            ))}
-          </div>
-        </nav>
-      )}
     </header>
   );
 };
