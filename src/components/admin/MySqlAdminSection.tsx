@@ -218,11 +218,13 @@ export const MySqlAdminSection = () => {
                 : "This console can only look up data. Turn on write mode below to edit punishment rows, or use the in-game commands (/unban, /unmute). Time columns are epoch milliseconds. Owner-only."}
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <PencilLine className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-medium">Write mode</span>
-            <Switch checked={writeMode} onCheckedChange={onWriteToggle} />
-          </div>
+          {canWrite && (
+            <div className="flex items-center gap-2 shrink-0">
+              <PencilLine className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs font-medium">Write mode</span>
+              <Switch checked={writeMode} onCheckedChange={onWriteToggle} />
+            </div>
+          )}
         </div>
       </Card>
 
