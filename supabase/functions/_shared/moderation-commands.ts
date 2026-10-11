@@ -44,7 +44,10 @@ export async function handleModeration(body: any): Promise<string | null> {
     fetch(`https://discord.com/api/v10${path}`, {
       method,
       headers: {
-        Authorization: `Bot ${token}`, "Content-Type": "application/json",
+        Authorization: `Bot ${token}`,
+        // Only declare a JSON body when one is actually sent — Discord
+        // rejects empty bodies with a JSON content type (error 50109).
+        ...(json === undefined ? {} : { "Content-Type": "application/json" }),
         ...(auditReason ? { "X-Audit-Log-Reason": encodeURIComponent(`${mod}: ${auditReason}`.slice(0, 500)) } : {}),
       },
       body: json === undefined ? undefined : JSON.stringify(json),
