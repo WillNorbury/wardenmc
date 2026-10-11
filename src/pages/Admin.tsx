@@ -2180,6 +2180,20 @@ const BotDashboardSection = () => {
     }
   };
 
+  const runSupporterSync = async () => {
+    setBusy("supporter-sync");
+    const { data, error } = await supabase.functions.invoke("discord-supporter-role", { body: {} });
+    setBusy(null);
+    const payload = error
+      ? { ok: false, message: error.message }
+      : data?.ok
+        ? { ok: true, message: `Scanned ${data.scanned} members — ${data.matched} advertising, ${data.granted} given the role, ${data.removed} removed.` }
+        : { ok: false, message: data?.error ?? "Sync failed" };
+    setActionResults((r) => ({ ...r, "supporter-sync": payload }));
+    if (payload.ok) toast.success(payload.message);
+    else toast.error(payload.message);
+  };
+
   type EmbedAction = "announce" | "status" | "welcome" | "roles" | "info" | "rules";
 
   const runAction = async (action: EmbedAction) => {
@@ -2307,6 +2321,27 @@ const BotDashboardSection = () => {
             {result.ok && result.guildError && <div className="text-amber-400">Warning: {result.guildError}</div>}
           </div>
         )}
+      </Card>
+
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="font-bold">Supporter role</h2>
+            <p className="text-sm text-muted-foreground">
+              Gives the supporter role to members whose Discord status shows discord.warden.rip or the invite link,
+              and removes it when they stop. Runs automatically every hour.
+            </p>
+            {actionResults["supporter-sync"] && (
+              <div className={`mt-2 text-xs ${actionResults["supporter-sync"].ok ? "text-emerald-400" : "text-destructive"}`}>
+                {actionResults["supporter-sync"].ok ? "✓ " : "✗ "}
+                {actionResults["supporter-sync"].message}
+              </div>
+            )}
+          </div>
+          <Button onClick={runSupporterSync} disabled={!!busy || !cfg.guildId}>
+            {busy === "supporter-sync" ? "Syncing..." : "Sync now"}
+          </Button>
+        </div>
       </Card>
 
       <Card className="p-6 space-y-4">
