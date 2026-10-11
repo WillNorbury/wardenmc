@@ -135,11 +135,11 @@ const Apply = () => {
                 <Badge variant="outline">Partnerships open</Badge>
               </div>
               <div className="font-display font-bold text-xl">
-                Run a Minecraft server? <span className="text-gradient">Become a Partner.</span>
+                Run a Minecraft server? <span className="text-gradient">Become a WardenMC Partner.</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Get featured on our Partners page, cross-promote your community, and reach new
-                players. Submit a partnership application in a few minutes.
+                Get your server listed on our Partners page with live status, cross-promote your
+                community, and reach new players. Apply in a few minutes.
               </p>
               <div className="mt-3 inline-flex items-center text-sm text-primary font-medium">
                 Send a partner application
