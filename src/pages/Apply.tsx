@@ -63,7 +63,7 @@ const getIcon = (name: string) => {
 const Shell = ({ children }: { children: React.ReactNode }) => (
   <div className="min-h-screen flex flex-col bg-background">
     <Navbar />
-    <main className="flex-1 container pt-28 pb-16 max-w-4xl">{children}</main>
+    <main className="flex-1 pt-24 pb-16">{children}</main>
     <Footer />
   </div>
 );
@@ -96,15 +96,16 @@ const Apply = () => {
         description="Apply to join the team. Pick a role and tell us about yourself."
         path="/apply"
       />
-      <header className="mb-8 text-center">
-        <Badge variant="secondary" className="mb-3 text-primary border-primary/40">
-          <ClipboardList className="h-3 w-3 mr-1" /> Applications
-        </Badge>
-        <h1 className="font-display text-4xl md:text-5xl font-black mb-2">
-          Join the <span className="text-gradient">Team</span>
-        </h1>
-        <p className="text-muted-foreground">Pick the role that fits you best.</p>
-      </header>
+      <section className="aurora border-b border-border/60 mb-10">
+        <div className="container max-w-4xl py-12 md:py-16">
+          <div className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">WardenMC · Applications</div>
+          <h1 className="font-display text-7xl leading-none md:text-8xl">
+            JOIN THE <span className="text-gradient">TEAM</span>
+          </h1>
+          <p className="mt-3 text-base text-muted-foreground md:text-lg">Pick the role that fits you best and tell us your story.</p>
+        </div>
+      </section>
+      <div className="container max-w-4xl">
 
       {!types && (
         <div className="flex justify-center py-16">
