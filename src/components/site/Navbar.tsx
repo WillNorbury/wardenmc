@@ -21,6 +21,7 @@ export const NAV_LINKS = [
   { to: "/rules", label: "Rules" },
   { to: "/faq", label: "FAQ" },
   { to: "/discord", label: "Discord" },
+  { to: "/partners", label: "Partners" },
   { to: "/apply", label: "Apply" },
 ];
 

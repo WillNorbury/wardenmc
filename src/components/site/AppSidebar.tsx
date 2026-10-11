@@ -54,6 +54,7 @@ const communityGroup: NavGroup = {
   items: [
     { to: "/staff", label: "Staff", icon: ShieldCheck },
     { to: "/discord", label: "Discord", icon: Hash },
+    { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/faq", label: "FAQ", icon: HelpCircle },
   ],
