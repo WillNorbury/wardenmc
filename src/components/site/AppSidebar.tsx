@@ -134,6 +134,7 @@ export function AppSidebar() {
   };
 
   const groups: NavGroup[] = [
+    linksGroup,
     mainGroup,
     communityGroup,
     ...(user ? [accountGroup] : []),
@@ -143,7 +144,6 @@ export function AppSidebar() {
           { id: "admin", label: "Admin", items: [{ to: "/admin", label: "Admin", icon: Shield }] } as NavGroup,
         ]
       : []),
-    linksGroup,
   ];
 
   return (
