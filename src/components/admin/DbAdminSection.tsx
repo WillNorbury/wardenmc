@@ -137,7 +137,7 @@ export const DbAdminSection = () => {
         </div>
       </Card>
 
-      {result && !result.ok && (
+      {result?.ok === false && (
         <Card className="p-4 border-destructive/40">
           <p className="text-sm text-destructive font-mono whitespace-pre-wrap">{result.error}</p>
         </Card>
