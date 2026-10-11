@@ -13,6 +13,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Database,
   Play,
@@ -21,6 +32,7 @@ import {
   Copy,
   History,
   BookOpen,
+  PencilLine,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +44,15 @@ type RunResult =
       rows: Record<string, unknown>[];
       rowCount: number;
       fields: { name: string }[];
+      durationMs: number;
+    }
+  | {
+      ok: true;
+      kind: "write";
+      affectedRows: number;
+      changedRows: number;
+      insertId: number;
+      info: string | null;
       durationMs: number;
     }
   | { ok: false; error: string; code?: string | null; sqlState?: string | null };
@@ -48,6 +69,21 @@ const SNIPPETS: { title: string; sql: string }[] = [
   {
     title: "Recent 25 punishments",
     sql: "(SELECT 'ban' AS type, id, name, reason, time FROM litebans_bans)\nUNION ALL\n(SELECT 'mute', id, name, reason, time FROM litebans_mutes)\nUNION ALL\n(SELECT 'kick', id, name, reason, time FROM litebans_kicks)\nUNION ALL\n(SELECT 'warn', id, name, reason, time FROM litebans_warnings)\nORDER BY time DESC\nLIMIT 25;",
+  },
+];
+
+const WRITE_SNIPPETS: { title: string; sql: string }[] = [
+  {
+    title: "Lift a ban (set inactive)",
+    sql: "UPDATE litebans_bans\nSET active = 0, removed_by_name = 'WardenMC Web', removed_by_reason = 'Lifted via admin panel', removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE uuid = '<UUID>' AND active = 1;",
+  },
+  {
+    title: "Lift a mute (set inactive)",
+    sql: "UPDATE litebans_mutes\nSET active = 0, removed_by_name = 'WardenMC Web', removed_by_reason = 'Lifted via admin panel', removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE uuid = '<UUID>' AND active = 1;",
+  },
+  {
+    title: "Edit a ban reason",
+    sql: "UPDATE litebans_bans\nSET reason = 'New reason here'\nWHERE id = 123;",
   },
 ];
 
@@ -77,6 +113,9 @@ export const MySqlAdminSection = () => {
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
   const [history, setHistory] = useState<string[]>([]);
+  const [writeMode, setWriteMode] = useState(false);
+  const [showEnableWrite, setShowEnableWrite] = useState(false);
+  const [showConfirmWrite, setShowConfirmWrite] = useState(false);
 
   useEffect(() => {
     try {
@@ -100,14 +139,14 @@ export const MySqlAdminSection = () => {
     });
   };
 
-  const runNow = async () => {
+  const runNow = async (isWrite: boolean) => {
     const query = sql.trim();
     if (!query) return;
     setRunning(true);
     setResult(null);
     try {
       const { data, error } = await supabase.functions.invoke("litebans-mysql-query", {
-        body: { sql: query },
+        body: { sql: query, write: isWrite, confirm: isWrite },
       });
       if (error) {
         setResult({ ok: false, error: error.message });
@@ -116,7 +155,11 @@ export const MySqlAdminSection = () => {
         setResult(data as RunResult);
         if ((data as any)?.ok) {
           pushHistory(query);
-          toast.success(`${(data as any).rowCount} rows in ${(data as any).durationMs}ms`);
+          if ((data as any).kind === "write") {
+            toast.success(`Done — ${(data as any).affectedRows} row(s) affected in ${(data as any).durationMs}ms`);
+          } else {
+            toast.success(`${(data as any).rowCount} rows in ${(data as any).durationMs}ms`);
+          }
         } else {
           toast.error("MySQL error");
         }
@@ -132,27 +175,47 @@ export const MySqlAdminSection = () => {
   const onRun = () => {
     if (!sql.trim()) return;
     if (!isReadOnly(sql)) {
-      toast.error("This console is read-only. Use in-game commands (e.g. /unban, /unmute) to change punishments.");
+      if (!writeMode) {
+        toast.error("Turn on write mode to run INSERT/UPDATE/DELETE queries.");
+        return;
+      }
+      setShowConfirmWrite(true);
       return;
     }
-    void runNow();
+    void runNow(false);
+  };
+
+  const onWriteToggle = (next: boolean) => {
+    if (next) {
+      setShowEnableWrite(true);
+    } else {
+      setWriteMode(false);
+    }
   };
 
   const verb = useMemo(() => detectVerb(sql), [sql]);
 
   return (
     <div className="space-y-6">
-      <Card className="p-4 border-amber-500/30 bg-amber-500/5">
+      <Card className={writeMode ? "p-4 border-destructive/40 bg-destructive/5" : "p-4 border-amber-500/30 bg-amber-500/5"}>
         <div className="flex gap-3">
-          <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-          <div className="text-sm space-y-1">
-            <p className="font-medium">You are connected directly to the LiteBans database (read-only).</p>
-            <p className="text-muted-foreground">
-              This console can only look up data — it can't change or remove punishments. To lift a ban or mute,
-              use the in-game commands (<code className="bg-muted px-1 rounded">/unban</code>,{" "}
-              <code className="bg-muted px-1 rounded">/unmute</code>). Time columns are epoch milliseconds.
-              Owner-only.
+          <ShieldAlert className={`h-5 w-5 shrink-0 mt-0.5 ${writeMode ? "text-destructive" : "text-amber-500"}`} />
+          <div className="text-sm space-y-1 flex-1">
+            <p className="font-medium">
+              {writeMode
+                ? "Write mode is ON — queries can change or remove punishments."
+                : "You are connected directly to the LiteBans database (read-only)."}
             </p>
+            <p className="text-muted-foreground">
+              {writeMode
+                ? "INSERT, UPDATE, DELETE and REPLACE are allowed on litebans_ tables only. UPDATE/DELETE need a WHERE clause. Every write asks for confirmation first."
+                : "This console can only look up data. Turn on write mode below to edit punishment rows, or use the in-game commands (/unban, /unmute). Time columns are epoch milliseconds. Owner-only."}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <PencilLine className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs font-medium">Write mode</span>
+            <Switch checked={writeMode} onCheckedChange={onWriteToggle} />
           </div>
         </div>
       </Card>
@@ -246,6 +309,16 @@ export const MySqlAdminSection = () => {
                 </div>
               );
             })()}
+            {result?.ok && result.kind === "write" && (
+              <div className="border border-primary/40 bg-primary/5 rounded-md p-3 text-sm space-y-1">
+                <div className="font-semibold">Write query completed</div>
+                <div className="text-xs text-muted-foreground">
+                  {result.affectedRows} row(s) affected · {result.changedRows} changed
+                  {result.insertId ? <> · new id {result.insertId}</> : null} · {result.durationMs}ms
+                </div>
+                {result.info && <div className="font-mono text-xs">{result.info}</div>}
+              </div>
+            )}
             {result?.ok && result.kind === "rows" && (
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
@@ -298,6 +371,20 @@ export const MySqlAdminSection = () => {
                 <Button size="sm" variant="outline" onClick={() => setSql(s.sql)}>Load</Button>
               </div>
             ))}
+            {writeMode && (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive pt-2">Write snippets</p>
+                {WRITE_SNIPPETS.map((s) => (
+                  <div key={s.title} className="border border-destructive/30 rounded-md p-2 flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium">{s.title}</div>
+                      <pre className="text-xs bg-muted/40 rounded p-2 mt-1 overflow-x-auto"><code>{s.sql}</code></pre>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => setSql(s.sql)}>Load</Button>
+                  </div>
+                ))}
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="history" className="mt-4 space-y-2">
@@ -323,6 +410,53 @@ export const MySqlAdminSection = () => {
           </TabsContent>
         </Tabs>
       </Card>
+
+      <AlertDialog open={showEnableWrite} onOpenChange={setShowEnableWrite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Turn on write mode?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Write mode lets you run INSERT, UPDATE, DELETE and REPLACE statements directly against the live
+              LiteBans database. Mistakes can change or remove real punishment records and cannot be undone
+              from here. In-game commands remain the safer option for routine changes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep read-only</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setWriteMode(true);
+                toast.success("Write mode on — every write still asks for confirmation.");
+              }}
+            >
+              Turn on write mode
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showConfirmWrite} onOpenChange={setShowConfirmWrite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Run this write query?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will change the live LiteBans database immediately. Review the statement before confirming.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <pre className="text-xs bg-muted/40 rounded p-3 overflow-x-auto max-h-64"><code>{sql}</code></pre>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowConfirmWrite(false);
+                void runNow(true);
+              }}
+            >
+              Run write query
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );
