@@ -20,6 +20,7 @@ export const NAV_LINKS = [
   { to: "/rules", label: "Rules" },
   { to: "/faq", label: "FAQ" },
   { to: "/discord", label: "Discord" },
+  { to: "/apply", label: "Apply" },
 ];
 
 const Navbar = () => {

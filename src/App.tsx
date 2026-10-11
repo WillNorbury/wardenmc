@@ -28,6 +28,7 @@ import PluginDevelopers from "./pages/PluginDevelopers.tsx";
 import PluginDetail from "./pages/PluginDetail.tsx";
 import PluginSettings from "./pages/PluginSettings.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Apply from "./pages/Apply.tsx";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,9 @@ const Shell = () => (
         <Route path="/plugins/:slug" element={<PluginDetail />} />
         <Route path="/plugin/:slug/settings" element={<PluginSettings />} />
         <Route path="/plugins/:slug/settings" element={<PluginSettings />} />
+
+        <Route path="/apply" element={<Apply />} />
+        <Route path="/apply/:slug" element={<Apply />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

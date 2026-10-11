@@ -15,14 +15,14 @@ export default function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <section className="border-b border-border/70 bg-card/30">
+    <section className="aurora border-b border-border/60 pt-16">
       <div className="container max-w-[1400px] py-10 md:py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl">
-            <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
-              WARDENMC • {eyebrow}
+            <div className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">
+              WardenMC · {eyebrow}
             </div>
-            <h1 className="font-display text-4xl font-black tracking-tight md:text-5xl break-words">
+            <h1 className="font-display text-6xl leading-none md:text-7xl break-words">
               {title}
             </h1>
             {description && (

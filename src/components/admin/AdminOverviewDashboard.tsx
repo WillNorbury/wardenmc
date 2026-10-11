@@ -20,6 +20,7 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
   const [newest, setNewest] = useState<any[]>([]);
   const [latestPlugins, setLatestPlugins] = useState<any[]>([]);
   const [discordLog, setDiscordLog] = useState<any[]>([]);
+  const [modLog, setModLog] = useState<any[]>([]);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +29,7 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
       const c = { count: "exact" as const, head: true };
       const [
         members, newMembers, plugins, published, featured, discord, discordFail, status,
-        newestP, latestPl, dLog, apps, appeals, reports, tickets, contact,
+        newestP, latestPl, dLog, modLog, apps, appeals, reports, tickets, contact,
       ] = await Promise.all([
         supabase.from("profiles").select("id", c),
         supabase.from("profiles").select("id", c).gte("created_at", since(7)),
@@ -40,7 +41,8 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
         supabase.from("server_status").select("*").eq("id", 1).maybeSingle(),
         supabase.from("profiles").select("id, display_name, avatar_url, created_at").order("created_at", { ascending: false }).limit(6),
         supabase.from("plugins").select("id, name, slug, published, created_at").order("created_at", { ascending: false }).limit(6),
-        supabase.from("discord_bot_action_logs").select("id, action, status, error, created_at").order("created_at", { ascending: false }).limit(8),
+        supabase.from("discord_bot_action_logs").select("id, action, status, error, request, created_at").order("created_at", { ascending: false }).limit(8),
+        supabase.from("discord_bot_action_logs").select("id, action, error, request, created_at").in("action", ["/ban", "/unban", "/kick", "/timeout", "/warn"]).order("created_at", { ascending: false }).limit(8),
         supabase.from("applications").select("id, type, mc_username, created_at").eq("status", "pending").order("created_at").limit(20),
         supabase.from("ban_appeals").select("id, minecraft_username, created_at").eq("status", "pending").order("created_at").limit(20),
         supabase.from("user_reports").select("id, target_type, target_label, reason, created_at").eq("status", "open").order("created_at").limit(20),
@@ -56,6 +58,7 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
       setNewest(newestP.data ?? []);
       setLatestPlugins(latestPl.data ?? []);
       setDiscordLog(dLog.data ?? []);
+      setModLog(modLog.data ?? []);
       const q: QueueItem[] = [
         ...(apps.data ?? []).map((a: any) => ({ id: a.id, kind: "Application", tab: "applications", title: a.mc_username || "Unknown", sub: String(a.type), created_at: a.created_at })),
         ...(appeals.data ?? []).map((a: any) => ({ id: a.id, kind: "Ban appeal", tab: "ban-appeals", title: a.minecraft_username, sub: "Awaiting review", created_at: a.created_at })),
@@ -80,7 +83,7 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
         <StatCard title="Server" value={s.online ? "Online" : "Offline"} icon={Server} color={s.online ? "bg-primary" : "bg-destructive"} description={s.online ? `${s.players} / ${s.max} players` : "currently down"} />
       </div>
 
-      <Card className="p-6">
+      <Card className="glass rounded-2xl p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-lg font-semibold">Pending requests</h3>
           <div className="flex flex-wrap gap-2">
@@ -106,8 +109,8 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="p-6">
-          <div className="mb-4 flex items-center justify-between"><h3 className="font-semibold">Newest members</h3>
+        <Card className="glass rounded-2xl p-6">
+          <div className="mb-4 flex items-center justify-between"><h3 className="font-display text-2xl">Newest members</h3>
             <Button size="sm" variant="ghost" onClick={() => onNavigate("users")}>All</Button></div>
           <ul className="space-y-3">
             {newest.map((m) => (
@@ -119,8 +122,8 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
             ))}
           </ul>
         </Card>
-        <Card className="p-6">
-          <div className="mb-4 flex items-center justify-between"><h3 className="font-semibold">Latest plugins</h3>
+        <Card className="glass rounded-2xl p-6">
+          <div className="mb-4 flex items-center justify-between"><h3 className="font-display text-2xl">Latest plugins</h3>
             <Button size="sm" variant="ghost" onClick={() => onNavigate("plugins")}>All</Button></div>
           <ul className="space-y-3">
             {latestPlugins.map((p) => (
@@ -132,8 +135,8 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
             ))}
           </ul>
         </Card>
-        <Card className="p-6">
-          <div className="mb-4 flex items-center justify-between"><h3 className="font-semibold">Discord activity</h3>
+        <Card className="glass rounded-2xl p-6">
+          <div className="mb-4 flex items-center justify-between"><h3 className="font-display text-2xl">Discord activity</h3>
             <Button size="sm" variant="ghost" onClick={() => onNavigate("bot-dashboard")}>Bot</Button></div>
           {discordLog.length === 0 ? <p className="text-sm text-muted-foreground">No recent bot activity.</p> : (
             <ul className="space-y-3">
@@ -148,6 +151,29 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
           )}
         </Card>
       </div>
+
+      <Card className="glass rounded-2xl p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="font-display text-3xl">Recent bans &amp; moderation</h3>
+          <Button size="sm" variant="ghost" onClick={() => onNavigate("bot-dashboard")}>Bot log</Button>
+        </div>
+        {modLog.length === 0 ? <p className="text-sm text-muted-foreground">No /ban, /kick, /timeout or /warn actions yet.</p> : (
+          <ul className="divide-y divide-border/60">
+            {modLog.map((m) => (
+              <li key={m.id} className="flex items-center gap-3 py-2.5">
+                <Badge variant={m.action === "/ban" ? "destructive" : "secondary"}>{m.action}</Badge>
+                <span className="flex-1 truncate text-sm">
+                  {m.request?.target ? `User ${m.request.target}` : "Unknown user"}
+                  {m.request?.reason ? <span className="text-muted-foreground"> — {m.request.reason}</span> : null}
+                  {m.request?.moderator ? <span className="text-muted-foreground"> · by {m.request.moderator}</span> : null}
+                </span>
+                {m.error ? <XCircle className="h-4 w-4 text-destructive" /> : <CheckCircle2 className="h-4 w-4 text-primary" />}
+                <span className="text-xs text-muted-foreground">{ago(m.created_at)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
     </div>
   );
 };

@@ -82,6 +82,20 @@ Deno.serve(async (req) => {
 
     const modReply = await handleModeration(body);
     if (modReply !== null) {
+      // Record moderation actions so they show on the Admin dashboard.
+      try {
+        const opts = Object.fromEntries((body.data?.options ?? []).map((x: any) => [x.name, x.value]));
+        const failed = /^[⛔⚠❌]/.test(modReply);
+        await createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!)
+          .from("discord_bot_action_logs").insert({
+            action: `/${body.data?.name}`,
+            status: failed ? "error" : "success",
+            error: failed ? modReply.slice(0, 300) : null,
+            channel_id: body.channel_id ?? null,
+            request: { target: opts.user ?? opts.user_id ?? null, reason: opts.reason ?? null, moderator: body.member?.user?.username ?? null },
+            response: { reply: modReply.slice(0, 300) },
+          });
+      } catch (e) { console.warn("mod log failed", e); }
       const pub = !/^[⛔⚠❌]|^Nothing/.test(modReply);
       return say(modReply, !pub);
     }

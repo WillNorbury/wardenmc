@@ -128,12 +128,12 @@ export default function Plugins() {
       <SEO title="Plugin Directory — WardenMC" description="Discover plugins built for Minecraft servers, networks, and communities." path="/plugins" />
       <Navbar />
       <main className="pb-20 pt-24">
-        <section className="border-b border-border/70 bg-card/30">
+        <section className="aurora border-b border-border/60">
           <div className="container max-w-[1400px] py-10 md:py-14">
             <DirectoryNav active="plugins" />
             <div className="max-w-3xl py-9">
-              <div className="mb-3 text-xs font-semibold uppercase text-primary">WARDENMC • PLUGIN DIRECTORY</div>
-              <h1 className="font-display text-4xl font-black md:text-5xl">Plugin Directory</h1>
+              <div className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">WardenMC · Directory</div>
+              <h1 className="font-display text-7xl leading-none md:text-8xl">PLUGIN <span className="text-gradient">DIRECTORY</span></h1>
               <p className="mt-3 text-base text-muted-foreground md:text-lg">Discover plugins built for Minecraft servers, networks, and communities.</p>
             </div>
             <PluginStats plugins={plugins} />
