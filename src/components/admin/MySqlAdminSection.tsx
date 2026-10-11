@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/lib/auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -108,7 +109,12 @@ const cellDisplay = (v: unknown) => {
   return String(v);
 };
 
+// Write mode is locked to this account only (server enforces the same).
+const WRITE_ALLOWED_USER_ID = "a9ff5e2f-cad4-4805-9acd-095065d18179";
+
 export const MySqlAdminSection = () => {
+  const { user } = useAuth();
+  const canWrite = user?.id === WRITE_ALLOWED_USER_ID;
   const [sql, setSql] = useState<string>("SHOW TABLES LIKE 'litebans_%';");
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
@@ -212,11 +218,13 @@ export const MySqlAdminSection = () => {
                 : "This console can only look up data. Turn on write mode below to edit punishment rows, or use the in-game commands (/unban, /unmute). Time columns are epoch milliseconds. Owner-only."}
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <PencilLine className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-medium">Write mode</span>
-            <Switch checked={writeMode} onCheckedChange={onWriteToggle} />
-          </div>
+          {canWrite && (
+            <div className="flex items-center gap-2 shrink-0">
+              <PencilLine className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs font-medium">Write mode</span>
+              <Switch checked={writeMode} onCheckedChange={onWriteToggle} />
+            </div>
+          )}
         </div>
       </Card>
 

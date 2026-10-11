@@ -62,6 +62,11 @@ Deno.serve(async (req) => {
   const isRead = /^(select|show|describe|desc|explain)\s/i.test(stripped);
 
   if (!isRead) {
+    // Write mode is locked to a single account (WillNorbury).
+    const WRITE_ALLOWED_USER = "a9ff5e2f-cad4-4805-9acd-095065d18179";
+    if (userData.user.id !== WRITE_ALLOWED_USER) {
+      return json(403, { error: "write mode is restricted to the site owner account" });
+    }
     if (!writeMode) {
       return json(400, { error: "only read-only queries (SELECT/SHOW/DESCRIBE/EXPLAIN) are allowed" });
     }
