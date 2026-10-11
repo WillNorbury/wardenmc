@@ -57,8 +57,28 @@ Deno.serve(async (req) => {
   if (sql.length > 20000) return json(400, { error: "sql too long" });
   const stripped = sql.replace(/;\s*$/, "");
   if (stripped.includes(";")) return json(400, { error: "only a single statement is allowed" });
-  if (!/^(select|show|describe|desc|explain)\s/i.test(stripped)) {
-    return json(400, { error: "only read-only queries (SELECT/SHOW/DESCRIBE/EXPLAIN) are allowed" });
+  const writeMode = body?.write === true;
+  const confirmed = body?.confirm === true;
+  const isRead = /^(select|show|describe|desc|explain)\s/i.test(stripped);
+
+  if (!isRead) {
+    if (!writeMode) {
+      return json(400, { error: "only read-only queries (SELECT/SHOW/DESCRIBE/EXPLAIN) are allowed" });
+    }
+    if (!confirmed) {
+      return json(400, { error: "write queries require explicit confirmation" });
+    }
+    // Write mode: only allow row-level changes on litebans_% tables.
+    if (!/^(insert|update|delete|replace)\s/i.test(stripped)) {
+      return json(400, { error: "write mode only allows INSERT, UPDATE, DELETE or REPLACE" });
+    }
+    if (!/\blitebans_\w+/i.test(stripped)) {
+      return json(400, { error: "write queries must target a litebans_ table" });
+    }
+    // UPDATE/DELETE must be scoped with a WHERE clause — no full-table changes.
+    if (/^(update|delete)\s/i.test(stripped) && !/\bwhere\b/i.test(stripped)) {
+      return json(400, { error: "UPDATE and DELETE require a WHERE clause" });
+    }
   }
   if (/\b(into\s+(out|dump)file|load_file|sleep|benchmark|for\s+update|lock\s+in\s+share)\b/i.test(stripped)) {
     return json(400, { error: "query contains a disallowed clause" });
