@@ -127,6 +127,27 @@ export const MySqlAdminSection = () => {
   const [cfg, setCfg] = useState({ host: "", port: "3306", username: "", password: "", database_name: "" });
   const [cfgLoaded, setCfgLoaded] = useState(false);
   const [cfgSaving, setCfgSaving] = useState(false);
+  const [cfgTesting, setCfgTesting] = useState(false);
+
+  const testCfg = async () => {
+    setCfgTesting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("litebans-mysql-query", {
+        body: { action: "test_connection", config: cfg },
+      });
+      if (error) {
+        toast.error(`Test failed: ${error.message}`);
+      } else if ((data as any)?.ok) {
+        toast.success(`Connected to ${(data as any).server} (${(data as any).database}) in ${(data as any).durationMs}ms`);
+      } else {
+        toast.error(`Test failed: ${(data as any)?.error ?? "unknown error"}`);
+      }
+    } catch (e: any) {
+      toast.error(`Test failed: ${String(e?.message ?? e)}`);
+    } finally {
+      setCfgTesting(false);
+    }
+  };
 
   useEffect(() => {
     if (!canWrite) return;
@@ -277,8 +298,12 @@ export const MySqlAdminSection = () => {
               <Input value={cfg.database_name} onChange={(e) => setCfg({ ...cfg, database_name: e.target.value })} placeholder="litebans" className="font-mono text-sm" />
             </div>
           </div>
-          <div className="flex justify-end mt-3">
-            <Button onClick={saveCfg} disabled={cfgSaving}>
+          <div className="flex justify-end gap-2 mt-3">
+            <Button variant="outline" onClick={testCfg} disabled={cfgTesting || cfgSaving}>
+              {cfgTesting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Test connection
+            </Button>
+            <Button onClick={saveCfg} disabled={cfgSaving || cfgTesting}>
               {cfgSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
               Save connection
             </Button>
