@@ -51,6 +51,48 @@ Deno.serve(async (req) => {
   } catch {
     return json(400, { error: "invalid json" });
   }
+  // --- Test connection action (locked to the write-allowed account) ---
+  if (body?.action === "test_connection") {
+    const WRITE_ALLOWED_USER_ID = "a9ff5e2f-cad4-4805-9acd-095065d18179";
+    if (userData.user.id !== WRITE_ALLOWED_USER_ID) return json(403, { error: "not allowed" });
+    const c = body?.config ?? {};
+    const { data: saved } = await admin
+      .from("litebans_mysql_config")
+      .select("host, port, username, password, database_name")
+      .eq("id", true)
+      .maybeSingle();
+    const tHost = String(c.host ?? "").trim() || saved?.host || Deno.env.get("LITEBANS_MYSQL_HOST");
+    const tPort = Number(c.port ?? saved?.port ?? Deno.env.get("LITEBANS_MYSQL_PORT") ?? "3306");
+    const tUser = String(c.username ?? "").trim() || saved?.username || Deno.env.get("LITEBANS_MYSQL_USER");
+    const tPass = String(c.password ?? "") || saved?.password || Deno.env.get("LITEBANS_MYSQL_PASSWORD");
+    const tDb = String(c.database_name ?? "").trim() || saved?.database_name || Deno.env.get("LITEBANS_MYSQL_DATABASE");
+    if (!tHost || !tUser || !tPass || !tDb) {
+      return json(200, { ok: false, error: "Missing host, username, password or database." });
+    }
+    let tConn: mysql.Connection | null = null;
+    const tStarted = Date.now();
+    try {
+      tConn = await mysql.createConnection({
+        host: tHost, port: tPort, user: tUser, password: tPass, database: tDb,
+        connectTimeout: 8000, multipleStatements: false,
+      });
+      await tConn.query("SELECT 1");
+      return json(200, { ok: true, durationMs: Date.now() - tStarted, server: `${tHost}:${tPort}`, database: tDb });
+    } catch (e: any) {
+      const code = e?.code ?? null;
+      const unreachable = code === "ECONNREFUSED" || code === "ETIMEDOUT" || code === "ENOTFOUND" || code === "EHOSTUNREACH";
+      return json(200, {
+        ok: false,
+        error: unreachable
+          ? `Cannot reach ${tHost}:${tPort} — check the database is online and allows external connections.`
+          : String(e?.message ?? e),
+        code,
+      });
+    } finally {
+      try { await tConn?.end(); } catch { /* ignore */ }
+    }
+  }
+
   const sql: string = String(body?.sql ?? "").trim();
   const params: unknown[] = Array.isArray(body?.params) ? body.params : [];
   if (!sql) return json(400, { error: "sql required" });
