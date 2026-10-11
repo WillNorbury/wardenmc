@@ -3753,6 +3753,7 @@ export type Database = {
         }[]
       }
       admin_get_user_email: { Args: { _user_id: string }; Returns: string }
+      admin_run_sql: { Args: { _sql: string }; Returns: Json }
       apply_creator_code: {
         Args: { _code: string }
         Returns: {
