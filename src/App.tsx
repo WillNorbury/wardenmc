@@ -29,6 +29,8 @@ import PluginDetail from "./pages/PluginDetail.tsx";
 import PluginSettings from "./pages/PluginSettings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Apply from "./pages/Apply.tsx";
+import Partners from "./pages/Partners.tsx";
+import PartnerDetail from "./pages/PartnerDetail.tsx";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/site/AppSidebar";
 
@@ -79,6 +81,9 @@ const Shell = () => (
 
         <Route path="/apply" element={<Apply />} />
         <Route path="/apply/:slug" element={<Apply />} />
+
+        <Route path="/partners" element={<Partners />} />
+        <Route path="/partners/:slug" element={<PartnerDetail />} />
 
         <Route path="*" element={<NotFound />} />
           </Routes>
