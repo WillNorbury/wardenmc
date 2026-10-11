@@ -3,8 +3,9 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import logo from "@/assets/warden-network-icon.png";
-import { LogIn, LogOut, Menu, Shield, User as UserIcon, X } from "lucide-react";
+import { LogIn, LogOut, Shield, User as UserIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
