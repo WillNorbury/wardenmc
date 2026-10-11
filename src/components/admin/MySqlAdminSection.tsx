@@ -197,17 +197,25 @@ export const MySqlAdminSection = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="p-4 border-amber-500/30 bg-amber-500/5">
+      <Card className={writeMode ? "p-4 border-destructive/40 bg-destructive/5" : "p-4 border-amber-500/30 bg-amber-500/5"}>
         <div className="flex gap-3">
-          <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-          <div className="text-sm space-y-1">
-            <p className="font-medium">You are connected directly to the LiteBans database (read-only).</p>
-            <p className="text-muted-foreground">
-              This console can only look up data — it can't change or remove punishments. To lift a ban or mute,
-              use the in-game commands (<code className="bg-muted px-1 rounded">/unban</code>,{" "}
-              <code className="bg-muted px-1 rounded">/unmute</code>). Time columns are epoch milliseconds.
-              Owner-only.
+          <ShieldAlert className={`h-5 w-5 shrink-0 mt-0.5 ${writeMode ? "text-destructive" : "text-amber-500"}`} />
+          <div className="text-sm space-y-1 flex-1">
+            <p className="font-medium">
+              {writeMode
+                ? "Write mode is ON — queries can change or remove punishments."
+                : "You are connected directly to the LiteBans database (read-only)."}
             </p>
+            <p className="text-muted-foreground">
+              {writeMode
+                ? "INSERT, UPDATE, DELETE and REPLACE are allowed on litebans_ tables only. UPDATE/DELETE need a WHERE clause. Every write asks for confirmation first."
+                : "This console can only look up data. Turn on write mode below to edit punishment rows, or use the in-game commands (/unban, /unmute). Time columns are epoch milliseconds. Owner-only."}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <PencilLine className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs font-medium">Write mode</span>
+            <Switch checked={writeMode} onCheckedChange={onWriteToggle} />
           </div>
         </div>
       </Card>
