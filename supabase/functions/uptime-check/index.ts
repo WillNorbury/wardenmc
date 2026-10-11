@@ -245,6 +245,30 @@ async function emailAdmins(
   }
 }
 
+// Only email admins once per service per hour, even if it keeps flapping.
+async function emailAdminsThrottled(
+  supabase: ReturnType<typeof createClient>,
+  serviceKey: string,
+  excludeIncidentId: string,
+  payload: Parameters<typeof emailAdmins>[1],
+) {
+  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { data: recent } = await supabase
+    .from("uptime_incidents")
+    .select("id")
+    .eq("service_key", serviceKey)
+    .eq("alerted", true)
+    .gte("opened_at", since)
+    .neq("id", excludeIncidentId)
+    .limit(1)
+    .maybeSingle();
+  if (recent) {
+    console.log(`email throttled for ${serviceKey} (already alerted within the hour)`);
+    return;
+  }
+  await emailAdmins(supabase, payload);
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -390,7 +414,7 @@ Deno.serve(async (req) => {
           if (c.service_key === "website" && websiteWebhookUrl)
             await logWebsiteDelivery(supabase, "down", websiteWebhookUrl, results);
           await supabase.from("uptime_incidents").update({ alerted: true }).eq("id", inc.id);
-          await emailAdmins(supabase, {
+          await emailAdminsThrottled(supabase, c.service_key, inc.id, {
             title: `${name} is DOWN`,
             severity: 'critical',
             summary: `${name} has failed multiple consecutive checks.`,
@@ -441,7 +465,7 @@ Deno.serve(async (req) => {
           .from("uptime_incidents")
           .update({ alerted: true, last_error: c.error })
           .eq("id", openIncident.id);
-        await emailAdmins(supabase, {
+        await emailAdminsThrottled(supabase, c.service_key, openIncident.id, {
           title: `${name} still DOWN`,
           severity: 'critical',
           summary: `${name} is still failing after ${duration}.`,
