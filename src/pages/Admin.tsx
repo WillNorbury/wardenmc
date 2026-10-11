@@ -84,6 +84,7 @@ import { SendEmailAdminSection } from "@/components/admin/SendEmailAdminSection"
 import { EmailDiagnosticsSection } from "@/components/admin/EmailDiagnosticsSection";
 import { ApplicationStatusEmailEditor } from "@/components/admin/ApplicationStatusEmailEditor";
 import { MySqlAdminSection } from "@/components/admin/MySqlAdminSection";
+import { DbAdminSection } from "@/components/admin/DbAdminSection";
 import ServersStatusAdminSection from "@/components/admin/ServersStatusAdminSection";
 import { StoreAdminSection } from "@/components/admin/StoreAdminSection";
 import { OrdersAdminSection } from "@/components/admin/OrdersAdminSection";
@@ -160,6 +161,7 @@ const sectionMeta: Record<AdminSection, { title: string; description: string }> 
   punishments: { title: "Punishments", description: "Browse bans, mutes, kicks, and warnings from the network database. Unban or unmute players from the web (silent by default)." },
   console: { title: "Owner Console", description: "Terminal-style admin console. Type `help` for available commands." },
   mysql: { title: "LiteBans MySQL", description: "Connect and edit the LiteBans database directly. Use with caution." },
+  database: { title: "Site database", description: "Run SQL against the website database. Locked to the site owner account." },
   "servers-status": { title: "Servers (Public Status)", description: "Edit the per-server cards on /servers-status: players, TPS, uptime, IP, and MOTD." },
   store: { title: "Store", description: "Manage the categories and items shown on /store." },
   orders: { title: "Order Inbox", description: "Track every store order and its payment status in one place." },
@@ -330,6 +332,7 @@ const Admin = () => {
           {section === "bot-config" && (isOwner ? <DiscordConfigSection /> : denied)}
           {section === "console" && (isOwner ? <ConsoleAdminSection /> : denied)}
           {section === "mysql" && (isOwner ? <MySqlAdminSection /> : denied)}
+          {section === "database" && (isOwner ? <DbAdminSection /> : denied)}
           {section === "servers-status" && <ServersStatusAdminSection />}
           {section === "orders" && <OrdersAdminSection />}
           {section === "signup-funnel" && <SignupFunnelAdminSection />}
