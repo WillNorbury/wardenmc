@@ -309,6 +309,16 @@ export const MySqlAdminSection = () => {
                 </div>
               );
             })()}
+            {result?.ok && result.kind === "write" && (
+              <div className="border border-primary/40 bg-primary/5 rounded-md p-3 text-sm space-y-1">
+                <div className="font-semibold">Write query completed</div>
+                <div className="text-xs text-muted-foreground">
+                  {result.affectedRows} row(s) affected · {result.changedRows} changed
+                  {result.insertId ? <> · new id {result.insertId}</> : null} · {result.durationMs}ms
+                </div>
+                {result.info && <div className="font-mono text-xs">{result.info}</div>}
+              </div>
+            )}
             {result?.ok && result.kind === "rows" && (
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
