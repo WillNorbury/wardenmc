@@ -131,6 +131,27 @@ Deno.serve(async (req) => {
         return json(200, { required: false })
       }
 
+      if (action === 'check') {
+        // A valid code was already emailed for this device — show the code
+        // screen again without spamming a fresh email on every page load.
+        const { data: pending } = await admin
+          .from('login_verifications')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('device_id', deviceId)
+          .gt('expires_at', new Date().toISOString())
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        if (pending) {
+          return json(200, {
+            required: true,
+            reason: device ? 'new_network' : 'new_device',
+            email: user.email ? maskEmail(user.email) : null,
+          })
+        }
+      }
+
       const emailed = await issueCode()
       if (!emailed) {
         // Email delivery is unavailable (unverified sender domain, suppressed
