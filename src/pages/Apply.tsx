@@ -108,13 +108,13 @@ const Apply = () => {
       <div className="container max-w-4xl">
 
       {!types && (
-        <div className="flex justify-center py-16">
+        <div className="container max-w-4xl flex justify-center py-16">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
 
       {types && types.length === 0 && (
-        <Card className="p-10 text-center text-muted-foreground">
+        <Card className="container max-w-4xl p-10 text-center text-muted-foreground">
           No application types are currently available. Check back soon.
         </Card>
       )}
@@ -346,7 +346,7 @@ const ApplyForm = ({
   if (authLoading || (!type && !typeError)) {
     return (
       <Shell>
-        <div className="flex justify-center py-20">
+        <div className="container max-w-4xl flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       </Shell>
@@ -356,7 +356,7 @@ const ApplyForm = ({
   if (typeError) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <h1 className="font-display text-2xl font-bold">Not found</h1>
           <p className="text-muted-foreground">{typeError}</p>
           <Button onClick={onBack}>Back to applications</Button>
@@ -371,7 +371,7 @@ const ApplyForm = ({
   if (!type.accepting) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <Icon className="h-10 w-10 mx-auto text-primary" />
           <h1 className="font-display text-2xl font-bold">{type.label} applications are closed</h1>
           <p className="text-muted-foreground">Check back later — we'll reopen soon.</p>
@@ -724,7 +724,7 @@ const PartnerApplyForm = ({
   if (authLoading || (!type && !typeError)) {
     return (
       <Shell>
-        <div className="flex justify-center py-20">
+        <div className="container max-w-4xl flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       </Shell>
@@ -734,7 +734,7 @@ const PartnerApplyForm = ({
   if (typeError) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <h1 className="font-display text-2xl font-bold">Not available</h1>
           <p className="text-muted-foreground">{typeError}</p>
           <Button onClick={onBack}>Back to applications</Button>
@@ -748,7 +748,7 @@ const PartnerApplyForm = ({
   if (!type.accepting) {
     return (
       <Shell>
-        <Card className="p-10 text-center space-y-4">
+        <Card className="container max-w-4xl p-10 text-center space-y-4">
           <Icon className="h-10 w-10 mx-auto text-primary" />
           <h1 className="font-display text-2xl font-bold">Partner applications are closed</h1>
           <p className="text-muted-foreground">Check back later — we'll reopen soon.</p>
