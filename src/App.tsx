@@ -42,9 +42,12 @@ const AdminTabRedirect = () => {
 
 const Shell = () => (
   <MaintenanceGate>
-    <div className="flex min-h-svh w-full flex-col">
-      <VersionChecker />
-      <Routes>
+    <SidebarProvider>
+      <div className="flex min-h-svh w-full">
+        <AppSidebar />
+        <div className="flex min-h-svh w-full min-w-0 flex-1 flex-col">
+          <VersionChecker />
+          <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
