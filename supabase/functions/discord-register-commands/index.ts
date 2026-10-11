@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     const { data: u } = await userClient.auth.getUser();
     if (!u?.user) return json({ ok: false, error: "Unauthorized" }, 401);
     const { data: role } = await userClient
-      .from("user_roles").select("role").eq("user_id", u.user.id).in("role", ["admin", "owner", "founder", "*"]).limit(1).maybeSingle();
+      .from("user_roles").select("role").eq("user_id", u.user.id).in("role", ["admin", "owner", "founder", "star"]).limit(1).maybeSingle();
     if (!role) return json({ ok: false, error: "Admin only" }, 403);
 
     const appId = Deno.env.get("DISCORD_APPLICATION_ID");
