@@ -38,11 +38,7 @@ type NavGroup = { id: string; label: string; items: NavItem[]; defaultOpen?: boo
 const linksGroup: NavGroup = {
   id: "links",
   label: "Links",
-  items: [
-    { to: "https://portfolio.warden.rip", label: "Portfolio", icon: Link2, external: true },
-    { to: "https://appeals.warden.rip", label: "Appeals", icon: Link2, external: true },
-    { to: "https://spectorclient.com", label: "SpectorClient", icon: Link2, external: true },
-  ],
+  items: [{ to: "https://spectorclient.com", label: "SpectorClient", icon: Link2, external: true }],
 };
 
 const mainGroup: NavGroup = {
