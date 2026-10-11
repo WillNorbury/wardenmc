@@ -35,6 +35,16 @@ import { Button } from "@/components/ui/button";
 type NavItem = { to: string; label: string; icon: typeof Home; external?: boolean };
 type NavGroup = { id: string; label: string; items: NavItem[]; defaultOpen?: boolean };
 
+const linksGroup: NavGroup = {
+  id: "links",
+  label: "Links",
+  items: [
+    { to: "https://portfolio.warden.rip", label: "Portfolio", icon: Link2, external: true },
+    { to: "https://appeals.warden.rip", label: "Appeals", icon: Link2, external: true },
+    { to: "https://spectorclient.com", label: "SpectorClient", icon: Link2, external: true },
+  ],
+};
+
 const mainGroup: NavGroup = {
   id: "main",
   label: "Main",
@@ -57,16 +67,6 @@ const communityGroup: NavGroup = {
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/faq", label: "FAQ", icon: HelpCircle },
-  ],
-};
-
-const linksGroup: NavGroup = {
-  id: "links",
-  label: "Links",
-  items: [
-    { to: "https://portfolio.warden.rip", label: "Portfolio", icon: Link2, external: true },
-    { to: "https://appeals.warden.rip", label: "Appeals", icon: Link2, external: true },
-    { to: "https://spectorclient.com", label: "SpectorClient", icon: Link2, external: true },
   ],
 };
 
@@ -94,11 +94,7 @@ export function AppSidebar() {
 
   const renderItem = (l: NavItem) => (
     <SidebarMenuItem key={l.to}>
-      <SidebarMenuButton
-        asChild
-        isActive={!isExternal(l.to) && isActive(l.to)}
-        tooltip={l.label}
-      >
+      <SidebarMenuButton asChild isActive={!isExternal(l.to) && isActive(l.to)} tooltip={l.label}>
         {l.external || isExternal(l.to) ? (
           <a href={l.to} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
             <l.icon className="h-4 w-4 shrink-0" />
@@ -137,7 +133,18 @@ export function AppSidebar() {
     );
   };
 
-  const groups: NavGroup[] = [mainGroup, communityGroup, ...(user ? [accountGroup] : []), ...(isAdmin ? [applyGroup, { id: "admin", label: "Admin", items: [{ to: "/admin", label: "Admin", icon: Shield }] } as NavGroup] : []), linksGroup];
+  const groups: NavGroup[] = [
+    mainGroup,
+    communityGroup,
+    ...(user ? [accountGroup] : []),
+    ...(isAdmin
+      ? [
+          applyGroup,
+          { id: "admin", label: "Admin", items: [{ to: "/admin", label: "Admin", icon: Shield }] } as NavGroup,
+        ]
+      : []),
+    linksGroup,
+  ];
 
   return (
     <Sidebar collapsible="icon">
