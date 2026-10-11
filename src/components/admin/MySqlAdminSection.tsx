@@ -46,6 +46,15 @@ type RunResult =
       fields: { name: string }[];
       durationMs: number;
     }
+  | {
+      ok: true;
+      kind: "write";
+      affectedRows: number;
+      changedRows: number;
+      insertId: number;
+      info: string | null;
+      durationMs: number;
+    }
   | { ok: false; error: string; code?: string | null; sqlState?: string | null };
 
 const HISTORY_KEY = "litebans_sql_history_v1";
@@ -60,6 +69,21 @@ const SNIPPETS: { title: string; sql: string }[] = [
   {
     title: "Recent 25 punishments",
     sql: "(SELECT 'ban' AS type, id, name, reason, time FROM litebans_bans)\nUNION ALL\n(SELECT 'mute', id, name, reason, time FROM litebans_mutes)\nUNION ALL\n(SELECT 'kick', id, name, reason, time FROM litebans_kicks)\nUNION ALL\n(SELECT 'warn', id, name, reason, time FROM litebans_warnings)\nORDER BY time DESC\nLIMIT 25;",
+  },
+];
+
+const WRITE_SNIPPETS: { title: string; sql: string }[] = [
+  {
+    title: "Lift a ban (set inactive)",
+    sql: "UPDATE litebans_bans\nSET active = 0, removed_by_name = 'WardenMC Web', removed_by_reason = 'Lifted via admin panel', removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE uuid = '<UUID>' AND active = 1;",
+  },
+  {
+    title: "Lift a mute (set inactive)",
+    sql: "UPDATE litebans_mutes\nSET active = 0, removed_by_name = 'WardenMC Web', removed_by_reason = 'Lifted via admin panel', removed_by_date = UNIX_TIMESTAMP() * 1000\nWHERE uuid = '<UUID>' AND active = 1;",
+  },
+  {
+    title: "Edit a ban reason",
+    sql: "UPDATE litebans_bans\nSET reason = 'New reason here'\nWHERE id = 123;",
   },
 ];
 
