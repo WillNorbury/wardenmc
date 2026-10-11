@@ -411,6 +411,53 @@ export const MySqlAdminSection = () => {
         </Tabs>
       </Card>
 
+      <AlertDialog open={showEnableWrite} onOpenChange={setShowEnableWrite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Turn on write mode?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Write mode lets you run INSERT, UPDATE, DELETE and REPLACE statements directly against the live
+              LiteBans database. Mistakes can change or remove real punishment records and cannot be undone
+              from here. In-game commands remain the safer option for routine changes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep read-only</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setWriteMode(true);
+                toast.success("Write mode on — every write still asks for confirmation.");
+              }}
+            >
+              Turn on write mode
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showConfirmWrite} onOpenChange={setShowConfirmWrite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Run this write query?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will change the live LiteBans database immediately. Review the statement before confirming.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <pre className="text-xs bg-muted/40 rounded p-3 overflow-x-auto max-h-64"><code>{sql}</code></pre>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowConfirmWrite(false);
+                void runNow(true);
+              }}
+            >
+              Run write query
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 };
