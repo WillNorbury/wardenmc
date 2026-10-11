@@ -2,6 +2,7 @@
 // Invoke from the admin tab; admin-only.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { getDiscordBotToken } from "../_shared/discord-token.ts";
+import { moderationRegistrations } from "../_shared/moderation-commands.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
     const { data: u } = await userClient.auth.getUser();
     if (!u?.user) return json({ ok: false, error: "Unauthorized" }, 401);
     const { data: role } = await userClient
-      .from("user_roles").select("role").eq("user_id", u.user.id).eq("role", "admin").maybeSingle();
+      .from("user_roles").select("role").eq("user_id", u.user.id).in("role", ["admin", "owner", "founder", "star"]).limit(1).maybeSingle();
     if (!role) return json({ ok: false, error: "Admin only" }, 403);
 
     const appId = Deno.env.get("DISCORD_APPLICATION_ID");
@@ -48,10 +49,12 @@ Deno.serve(async (req) => {
       { name: "subscribe", description: "Subscribe to email notifications from Warden Network", type: 1 },
       { name: "unsubscribe", description: "Unsubscribe from email notifications from Warden Network", type: 1 },
     ];
+    const modNames = new Set(moderationRegistrations().map((m) => m.name));
+    const allCmds = [...cmds.filter((c) => !modNames.has(c.name)), ...moderationRegistrations()];
     const r = await fetch(`https://discord.com/api/v10/applications/${appId}/commands`, {
       method: "PUT",
       headers: { Authorization: `Bot ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify(cmds),
+      body: JSON.stringify(allCmds),
     });
     const data = await r.json().catch(() => ({}));
     return json(r.ok ? { ok: true, registered: data } : { ok: false, status: r.status, details: data }, r.ok ? 200 : 500);
