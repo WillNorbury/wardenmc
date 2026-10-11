@@ -11,22 +11,21 @@ const SUPABASE_ANON = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 
 // Connection settings come only from server-side secrets. Cached per isolate.
 type MysqlCfg = { host: string; port: number; user: string; password: string; database: string }
-let cfgCache: MysqlCfg | null = null
 async function loadMysqlConfig(): Promise<MysqlCfg | null> {
-  if (cfgCache) return cfgCache
-  const host = Deno.env.get('LITEBANS_MYSQL_HOST') ?? ''
-  const user = Deno.env.get('LITEBANS_MYSQL_USER') ?? ''
-  const password = Deno.env.get('LITEBANS_MYSQL_PASSWORD') ?? ''
-  const database = Deno.env.get('LITEBANS_MYSQL_DATABASE') ?? ''
+  let row: any = null
+  try {
+    const { createClient } = await import('npm:@supabase/supabase-js@2')
+    const admin = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '')
+    const { data } = await admin.from('litebans_mysql_config')
+      .select('host, port, username, password, database_name').eq('id', true).maybeSingle()
+    row = data
+  } catch (e) { console.error('config load failed', e) }
+  const host = row?.host || Deno.env.get('LITEBANS_MYSQL_HOST') || ''
+  const user = row?.username || Deno.env.get('LITEBANS_MYSQL_USER') || ''
+  const password = row?.password || Deno.env.get('LITEBANS_MYSQL_PASSWORD') || ''
+  const database = row?.database_name || Deno.env.get('LITEBANS_MYSQL_DATABASE') || ''
   if (!host || !user || !password || !database) return null
-  cfgCache = {
-    host,
-    port: Number(Deno.env.get('LITEBANS_MYSQL_PORT') ?? '3306'),
-    user,
-    password,
-    database,
-  }
-  return cfgCache
+  return { host, port: Number(row?.port ?? Deno.env.get('LITEBANS_MYSQL_PORT') ?? '3306'), user, password, database }
 }
 
 async function connect(): Promise<mysql.Connection> {
