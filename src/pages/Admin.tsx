@@ -1,3 +1,4 @@
+import { AdminOverviewDashboard } from "@/components/admin/AdminOverviewDashboard";
 import { confirm } from "@/lib/confirm";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
@@ -290,7 +291,7 @@ const Admin = () => {
               </Button>
             </div>
           )}
-          {section === "dashboard" && <DashboardSection onNavigate={onNavigate} />}
+          {section === "dashboard" && <AdminOverviewDashboard onNavigate={onNavigate} />}
           {section === "users" && <UsersTab />}
           {section === "roles" && <RolesSection />}
           {section === "news" && <NewsAnnouncementsTab />}
