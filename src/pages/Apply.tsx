@@ -853,6 +853,7 @@ const PartnerApplyForm = ({
           </Button>
         </div>
       </Card>
+      </div>
     </Shell>
   );
 };
