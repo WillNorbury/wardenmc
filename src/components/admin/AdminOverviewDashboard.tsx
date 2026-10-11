@@ -36,7 +36,7 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
         supabase.from("plugins").select("id", c).eq("published", true),
         supabase.from("plugins").select("id", c).eq("featured", true),
         supabase.from("discord_bot_action_logs").select("id", c).gte("created_at", since(7)),
-        supabase.from("discord_bot_action_logs").select("id", c).gte("created_at", since(7)).neq("status", "success"),
+        supabase.from("discord_bot_action_logs").select("id", c).gte("created_at", since(7)).not("error", "is", null),
         supabase.from("server_status").select("*").eq("id", 1).maybeSingle(),
         supabase.from("profiles").select("id, display_name, avatar_url, created_at").order("created_at", { ascending: false }).limit(6),
         supabase.from("plugins").select("id, name, slug, published, created_at").order("created_at", { ascending: false }).limit(6),
@@ -139,7 +139,7 @@ export const AdminOverviewDashboard = ({ onNavigate }: { onNavigate: (s: any) =>
             <ul className="space-y-3">
               {discordLog.map((d) => (
                 <li key={d.id} className="flex items-center gap-3">
-                  {d.status === "success" ? <CheckCircle2 className="h-4 w-4 text-primary" /> : <XCircle className="h-4 w-4 text-destructive" />}
+                  {!d.error ? <CheckCircle2 className="h-4 w-4 text-primary" /> : <XCircle className="h-4 w-4 text-destructive" />}
                   <span className="flex-1 truncate text-sm">{d.action}</span>
                   <span className="text-xs text-muted-foreground">{ago(d.created_at)}</span>
                 </li>
