@@ -44,11 +44,15 @@ const AdminTabRedirect = () => {
   return <Navigate to={`/admin?tab=${encodeURIComponent(firstSeg)}`} replace />;
 };
 
-const Shell = () => (
+const Shell = () => {
+  const { pathname } = useLocation();
+  // The Admin console has its own navigation sidebar — hide the site sidebar there.
+  const hideSidebar = pathname.startsWith("/admin");
+  return (
   <MaintenanceGate>
     <SidebarProvider>
       <div className="flex min-h-svh w-full">
-        <AppSidebar />
+        {!hideSidebar && <AppSidebar />}
         <div className="flex min-h-svh w-full min-w-0 flex-1 flex-col">
           <VersionChecker />
           <Routes>
