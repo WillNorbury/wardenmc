@@ -1,7 +1,9 @@
 // Discord moderation slash commands: definitions (for registration) and handler.
 import { getDiscordBotToken } from "./discord-token.ts";
 
-const P = { KICK: 1n << 1n, BAN: 1n << 2n, MANAGE_CHANNELS: 1n << 4n, MANAGE_MESSAGES: 1n << 13n, MODERATE: 1n << 40n };
+const P = { KICK: 1n << 1n, BAN: 1n << 2n, MANAGE_CHANNELS: 1n << 4n, MANAGE_MESSAGES: 1n << 13n, MODERATE: 1n << 40n, NICK: 1n << 27n, ROLES: 1n << 28n, MUTE: 1n << 22n, DEAFEN: 1n << 23n, MOVE: 1n << 24n, NONE: 0n };
+const ROLE = 8;
+const vc = (name: string, d: string) => opt(CHANNEL, name, d, true, { channel_types: [2, 13] });
 const USER = 6, STR = 3, INT = 4, CHANNEL = 7;
 const opt = (type: number, name: string, description: string, required = false, extra: Record<string, unknown> = {}) =>
   ({ type, name, description, required, ...extra });
@@ -18,11 +20,37 @@ export const MODERATION_COMMANDS = [
   { name: "slowmode", description: "Set slowmode for this channel", perm: P.MANAGE_CHANNELS, options: [opt(INT, "seconds", "Seconds (0 to turn off, max 21600)", true, { min_value: 0, max_value: 21600 })] },
   { name: "lock", description: "Stop @everyone sending messages in a channel", perm: P.MANAGE_CHANNELS, options: [opt(CHANNEL, "channel", "Channel (default: this one)"), reason] },
   { name: "unlock", description: "Let @everyone send messages in a channel again", perm: P.MANAGE_CHANNELS, options: [opt(CHANNEL, "channel", "Channel (default: this one)")] },
-];
+  { name: "softban", description: "Ban and instantly unban to wipe a member's recent messages", perm: P.BAN, options: [opt(USER, "user", "Member", true), reason] },
+  { name: "nick", description: "Change a member's nickname (empty to reset)", perm: P.NICK, options: [opt(USER, "user", "Member", true), opt(STR, "nickname", "New nickname", false, { max_length: 32 })] },
+  { name: "addrole", description: "Give a member a role", perm: P.ROLES, options: [opt(USER, "user", "Member", true), opt(ROLE, "role", "Role", true), reason] },
+  { name: "removerole", description: "Take a role from a member", perm: P.ROLES, options: [opt(USER, "user", "Member", true), opt(ROLE, "role", "Role", true), reason] },
+  // Voice
+  { name: "vcmute", description: "Server-mute a member in voice", perm: P.MUTE, category: "voice", options: [opt(USER, "user", "Member", true), reason] },
+  { name: "vcunmute", description: "Remove a member's server mute", perm: P.MUTE, category: "voice", options: [opt(USER, "user", "Member", true)] },
+  { name: "deafen", description: "Server-deafen a member in voice", perm: P.DEAFEN, category: "voice", options: [opt(USER, "user", "Member", true), reason] },
+  { name: "undeafen", description: "Remove a member's server deafen", perm: P.DEAFEN, category: "voice", options: [opt(USER, "user", "Member", true)] },
+  { name: "vcmove", description: "Move a member to another voice channel", perm: P.MOVE, category: "voice", options: [opt(USER, "user", "Member", true), vc("channel", "Voice channel to move them to")] },
+  { name: "vcdisconnect", description: "Disconnect a member from voice", perm: P.MOVE, category: "voice", options: [opt(USER, "user", "Member", true), reason] },
+  { name: "vclimit", description: "Set the user limit of a voice channel (0 = no limit)", perm: P.MANAGE_CHANNELS, category: "voice", options: [vc("channel", "Voice channel"), opt(INT, "limit", "Max users (0-99)", true, { min_value: 0, max_value: 99 })] },
+  // Fun (everyone)
+  { name: "8ball", description: "Ask the magic 8-ball a question", perm: P.NONE, category: "fun", options: [opt(STR, "question", "Your question", true, { max_length: 200 })] },
+  { name: "coinflip", description: "Flip a coin", perm: P.NONE, category: "fun", options: [] },
+  { name: "roll", description: "Roll dice", perm: P.NONE, category: "fun", options: [opt(INT, "sides", "Sides per die (default 6)", false, { min_value: 2, max_value: 1000 }), opt(INT, "count", "How many dice (default 1)", false, { min_value: 1, max_value: 20 })] },
+  { name: "rps", description: "Rock, paper, scissors against the bot", perm: P.NONE, category: "fun", options: [opt(STR, "choice", "Your pick", true, { choices: ["rock", "paper", "scissors"].map((v) => ({ name: v, value: v })) })] },
+  { name: "choose", description: "Let the bot pick between options (separate with commas)", perm: P.NONE, category: "fun", options: [opt(STR, "options", "e.g. pizza, tacos, sushi", true, { max_length: 300 })] },
+  { name: "avatar", description: "Show someone's avatar", perm: P.NONE, category: "fun", options: [opt(USER, "user", "Member (default: you)")] },
+  { name: "hug", description: "Give someone a hug", perm: P.NONE, category: "fun", options: [opt(USER, "user", "Who to hug", true)] },
+  { name: "joke", description: "Hear a Minecraft joke", perm: P.NONE, category: "fun", options: [] },
+] as { name: string; description: string; perm: bigint; category?: string; options: any[] }[];
+
+export const isFunCommand = (name?: string) => MODERATION_COMMANDS.some((c) => c.name === name && c.category === "fun");
+const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+const BALL = ["It is certain.", "Without a doubt.", "Yes — definitely.", "Most likely.", "Signs point to yes.", "Ask again later.", "Cannot predict now.", "Don't count on it.", "My sources say no.", "Very doubtful.", "Outlook not so good.", "Creepers say yes. 💥"];
+const JOKES = ["Why did the creeper break up with his girlfriend? Because she was too explosive.", "What do you call a sleepy Enderman? An Ender-yawn.", "Why are Minecraft players bad at keeping secrets? They always spill the beans... and the lava.", "Why did Steve go to therapy? He had too many blocks.", "How does Steve stay fit? He runs around the block.", "What's a skeleton's favourite instrument? The trom-bone."];
 
 export const moderationRegistrations = () => MODERATION_COMMANDS.map((c) => ({
   name: c.name, description: c.description, type: 1, dm_permission: false,
-  default_member_permissions: c.perm.toString(), options: c.options,
+  ...(c.perm === 0n ? {} : { default_member_permissions: c.perm.toString() }), options: c.options,
 }));
 
 const SEND = 1n << 11n;
@@ -33,13 +61,12 @@ export async function handleModeration(body: any): Promise<string | null> {
   const guild = body.guild_id;
   if (!guild) return "⚠️ Use this command in a server.";
   const perms = BigInt(body.member?.permissions ?? "0");
-  if ((perms & 8n) === 0n && (perms & def.perm) === 0n) return "⛔ You don't have permission to use this command.";
+  if (def.perm !== 0n && (perms & 8n) === 0n && (perms & def.perm) === 0n) return "⛔ You don't have permission to use this command.";
 
-  const token = await getDiscordBotToken();
-  if (!token) return "❌ Bot token is not configured.";
   const o: Record<string, any> = Object.fromEntries((body.data.options ?? []).map((x: any) => [x.name, x.value]));
   const mod = body.member?.user?.username ?? "a moderator";
   const why = String(o.reason ?? "No reason given");
+  let token: string | null = null;
   const api = (method: string, path: string, json?: unknown, auditReason?: string) =>
     fetch(`https://discord.com/api/v10${path}`, {
       method,
@@ -62,7 +89,76 @@ export async function handleModeration(body: any): Promise<string | null> {
     return (await api("POST", `/channels/${cid}/messages`, { content })).ok;
   };
 
+  const me = body.member?.user?.id;
   switch (def.name) {
+    case "8ball": return `🎱 **${String(o.question).slice(0, 200)}**\n${pick(BALL)}`;
+    case "coinflip": return `🪙 ${Math.random() < 0.5 ? "Heads" : "Tails"}!`;
+    case "roll": {
+      const sides = Math.max(2, Math.min(1000, Number(o.sides ?? 6))), n = Math.max(1, Math.min(20, Number(o.count ?? 1)));
+      const r = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * sides));
+      return `🎲 Rolled ${n}d${sides}: ${r.join(", ")}${n > 1 ? ` (total ${r.reduce((a, b) => a + b, 0)})` : ""}`;
+    }
+    case "rps": {
+      const bot = pick(["rock", "paper", "scissors"]), you = String(o.choice);
+      const beats: Record<string, string> = { rock: "scissors", paper: "rock", scissors: "paper" };
+      return `✊ You: **${you}** · Bot: **${bot}** — ${you === bot ? "It's a tie!" : beats[you] === bot ? "You win! 🎉" : "I win! 😎"}`;
+    }
+    case "choose": {
+      const list = String(o.options).split(",").map((x) => x.trim()).filter(Boolean);
+      return list.length < 2 ? "⚠️ Give at least two options, separated by commas." : `🤔 I choose: **${pick(list)}**`;
+    }
+    case "avatar": {
+      const u = id(o.user) || me;
+      const user = body.data?.resolved?.users?.[u] ?? body.member?.user;
+      const url = user?.avatar ? `https://cdn.discordapp.com/avatars/${u}/${user.avatar}.png?size=1024` : `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(u) >> 22n) % 6n)}.png`;
+      return `🖼️ <@${u}>'s avatar: ${url}`;
+    }
+    case "hug": return id(o.user) === me ? `🤗 <@${me}> hugs themselves. It's okay, we all need one sometimes.` : `🤗 <@${me}> gives <@${id(o.user)}> a big hug!`;
+    case "joke": return `😂 ${pick(JOKES)}`;
+  }
+
+  token = await getDiscordBotToken();
+  if (!token) return "❌ Bot token is not configured.";
+  switch (def.name) {
+    case "softban": {
+      const u = id(o.user);
+      const r = await api("PUT", `/guilds/${guild}/bans/${u}`, { delete_message_seconds: 7 * 86400 }, `softban: ${why}`);
+      if (!r.ok) return fail(r, "softban that member");
+      await api("DELETE", `/guilds/${guild}/bans/${u}`, undefined, "softban");
+      return `🧽 Softbanned <@${u}> (messages wiped, they can rejoin) — ${why}`;
+    }
+    case "nick": {
+      const u = id(o.user), nick = String(o.nickname ?? "").trim();
+      const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { nick: nick || null }, "nickname");
+      return r.ok ? (nick ? `✏️ Renamed <@${u}> to **${nick}**` : `✏️ Reset <@${u}>'s nickname`) : fail(r, "change that nickname");
+    }
+    case "addrole":
+    case "removerole": {
+      const u = id(o.user), role = id(o.role), add = def.name === "addrole";
+      const r = await api(add ? "PUT" : "DELETE", `/guilds/${guild}/members/${u}/roles/${role}`, undefined, why);
+      return r.ok ? (add ? `➕ Gave <@&${role}> to <@${u}>` : `➖ Removed <@&${role}> from <@${u}>`) : fail(r, add ? "add that role" : "remove that role");
+    }
+    case "vcmute": case "vcunmute": case "deafen": case "undeafen": {
+      const u = id(o.user), field = def.name.includes("mute") ? "mute" : "deaf", on = !def.name.startsWith("vcun") && !def.name.startsWith("un");
+      const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { [field]: on }, why);
+      const label = { vcmute: "🔇 Voice-muted", vcunmute: "🔊 Voice-unmuted", deafen: "🙉 Deafened", undeafen: "👂 Undeafened" }[def.name];
+      return r.ok ? `${label} <@${u}>` : fail(r, `${def.name} that member (they must be in voice)`);
+    }
+    case "vcmove": {
+      const u = id(o.user), ch = id(o.channel);
+      const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { channel_id: ch }, "vcmove");
+      return r.ok ? `➡️ Moved <@${u}> to <#${ch}>` : fail(r, "move that member (they must be in voice)");
+    }
+    case "vcdisconnect": {
+      const u = id(o.user);
+      const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { channel_id: null }, why);
+      return r.ok ? `📴 Disconnected <@${u}> from voice` : fail(r, "disconnect that member");
+    }
+    case "vclimit": {
+      const ch = id(o.channel), n = Math.max(0, Math.min(99, Number(o.limit)));
+      const r = await api("PATCH", `/channels/${ch}`, { user_limit: n }, "vclimit");
+      return r.ok ? (n ? `👥 <#${ch}> limited to ${n} users` : `👥 Removed the user limit on <#${ch}>`) : fail(r, "change that limit");
+    }
     case "ban": {
       const u = id(o.user);
       await dm(u, `🔨 You were banned from the WardenMC server. Reason: ${why}`);
