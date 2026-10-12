@@ -4,7 +4,7 @@
 import nacl from "https://esm.sh/tweetnacl@1.0.3";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { buildRulesEmbed as formatRulesEmbed } from "../_shared/rules-embed.ts";
-import { handleModeration } from "../_shared/moderation-commands.ts";
+import { handleModeration, isFunCommand } from "../_shared/moderation-commands.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     const modReply = await handleModeration(body);
     if (modReply !== null) {
       // Record moderation actions so they show on the Admin dashboard.
-      try {
+      if (!isFunCommand(body.data?.name)) try {
         const opts = Object.fromEntries((body.data?.options ?? []).map((x: any) => [x.name, x.value]));
         const failed = /^[⛔⚠❌]/.test(modReply);
         await createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!)
