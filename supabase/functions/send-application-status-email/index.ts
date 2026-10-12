@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { marked } from 'npm:marked@12'
+import { SITE_URL } from '../_shared/site-urls.ts'
 
 function applyVars(input: string, data: Record<string, string>): string {
   return input.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, k) => data[k] ?? '')
@@ -92,7 +93,7 @@ Deno.serve(async (req) => {
     applicationType: app.type ?? '',
     status: body.status,
     reviewerNotes: body.reviewerNotes ?? '',
-    dashboardUrl: body.dashboardUrl ?? '',
+    dashboardUrl: body.dashboardUrl || SITE_URL,
   }
 
   // Look up admin-editable override for this status variant

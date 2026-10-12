@@ -16,11 +16,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://carnagemc.net/dashboard</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://carnagemc.net/link-account</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
