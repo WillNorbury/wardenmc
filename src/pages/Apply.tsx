@@ -340,7 +340,7 @@ const ApplyForm = ({
     }
 
     toast.success("Application submitted! We'll review it soon.");
-    navigate("/dashboard");
+    navigate("/");
   };
 
   if (authLoading || (!type && !typeError)) {
@@ -718,7 +718,7 @@ const PartnerApplyForm = ({
     }
 
     toast.success("Partner application submitted! We'll be in touch soon.");
-    navigate("/dashboard");
+    navigate("/");
   };
 
   if (authLoading || (!type && !typeError)) {

@@ -18,7 +18,7 @@ const Email = ({
   applicationType = 'staff',
   status = 'updated',
   reviewerNotes = '',
-  dashboardUrl = 'https://warden.rip/dashboard',
+  dashboardUrl = 'https://warden.rip',
 }: Props) => {
   const accent =
     status === 'approved' ? 'hsl(160, 84%, 39%)' :
@@ -41,7 +41,7 @@ const Email = ({
             </Section>
           )}
           <Button style={{ ...button, backgroundColor: accent }} href={dashboardUrl}>
-            Open dashboard
+            Visit WardenMC
           </Button>
           <Text style={footer}>— Warden Network Staff</Text>
         </Container>

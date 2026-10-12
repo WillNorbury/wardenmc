@@ -3517,7 +3517,7 @@ const PluginsTab = () => {
               placeholder="Their display name or Minecraft username"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              The plugin will appear in this user's /dashboard. Leave blank to keep it admin-owned.
+              The plugin will appear in this user's plugins list on their profile. Leave blank to keep it admin-owned.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -4231,7 +4231,7 @@ const ApplicationsTab = () => {
         ...common,
         status: "approved",
         reviewerNotes: "Thanks for applying — this is a test status update.",
-        dashboardUrl: `${window.location.origin}/dashboard`,
+        dashboardUrl: window.location.origin,
       };
     } else {
       templateName = "application-admin";
@@ -4328,7 +4328,7 @@ const ApplicationsTab = () => {
         applicationId: id,
         status,
         reviewerNotes: notes || null,
-        dashboardUrl: `${window.location.origin}/dashboard`,
+        dashboardUrl: window.location.origin,
       },
     }).catch(() => {});
     setOpen(null);

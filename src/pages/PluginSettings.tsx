@@ -364,7 +364,7 @@ const PluginSettings = () => {
       return;
     }
     toast.success("Plugin deleted");
-    navigate("/dashboard");
+    navigate("/profile");
   };
 
   const addTag = () => {
@@ -504,8 +504,8 @@ const PluginSettings = () => {
             </div>
           </div>
           <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard">
-              <LayoutGrid className="h-4 w-4 mr-1.5" /> Visit projects dashboard
+            <Link to="/profile">
+              <LayoutGrid className="h-4 w-4 mr-1.5" /> Your plugins
             </Link>
           </Button>
         </div>
