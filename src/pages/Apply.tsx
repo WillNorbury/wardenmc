@@ -339,8 +339,10 @@ const ApplyForm = ({
       }).catch(() => {});
     }
 
-    toast.success("Application submitted! We'll review it soon.");
-    navigate("/");
+    toast.success("Application submitted! We'll review it soon.", {
+      action: appId ? { label: "View status", onClick: () => navigate(`/applications/${appId}`) } : undefined,
+    });
+    navigate(appId ? `/applications/${appId}` : "/applications");
   };
 
   if (authLoading || (!type && !typeError)) {
@@ -718,7 +720,7 @@ const PartnerApplyForm = ({
     }
 
     toast.success("Partner application submitted! We'll be in touch soon.");
-    navigate("/");
+    navigate(appId ? `/applications/${appId}` : "/applications");
   };
 
   if (authLoading || (!type && !typeError)) {
