@@ -28,6 +28,7 @@ import PluginDevelopers from "./pages/PluginDevelopers.tsx";
 import PluginDetail from "./pages/PluginDetail.tsx";
 import PluginSettings from "./pages/PluginSettings.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ApplicationStatus from "./pages/ApplicationStatus.tsx";
 import Apply from "./pages/Apply.tsx";
 import Partners from "./pages/Partners.tsx";
 import PartnerDetail from "./pages/PartnerDetail.tsx";
@@ -85,6 +86,8 @@ const Shell = () => {
 
         <Route path="/apply" element={<Apply />} />
         <Route path="/apply/:slug" element={<Apply />} />
+        <Route path="/applications" element={<ApplicationStatus />} />
+        <Route path="/applications/:id" element={<ApplicationStatus />} />
 
         <Route path="/partners" element={<Partners />} />
         <Route path="/partners/:slug" element={<PartnerDetail />} />
