@@ -15,6 +15,13 @@
       "when": 1791699606816,
       "tag": "0001_litebans_mysql_config",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791867285197,
+      "tag": "0002_partners_add_links",
+      "breakpoints": true
     }
   ]
 }

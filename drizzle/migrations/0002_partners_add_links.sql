@@ -1,0 +1,1 @@
+ALTER TABLE public.partners ADD COLUMN website_url text; ALTER TABLE public.partners ADD COLUMN discord_url text;
