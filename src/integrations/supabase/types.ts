@@ -1950,6 +1950,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          discord_url: string | null
           icon: string | null
           id: string
           is_active: boolean
@@ -1957,10 +1958,12 @@ export type Database = {
           sort_order: number
           updated_at: string
           url: string
+          website_url: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
+          discord_url?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean
@@ -1968,10 +1971,12 @@ export type Database = {
           sort_order?: number
           updated_at?: string
           url: string
+          website_url?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
+          discord_url?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean
@@ -1979,6 +1984,7 @@ export type Database = {
           sort_order?: number
           updated_at?: string
           url?: string
+          website_url?: string | null
         }
         Relationships: []
       }

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Handshake, Search, Users, ArrowRight, Globe } from "lucide-react";
+import { Handshake, Search, Users, ArrowRight, Globe, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { partnerSlug, fetchPartnerStatus, PartnerStatus } from "@/lib/partnerSlug";
 
@@ -19,6 +19,8 @@ type Partner = {
   url: string;
   description: string | null;
   icon: string | null;
+  website_url: string | null;
+  discord_url: string | null;
 };
 
 const Partners = () => {
@@ -32,7 +34,7 @@ const Partners = () => {
     (async () => {
       const { data, error } = await supabase
         .from("partners")
-        .select("id,label,url,description,icon")
+        .select("id,label,url,description,icon,website_url,discord_url")
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
       if (error) toast.error(error.message);
@@ -159,8 +161,34 @@ const Partners = () => {
                                 : "Offline"
                               : "Checking…"}
                           </span>
-                          <span className="text-primary flex items-center gap-1">
-                            View <ArrowRight className="h-3.5 w-3.5" />
+                          <span className="flex items-center gap-2">
+                            {p.website_url && (
+                              <a
+                                href={p.website_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-muted-foreground hover:text-primary"
+                                aria-label={`${p.label} website`}
+                              >
+                                <Globe className="h-3.5 w-3.5" />
+                              </a>
+                            )}
+                            {p.discord_url && (
+                              <a
+                                href={p.discord_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-muted-foreground hover:text-primary"
+                                aria-label={`${p.label} Discord`}
+                              >
+                                <MessageCircle className="h-3.5 w-3.5" />
+                              </a>
+                            )}
+                            <span className="text-primary flex items-center gap-1">
+                              View <ArrowRight className="h-3.5 w-3.5" />
+                            </span>
                           </span>
                         </div>
                       </button>
