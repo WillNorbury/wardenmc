@@ -67,12 +67,12 @@ const Navbar = () => {
               to={l.to}
               className={({ isActive }) =>
                 cn(
-                  "rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-wide transition-colors",
+                  "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-wide transition-colors",
                   isActive ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground",
                 )
               }
             >
-              {l.icon && <l.icon className="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" />}
+              {l.icon && <l.icon className="h-3.5 w-3.5 shrink-0" />}
               {l.label}
             </NavLink>
           ))}
