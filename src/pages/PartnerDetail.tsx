@@ -5,7 +5,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { SEO } from "@/components/site/SEO";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Copy, Loader2 } from "lucide-react";
+import { ArrowLeft, Copy, Globe, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { partnerSlug, fetchPartnerStatus, PartnerStatus } from "@/lib/partnerSlug";
 
@@ -134,6 +134,24 @@ const PartnerDetail = () => {
                       <Copy className="h-4 w-4 mr-1" /> Copy
                     </Button>
                   </div>
+                  {(partner.website_url || partner.discord_url) && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {partner.website_url && (
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={partner.website_url} target="_blank" rel="noopener noreferrer">
+                            <Globe className="h-4 w-4 mr-1" /> Website
+                          </a>
+                        </Button>
+                      )}
+                      {partner.discord_url && (
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={partner.discord_url} target="_blank" rel="noopener noreferrer">
+                            <MessageCircle className="h-4 w-4 mr-1" /> Discord
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {status.version && (
