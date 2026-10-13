@@ -3,6 +3,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Gavel, Megaphone, MessageSquare, Users } from "lucide-react";
+import DiscordMark from "@/components/site/DiscordMark";
 
 const INVITE = "https://discord.warden.rip";
 
@@ -24,6 +25,7 @@ const Discord = () => {
       <main className="flex-1">
         <section className="aurora relative overflow-hidden pt-36 pb-20">
           <div className="container max-w-[1100px] text-center">
+            <DiscordMark className="mx-auto mb-5 h-16 w-16 text-primary drop-shadow-[0_0_28px_rgba(45,212,191,0.45)]" />
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">Community</p>
             <h1 className="font-display text-7xl leading-none tracking-wide md:text-9xl">
               JOIN THE <span className="text-gradient">DISCORD</span>
@@ -32,8 +34,9 @@ const Discord = () => {
               Talk with the WardenMC community, get help from staff and be first to hear what's next.
             </p>
             <Button asChild size="lg" className="mt-8 rounded-full px-8 text-base glow">
-              <a href={INVITE} target="_blank" rel="noopener noreferrer">
-                Open invite <ExternalLink className="ml-2 h-4 w-4" />
+              <a href={INVITE} target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
+                <DiscordMark className="mr-2 h-5 w-5" /> Open invite
+                <ExternalLink className="ml-2 h-4 w-4" />
               </a>
             </Button>
             <p className="mt-3 text-sm text-muted-foreground">discord.warden.rip</p>

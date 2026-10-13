@@ -19,8 +19,9 @@ const Footer = () => (
           <Link
             key={l.to}
             to={l.to}
-            className="text-sm font-semibold uppercase tracking-wide text-muted-foreground hover:text-primary"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wide text-muted-foreground hover:text-primary"
           >
+            {l.icon && <l.icon className="h-3.5 w-3.5" />}
             {l.label}
           </Link>
         ))}
