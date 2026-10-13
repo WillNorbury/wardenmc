@@ -115,6 +115,12 @@ Deno.serve(async (req) => {
     callerRole = ''
   }
 
+  // Internal callers (other edge functions such as notify-changelog, uptime-check
+  // and notify-post) present the project's own key. Newer API keys are not JWTs,
+  // so the role claim above cannot see them; an exact key match is the same
+  // level of trust and is what lets those server-side sends through.
+  const isInternalCaller = !!supabaseServiceKey && token === supabaseServiceKey
+
   const forbidden = () =>
     new Response(JSON.stringify({ error: 'forbidden' }), {
       status: 403,
@@ -136,7 +142,7 @@ Deno.serve(async (req) => {
     return data ?? null
   }
 
-  if (callerRole !== 'service_role') {
+  if (!isInternalCaller && callerRole !== 'service_role') {
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       global: { headers: { Authorization: authHeader } },
     })
