@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import logo from "@/assets/warden-network-icon.png";
-import { LogIn, LogOut, Shield, User as UserIcon } from "lucide-react";
+import DiscordMark from "./DiscordMark";
+import { LogIn, LogOut, Shield, User as UserIcon, type LucideIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +15,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const NAV_LINKS = [
+export const NAV_LINKS: { to: string; label: string; icon?: LucideIcon }[] = [
   { to: "/plugins", label: "Plugins" },
   { to: "/posts", label: "Posts" },
   { to: "/staff", label: "Staff" },
   { to: "/rules", label: "Rules" },
   { to: "/faq", label: "FAQ" },
-  { to: "/discord", label: "Discord" },
+  { to: "/discord", label: "Discord", icon: DiscordMark },
   { to: "/partners", label: "Partners" },
   { to: "/apply", label: "Apply" },
 ];
@@ -71,6 +72,7 @@ const Navbar = () => {
                 )
               }
             >
+              {l.icon && <l.icon className="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" />}
               {l.label}
             </NavLink>
           ))}

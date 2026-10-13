@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth";
 import logo from "@/assets/warden-network-icon.png";
+import DiscordMark from "./DiscordMark";
 import {
   Home,
   Puzzle,
@@ -23,7 +24,6 @@ import {
   ShieldCheck,
   ScrollText,
   HelpCircle,
-  Hash,
   FileText,
   Link2,
   User as UserIcon,
@@ -59,7 +59,7 @@ const communityGroup: NavGroup = {
   label: "Community",
   items: [
     { to: "/staff", label: "Staff", icon: ShieldCheck },
-    { to: "/discord", label: "Discord", icon: Hash },
+    { to: "/discord", label: "Discord", icon: DiscordMark },
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/faq", label: "FAQ", icon: HelpCircle },
