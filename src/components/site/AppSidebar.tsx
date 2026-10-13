@@ -15,6 +15,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import logo from "@/assets/warden-network-icon.png";
 import DiscordMark from "./DiscordMark";
+import spectorLogo from "@/assets/spectorclient-logo.png";
 import {
   Home,
   Puzzle,
@@ -25,20 +26,19 @@ import {
   ScrollText,
   HelpCircle,
   FileText,
-  Link2,
   User as UserIcon,
   Shield,
   LogIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type NavItem = { to: string; label: string; icon: typeof Home; external?: boolean };
+type NavItem = { to: string; label: string; icon?: typeof Home; image?: string; external?: boolean };
 type NavGroup = { id: string; label: string; items: NavItem[]; defaultOpen?: boolean };
 
 const linksGroup: NavGroup = {
   id: "links",
   label: "Links",
-  items: [{ to: "https://spectorclient.com", label: "SpectorClient", icon: Link2, external: true }],
+  items: [{ to: "https://spectorclient.com", label: "SpectorClient", image: spectorLogo, external: true }],
 };
 
 const mainGroup: NavGroup = {
@@ -88,17 +88,32 @@ export function AppSidebar() {
   const isActive = (path: string) => pathname === path;
   const isExternal = (path: string) => /^https?:\/\//.test(path);
 
+  const renderIcon = (l: NavItem) => {
+    const Icon = l.icon;
+    if (l.image) {
+      return (
+        <img
+          src={l.image}
+          alt=""
+          aria-hidden="true"
+          className="h-5 w-5 shrink-0 object-contain drop-shadow-[0_0_6px_hsl(var(--primary)/0.45)]"
+        />
+      );
+    }
+    return Icon ? <Icon className="h-4 w-4 shrink-0" /> : null;
+  };
+
   const renderItem = (l: NavItem) => (
     <SidebarMenuItem key={l.to}>
       <SidebarMenuButton asChild isActive={!isExternal(l.to) && isActive(l.to)} tooltip={l.label}>
         {l.external || isExternal(l.to) ? (
           <a href={l.to} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-            <l.icon className="h-4 w-4 shrink-0" />
+            {renderIcon(l)}
             {!collapsed && <span className="uppercase tracking-wider text-xs">{l.label}</span>}
           </a>
         ) : (
           <Link to={l.to} onClick={() => isMobile && setOpenMobile(false)} className="flex items-center gap-2">
-            <l.icon className="h-4 w-4 shrink-0" />
+            {renderIcon(l)}
             {!collapsed && <span className="uppercase tracking-wider text-xs">{l.label}</span>}
           </Link>
         )}
