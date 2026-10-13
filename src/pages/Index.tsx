@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, HelpCircle, MessageCircle, Package, Shield, Users } from "lucide-react";
+import { ArrowRight, BookOpen, HelpCircle, MessageCircle, Package, Shield } from "lucide-react";
+import DiscordMark from "@/components/site/DiscordMark";
 
 const TILES = [
   { to: "/plugins", icon: Package, title: "Plugins", text: "Browse and download community plugins.", big: true },
@@ -11,7 +12,7 @@ const TILES = [
   { to: "/staff", icon: Shield, title: "Staff", text: "Meet the team behind WardenMC." },
   { to: "/rules", icon: BookOpen, title: "Rules", text: "How we keep things fair." },
   { to: "/faq", icon: HelpCircle, title: "FAQ", text: "Quick answers to common questions." },
-  { to: "/discord", icon: Users, title: "Discord", text: "Join the conversation.", big: true },
+  { to: "/discord", icon: DiscordMark, title: "Discord", text: "Join the conversation.", big: true },
 ];
 
 const Index = () => {
@@ -43,7 +44,9 @@ const Index = () => {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
-                <Link to="/discord">Join Discord</Link>
+                <Link to="/discord">
+                  <DiscordMark className="mr-2 h-5 w-5" /> Join Discord
+                </Link>
               </Button>
             </div>
           </div>
