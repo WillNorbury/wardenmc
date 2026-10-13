@@ -141,6 +141,22 @@ export const PartnersAdminSection = () => {
                   onChange={(e) => update(row.id, { url: e.target.value })}
                 />
               </div>
+              <div>
+                <Label>Website (optional)</Label>
+                <Input
+                  value={row.website_url ?? ""}
+                  placeholder="https://example.net"
+                  onChange={(e) => update(row.id, { website_url: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Discord invite (optional)</Label>
+                <Input
+                  value={row.discord_url ?? ""}
+                  placeholder="https://discord.gg/…"
+                  onChange={(e) => update(row.id, { discord_url: e.target.value })}
+                />
+              </div>
               <div className="md:col-span-2">
                 <Label>Description (optional)</Label>
                 <Textarea
