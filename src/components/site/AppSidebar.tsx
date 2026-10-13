@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import logo from "@/assets/warden-network-icon.png";
 import DiscordMark from "./DiscordMark";
-import spectorLogo from "@/assets/spectorclient-logo.png.asset.json";
+import spectorLogo from "@/assets/spectorclient-logo.png";
 import {
   Home,
   Puzzle,
@@ -38,7 +38,7 @@ type NavGroup = { id: string; label: string; items: NavItem[]; defaultOpen?: boo
 const linksGroup: NavGroup = {
   id: "links",
   label: "Links",
-  items: [{ to: "https://spectorclient.com", label: "SpectorClient", image: spectorLogo.url, external: true }],
+  items: [{ to: "https://spectorclient.com", label: "SpectorClient", image: spectorLogo, external: true }],
 };
 
 const mainGroup: NavGroup = {
