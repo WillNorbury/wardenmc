@@ -15,6 +15,8 @@ type Partner = {
   url: string;
   description: string | null;
   icon: string | null;
+  website_url: string | null;
+  discord_url: string | null;
 };
 
 const PartnerDetail = () => {
@@ -27,7 +29,7 @@ const PartnerDetail = () => {
     (async () => {
       const { data } = await supabase
         .from("partners")
-        .select("id,label,url,description,icon")
+        .select("id,label,url,description,icon,website_url,discord_url")
         .eq("is_active", true);
       const match = (data ?? []).find((p: Partner) => partnerSlug(p.label) === slug) ?? null;
       setPartner(match as Partner | null);

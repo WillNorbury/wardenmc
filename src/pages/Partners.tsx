@@ -19,6 +19,8 @@ type Partner = {
   url: string;
   description: string | null;
   icon: string | null;
+  website_url: string | null;
+  discord_url: string | null;
 };
 
 const Partners = () => {
@@ -32,7 +34,7 @@ const Partners = () => {
     (async () => {
       const { data, error } = await supabase
         .from("partners")
-        .select("id,label,url,description,icon")
+        .select("id,label,url,description,icon,website_url,discord_url")
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
       if (error) toast.error(error.message);
