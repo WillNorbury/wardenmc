@@ -32,6 +32,7 @@ import ApplicationStatus from "./pages/ApplicationStatus.tsx";
 import Apply from "./pages/Apply.tsx";
 import Partners from "./pages/Partners.tsx";
 import PartnerDetail from "./pages/PartnerDetail.tsx";
+import Changelog from "./pages/Changelog.tsx";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/site/AppSidebar";
 
