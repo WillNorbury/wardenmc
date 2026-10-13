@@ -15,6 +15,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import logo from "@/assets/warden-network-icon.png";
 import DiscordMark from "./DiscordMark";
+import spectorLogo from "@/assets/spectorclient-logo.png.asset.json";
 import {
   Home,
   Puzzle,
@@ -25,7 +26,6 @@ import {
   ScrollText,
   HelpCircle,
   FileText,
-  Link2,
   User as UserIcon,
   Shield,
   LogIn,
