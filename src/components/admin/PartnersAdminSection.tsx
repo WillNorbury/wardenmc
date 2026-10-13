@@ -16,6 +16,8 @@ type Partner = {
   url: string;
   description: string | null;
   icon: string | null;
+  website_url: string | null;
+  discord_url: string | null;
   sort_order: number;
   is_active: boolean;
 };
@@ -53,6 +55,8 @@ export const PartnersAdminSection = () => {
         url: row.url,
         description: row.description,
         icon: row.icon,
+        website_url: row.website_url,
+        discord_url: row.discord_url,
         sort_order: row.sort_order,
         is_active: row.is_active,
       })
