@@ -5,3 +5,4 @@
 - WebM selections become a still PNG frame before upload because profile photos throughout the app are rendered as images.
 - Organization membership management policies use `is_org_owner(org_id)` rather than directly reading `organizations`, so ownership checks remain valid when organization table permissions are restricted.
 - Server-side notifiers call `send-app-email` with the project's own key, and that function trusts an exact match of it as well as a `service_role` JWT claim, because newer API keys are not JWTs and the JWT-only check silently rejected every bulk send.
+- Images the site displays are imported from `src/assets` as real files, not Lovable CDN pointer JSON, because the preview server answers `/__l5e/assets-v1/...` with the app HTML instead of the image.
