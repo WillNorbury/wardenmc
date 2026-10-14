@@ -14,19 +14,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { userProfilePath } from "@/lib/userSlug";
 import {
   Search,
-  Newspaper,
   Puzzle,
-  Sparkles,
   Users as UsersIcon,
   HelpCircle,
-  Calendar,
   Home,
   ShieldCheck,
-  Vote as VoteIcon,
   ScrollText,
-  LifeBuoy,
-  Trophy,
   ClipboardList,
+  MessageSquare,
+  Handshake,
 } from "lucide-react";
 
 type Hit = { id: string; type: string; title: string; subtitle?: string; to: string; icon: any };
