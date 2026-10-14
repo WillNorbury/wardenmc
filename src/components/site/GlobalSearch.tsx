@@ -14,37 +14,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { userProfilePath } from "@/lib/userSlug";
 import {
   Search,
-  Newspaper,
   Puzzle,
-  Sparkles,
   Users as UsersIcon,
   HelpCircle,
-  Calendar,
   Home,
   ShieldCheck,
-  Vote as VoteIcon,
   ScrollText,
-  LifeBuoy,
-  Trophy,
   ClipboardList,
+  MessageSquare,
+  Handshake,
 } from "lucide-react";
 
 type Hit = { id: string; type: string; title: string; subtitle?: string; to: string; icon: any };
 
 const PAGES: Hit[] = [
   { id: "p-home", type: "page", title: "Home", to: "/", icon: Home },
-  { id: "p-news", type: "page", title: "News", to: "/news", icon: Newspaper },
   { id: "p-changelog", type: "page", title: "Changelog", to: "/changelog", icon: ClipboardList },
   { id: "p-staff", type: "page", title: "Staff", to: "/staff", icon: ShieldCheck },
-  { id: "p-vote", type: "page", title: "Vote", to: "/vote", icon: VoteIcon },
   { id: "p-rules", type: "page", title: "Rules", to: "/rules", icon: ScrollText },
   { id: "p-plugins", type: "page", title: "Plugins", to: "/plugins", icon: Puzzle },
-  { id: "p-features", type: "page", title: "Features", to: "/features", icon: Sparkles },
+  { id: "p-posts", type: "page", title: "Posts", to: "/posts", icon: MessageSquare },
+  { id: "p-partners", type: "page", title: "Partners", to: "/partners", icon: Handshake },
+  { id: "p-discord", type: "page", title: "Discord", to: "/discord", icon: MessageSquare },
+  { id: "p-apply", type: "page", title: "Apply", to: "/apply", icon: ClipboardList },
   { id: "p-faq", type: "page", title: "FAQ", to: "/faq", icon: HelpCircle },
-  { id: "p-events", type: "page", title: "Events", to: "/events", icon: Calendar },
-  { id: "p-leaderboard", type: "page", title: "Leaderboard", to: "/leaderboard", icon: Trophy },
-  { id: "p-users", type: "page", title: "Users", to: "/users", icon: UsersIcon },
-  { id: "p-support", type: "page", title: "Support", to: "/support", icon: LifeBuoy },
 ];
 
 export function GlobalSearch() {
@@ -76,31 +69,27 @@ export function GlobalSearch() {
     const t = setTimeout(async () => {
       const like = `%${term}%`;
       const results: Hit[] = [];
-      const [news, plugins, features, profiles, faqs, events] = await Promise.all([
-        supabase.from("news").select("id,title,slug,excerpt").eq("published", true).ilike("title", like).limit(5),
+      const [plugins, profiles, posts, faqs, partners] = await Promise.all([
         supabase.from("plugins").select("id,short_id,slug,name,description").eq("published", true).ilike("name", like).limit(5),
-        supabase.from("features").select("id,title,slug,description").eq("published", true).ilike("title", like).limit(5),
         supabase.from("profiles").select("id,display_name,mc_username").or(`display_name.ilike.${like},mc_username.ilike.${like}`).limit(5),
+        supabase.from("posts").select("id,content").ilike("content", like).limit(5),
         (supabase.from("faqs" as any) as any).select("id,question").eq("published", true).ilike("question", like).limit(5),
-        (supabase.from("events" as any) as any).select("id,title,slug").eq("published", true).ilike("title", like).limit(5),
+        supabase.from("partners").select("id,name,slug,server_address").or(`name.ilike.${like},server_address.ilike.${like}`).limit(5),
       ]);
-      (news.data ?? []).forEach((n: any) =>
-        results.push({ id: `n-${n.id}`, type: "News", title: n.title, subtitle: n.excerpt ?? undefined, to: `/news/${n.slug}`, icon: Newspaper })
-      );
       (plugins.data ?? []).forEach((p: any) =>
         results.push({ id: `pl-${p.id}`, type: "Plugin", title: p.name, subtitle: p.description ?? undefined, to: `/plugin/${p.slug ?? p.short_id}`, icon: Puzzle })
-      );
-      (features.data ?? []).forEach((f: any) =>
-        results.push({ id: `f-${f.id}`, type: "Feature", title: f.title, subtitle: f.description ?? undefined, to: `/features/${f.slug}`, icon: Sparkles })
       );
       (profiles.data ?? []).forEach((u: any) =>
         results.push({ id: `u-${u.id}`, type: "Player", title: u.display_name || u.mc_username || "Player", subtitle: u.mc_username ?? undefined, to: userProfilePath(u), icon: UsersIcon })
       );
+      (posts.data ?? []).forEach((p: any) =>
+        results.push({ id: `po-${p.id}`, type: "Post", title: p.content.length > 60 ? `${p.content.slice(0, 60)}…` : p.content, to: "/posts", icon: MessageSquare })
+      );
       (faqs.data ?? []).forEach((f: any) =>
         results.push({ id: `q-${f.id}`, type: "FAQ", title: f.question, to: `/faq`, icon: HelpCircle })
       );
-      (events.data ?? []).forEach((e: any) =>
-        results.push({ id: `e-${e.id}`, type: "Event", title: e.title, to: `/events`, icon: Calendar })
+      (partners.data ?? []).forEach((p: any) =>
+        results.push({ id: `pa-${p.id}`, type: "Partner", title: p.name, subtitle: p.server_address ?? undefined, to: `/partners/${p.slug ?? p.id}`, icon: Handshake })
       );
       if (!cancelled) setHits(results);
     }, 200);
