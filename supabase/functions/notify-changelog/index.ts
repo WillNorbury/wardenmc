@@ -136,27 +136,54 @@ Deno.serve(async (req) => {
 
     let queued = 0
     const errors: string[] = []
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+    let totalWaitedMs = 0
+    const MAX_TOTAL_WAIT_MS = 4 * 60 * 1000 // stay inside the function's time limit
+
     for (const email of list) {
+      const idempotencyKey = testEmail
+        ? `changelog-${entry.id}-test-${email}-${Date.now()}`
+        : `changelog-${entry.id}-${email}`
+      const sendBody = {
+        templateName: 'changelog-update',
+        recipientEmail: email,
+        idempotencyKey,
+        from: 'Warden Network Updates <updates@warden.rip>',
+        templateData: testEmail
+          ? { ...templateData, title: `[TEST] ${templateData.title}` }
+          : templateData,
+      }
+
       try {
-        const idempotencyKey = testEmail
-          ? `changelog-${entry.id}-test-${email}-${Date.now()}`
-          : `changelog-${entry.id}-${email}`
-        const { error } = await admin.functions.invoke('send-app-email', {
-          body: {
-            templateName: 'changelog-update',
-            recipientEmail: email,
-            idempotencyKey,
-            from: 'Warden Network Updates <updates@warden.rip>',
-            templateData: testEmail
-              ? { ...templateData, title: `[TEST] ${templateData.title}` }
-              : templateData,
-          },
-        })
-        if (error) errors.push(`${email}: ${error.message}`)
-        else queued += 1
+        let attempt = 0
+        while (true) {
+          const { data, error } = await admin.functions.invoke('send-app-email', {
+            body: sendBody,
+          })
+          const rateLimited = !error && data?.reason === 'rate_limited'
+          if (!error && !rateLimited) {
+            queued += 1
+            break
+          }
+          // On rate limit, wait the suggested time and retry (bounded so the
+          // function never runs past its time limit).
+          if (rateLimited && attempt < 3 && totalWaitedMs < MAX_TOTAL_WAIT_MS) {
+            attempt += 1
+            const waitMs = Math.min((data?.retryAfterSeconds ?? 60) * 1000, 120000)
+            totalWaitedMs += waitMs
+            await sleep(waitMs)
+            continue
+          }
+          errors.push(`${email}: ${error ? error.message : 'rate_limited'}`)
+          break
+        }
       } catch (e) {
         errors.push(`${email}: ${(e as Error).message}`)
       }
+
+      // Pace sends so a bulk announcement doesn't eat the whole hourly
+      // allowance in one burst.
+      await sleep(1500)
     }
 
     return json({
