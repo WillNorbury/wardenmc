@@ -18,6 +18,7 @@ import DiscordMark from "./DiscordMark";
 import spectorLogo from "@/assets/spectorclient-logo.png";
 import {
   Home,
+  Gamepad2,
   Puzzle,
   Layers,
   Users,
