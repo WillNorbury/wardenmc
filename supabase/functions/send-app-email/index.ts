@@ -220,6 +220,18 @@ Deno.serve(async (req) => {
     const message = error instanceof Error ? error.message : String(error)
     const code = error instanceof EmailAPIError ? error.code : undefined
     console.error('Failed to send app email', { templateName, code, message })
+
+    // Rate limit: report it as a normal outcome (with the wait time) so bulk
+    // callers can pace themselves and retry instead of counting a failure.
+    if (error instanceof EmailAPIError && error.status === 429) {
+      const retryAfterSeconds = (error as { retryAfterSeconds?: number }).retryAfterSeconds ?? 60
+      await log('rate_limited', message.slice(0, 500))
+      return new Response(
+        JSON.stringify({ success: false, reason: 'rate_limited', retryAfterSeconds }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     await log('failed', message.slice(0, 500))
 
     const notFound = message.includes('not found. Available:')
