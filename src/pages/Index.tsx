@@ -33,7 +33,7 @@ const TILES = [
   { to: "/discord", icon: DiscordMark, title: "Discord", text: "Join the conversation.", big: true },
 ];
 
-type Plugin = { id: string; name: string; slug: string | null; short_id: string; description: string | null; downloads: number | null };
+type Plugin = { id: string; name: string; slug: string | null; short_id: string; description: string | null };
 type Post = { id: string; content: string; created_at: string };
 type Entry = { id: string; title: string; category: string; entry_date: string };
 type Partner = { id: string; label: string; url: string; description: string | null };
@@ -68,26 +68,25 @@ const Index = () => {
     let cancelled = false;
     (async () => {
       const [pl, po, ch, pa, plCount, memCount, poCount, dlSum] = await Promise.all([
-        supabase.from("plugins").select("id,name,slug,short_id,description,downloads").eq("published", true).order("created_at", { ascending: false }).limit(6),
+        supabase.from("plugins").select("id,name,slug,short_id,description").eq("published", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("posts").select("id,content,created_at").order("created_at", { ascending: false }).limit(5),
         supabase.from("changelog_entries").select("id,title,category,entry_date").eq("published", true).order("entry_date", { ascending: false }).limit(4),
         supabase.from("partners").select("id,label,url,description").eq("is_active", true).order("sort_order", { ascending: true }).limit(6),
         supabase.from("plugins").select("id", { count: "exact", head: true }).eq("published", true),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("posts").select("id", { count: "exact", head: true }),
-        supabase.from("plugins").select("downloads").eq("published", true),
+        supabase.from("plugin_downloads").select("id", { count: "exact", head: true }),
       ]);
       if (cancelled) return;
       setPlugins((pl.data ?? []) as Plugin[]);
       setPosts((po.data ?? []) as Post[]);
       setEntries((ch.data ?? []) as Entry[]);
       setPartners((pa.data ?? []) as Partner[]);
-      const downloads = (dlSum.data ?? []).reduce((s: number, r: any) => s + (r.downloads ?? 0), 0);
       setCounts({
         plugins: plCount.count ?? 0,
         members: memCount.count ?? 0,
         posts: poCount.count ?? 0,
-        downloads,
+        downloads: dlSum.count ?? 0,
       });
       setLoading(false);
     })();
@@ -199,11 +198,9 @@ const Index = () => {
                   <p className="line-clamp-2 text-sm text-muted-foreground">
                     {p.description || "A community plugin."}
                   </p>
-                  {(p.downloads ?? 0) > 0 && (
-                    <p className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-                      <Download className="h-3.5 w-3.5" /> {p.downloads!.toLocaleString()} downloads
-                    </p>
-                  )}
+                  <p className="mt-3 flex items-center gap-1 text-xs text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    View plugin <ArrowRight className="h-3.5 w-3.5" />
+                  </p>
                 </Link>
               ))}
             </div>
