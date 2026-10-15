@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { DEFAULT_PREFS, normalizePalette, normalizeTheme, saveAppearance, type UserPreferences } from "@/lib/preferences";
 
 type AuthCtx = {
   session: Session | null;
@@ -70,6 +71,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    let active = true;
+    const uid = session?.user.id;
+    if (!uid) {
+      saveAppearance(DEFAULT_PREFS.theme, DEFAULT_PREFS.palette);
+      return;
+    }
+    supabase.rpc("get_my_private_profile").then(({ data, error }) => {
+      if (!active || error) return;
+      const row = Array.isArray(data) ? data[0] : null;
+      const prefs = row?.preferences as UserPreferences | undefined;
+      saveAppearance(normalizeTheme(prefs?.theme), normalizePalette(prefs?.palette));
+    });
+    return () => { active = false; };
+  }, [session?.user.id, loading]);
 
   return (
     <Ctx.Provider

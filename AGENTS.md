@@ -1,4 +1,5 @@
 # Project architecture
+- Profile appearance previews never write browser storage; only successful preference saves commit them, and profile exit restores saved appearance. Palette tokens live in global CSS and are hydrated from private account preferences on sign-in.
 - Discord rules messages and slash-command replies share one formatter and read published website rule sections, so both channels stay consistent.
 
 - Profile photo uploads use the existing public `plugin-screenshots` media bucket under each authenticated user ID; storage ownership rules already restrict writes to that folder, and public profile images need public URLs.
