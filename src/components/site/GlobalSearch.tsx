@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { userProfilePath } from "@/lib/userSlug";
+import { partnerSlug } from "@/lib/partnerSlug";
 import {
   Search,
   Puzzle,

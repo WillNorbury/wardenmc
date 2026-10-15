@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { userProfilePath } from "@/lib/userSlug";
+import { partnerSlug } from "@/lib/partnerSlug";
 import {
   Search as SearchIcon,
   Puzzle,
