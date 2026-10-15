@@ -34,6 +34,8 @@ import Partners from "./pages/Partners.tsx";
 import PartnerDetail from "./pages/PartnerDetail.tsx";
 import Changelog from "./pages/Changelog.tsx";
 import Search from "./pages/Search.tsx";
+import GameModes from "./pages/GameModes.tsx";
+import GameModeDetail from "./pages/GameModeDetail.tsx";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/site/AppSidebar";
 
@@ -96,6 +98,9 @@ const Shell = () => {
 
         <Route path="/changelog" element={<Changelog />} />
         <Route path="/search" element={<Search />} />
+
+        <Route path="/gamemodes" element={<GameModes />} />
+        <Route path="/gamemodes/:slug" element={<GameModeDetail />} />
 
         <Route path="*" element={<NotFound />} />
           </Routes>
