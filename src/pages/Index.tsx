@@ -1,9 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, HelpCircle, MessageCircle, Package, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import AnimatedCounter from "@/components/site/AnimatedCounter";
+import ServerStatusWidget from "@/components/site/ServerStatusWidget";
+import { supabase } from "@/integrations/supabase/client";
+import { partnerSlug } from "@/lib/partnerSlug";
+import { changelogSlug } from "@/lib/changelog-slug";
+import {
+  ArrowRight,
+  BookOpen,
+  ClipboardList,
+  Download,
+  Handshake,
+  HelpCircle,
+  MessageCircle,
+  Package,
+  Shield,
+  Users,
+} from "lucide-react";
 import DiscordMark from "@/components/site/DiscordMark";
 
 const TILES = [
@@ -15,10 +33,74 @@ const TILES = [
   { to: "/discord", icon: DiscordMark, title: "Discord", text: "Join the conversation.", big: true },
 ];
 
+type Plugin = { id: string; name: string; slug: string | null; short_id: string; description: string | null };
+type Post = { id: string; content: string; created_at: string };
+type Entry = { id: string; title: string; category: string; entry_date: string };
+type Partner = { id: string; label: string; url: string; description: string | null };
+
+const SectionHeading = ({ eyebrow, title, to }: { eyebrow: string; title: string; to: string }) => (
+  <div className="mb-6 flex items-end justify-between gap-4">
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">{eyebrow}</p>
+      <h2 className="font-display text-4xl tracking-wide md:text-5xl">{title}</h2>
+    </div>
+    <Button asChild variant="ghost" size="sm" className="shrink-0">
+      <Link to={to}>
+        View all <ArrowRight className="ml-1 h-4 w-4" />
+      </Link>
+    </Button>
+  </div>
+);
+
 const Index = () => {
+  const [plugins, setPlugins] = useState<Plugin[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [counts, setCounts] = useState({ plugins: 0, members: 0, posts: 0, downloads: 0 });
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     document.title = "WardenMC — Minecraft Community";
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [pl, po, ch, pa, plCount, memCount, poCount, dlSum] = await Promise.all([
+        supabase.from("plugins").select("id,name,slug,short_id,description").eq("published", true).order("created_at", { ascending: false }).limit(6),
+        supabase.from("posts").select("id,content,created_at").order("created_at", { ascending: false }).limit(5),
+        supabase.from("changelog_entries").select("id,title,category,entry_date").eq("published", true).order("entry_date", { ascending: false }).limit(4),
+        supabase.from("partners").select("id,label,url,description").eq("is_active", true).order("sort_order", { ascending: true }).limit(6),
+        supabase.from("plugins").select("id", { count: "exact", head: true }).eq("published", true),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("posts").select("id", { count: "exact", head: true }),
+        supabase.from("plugin_downloads").select("id", { count: "exact", head: true }),
+      ]);
+      if (cancelled) return;
+      setPlugins((pl.data ?? []) as Plugin[]);
+      setPosts((po.data ?? []) as Post[]);
+      setEntries((ch.data ?? []) as Entry[]);
+      setPartners((pa.data ?? []) as Partner[]);
+      setCounts({
+        plugins: plCount.count ?? 0,
+        members: memCount.count ?? 0,
+        posts: poCount.count ?? 0,
+        downloads: dlSum.count ?? 0,
+      });
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const stats = [
+    { label: "Plugins", value: counts.plugins, icon: Package },
+    { label: "Downloads", value: counts.downloads, icon: Download },
+    { label: "Members", value: counts.members, icon: Users },
+    { label: "Posts", value: counts.posts, icon: MessageCircle },
+  ];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -69,6 +151,161 @@ const Index = () => {
                 </div>
               </Link>
             ))}
+          </div>
+        </section>
+
+        {/* Live server + stats */}
+        <section className="container mt-20 max-w-[1400px]">
+          <div className="grid gap-4 lg:grid-cols-3">
+            <ServerStatusWidget className="lg:col-span-1" />
+            <div className="grid grid-cols-2 gap-4 lg:col-span-2">
+              {stats.map((s) => (
+                <div key={s.label} className="glass flex flex-col justify-center rounded-2xl p-6">
+                  <s.icon className="mb-3 h-6 w-6 text-primary" />
+                  <p className="font-display text-4xl tracking-wide md:text-5xl">
+                    {loading ? "—" : <AnimatedCounter to={s.value} />}
+                  </p>
+                  <p className="text-sm uppercase tracking-widest text-muted-foreground">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Latest plugins */}
+        <section className="container mt-20 max-w-[1400px]">
+          <SectionHeading eyebrow="Fresh from the forge" title="LATEST PLUGINS" to="/plugins" />
+          {loading ? (
+            <div className="grid gap-4 md:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-32 rounded-2xl" />
+              ))}
+            </div>
+          ) : plugins.length === 0 ? (
+            <p className="text-muted-foreground">No plugins yet — check back soon.</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {plugins.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/plugin/${p.slug ?? p.short_id}`}
+                  className="glass group rounded-2xl p-5 transition-all hover:-translate-y-1 hover:border-primary/50"
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <Package className="h-5 w-5 shrink-0 text-primary" />
+                    <h3 className="truncate font-display text-2xl tracking-wide">{p.name}</h3>
+                  </div>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                    {p.description || "A community plugin."}
+                  </p>
+                  <p className="mt-3 flex items-center gap-1 text-xs text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    View plugin <ArrowRight className="h-3.5 w-3.5" />
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Latest posts + changelog */}
+        <section className="container mt-20 max-w-[1400px]">
+          <div className="grid gap-10 lg:grid-cols-2">
+            <div>
+              <SectionHeading eyebrow="Community" title="LATEST POSTS" to="/posts" />
+              {loading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-16 rounded-xl" />
+                  ))}
+                </div>
+              ) : posts.length === 0 ? (
+                <p className="text-muted-foreground">No posts yet — be the first to share something.</p>
+              ) : (
+                <div className="divide-y divide-border/50 overflow-hidden rounded-2xl border border-border/60 bg-card/50 backdrop-blur">
+                  {posts.map((p) => (
+                    <Link key={p.id} to="/posts" className="block px-5 py-4 transition-colors hover:bg-primary/5">
+                      <p className="line-clamp-2">{p.content}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {new Date(p.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div>
+              <SectionHeading eyebrow="What's new" title="CHANGELOG" to="/changelog" />
+              {loading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-16 rounded-xl" />
+                  ))}
+                </div>
+              ) : entries.length === 0 ? (
+                <p className="text-muted-foreground">Nothing published yet.</p>
+              ) : (
+                <div className="divide-y divide-border/50 overflow-hidden rounded-2xl border border-border/60 bg-card/50 backdrop-blur">
+                  {entries.map((e) => (
+                    <Link
+                      key={e.id}
+                      to={`/changelog#${changelogSlug(e.title)}`}
+                      className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-primary/5"
+                    >
+                      <ClipboardList className="h-4 w-4 shrink-0 text-primary" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{e.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(e.entry_date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="shrink-0 capitalize">{e.category}</Badge>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Partners */}
+        {partners.length > 0 && (
+          <section className="container mt-20 max-w-[1400px]">
+            <SectionHeading eyebrow="Our friends" title="PARTNERS" to="/partners" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {partners.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/partners/${partnerSlug(p.label)}`}
+                  className="glass group flex items-center gap-4 rounded-2xl p-5 transition-all hover:-translate-y-1 hover:border-primary/50"
+                >
+                  <Handshake className="h-6 w-6 shrink-0 text-primary transition-colors group-hover:text-accent" />
+                  <div className="min-w-0">
+                    <h3 className="truncate font-display text-2xl tracking-wide">{p.label}</h3>
+                    <p className="truncate text-sm text-muted-foreground">{p.url}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* CTA */}
+        <section className="container my-24 max-w-[1400px]">
+          <div className="aurora relative overflow-hidden rounded-3xl border border-border/60 px-8 py-16 text-center md:py-20">
+            <h2 className="font-display text-5xl tracking-wide md:text-6xl">
+              READY TO <span className="text-gradient">JOIN?</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-muted-foreground">
+              Hop on the server, grab a plugin, or say hi in Discord — the realm is waiting.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button asChild size="lg" className="rounded-full px-8 glow">
+                <Link to="/auth">Create an account</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="rounded-full px-8">
+                <Link to="/apply">Apply for staff</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
