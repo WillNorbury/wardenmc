@@ -64,7 +64,7 @@ export default function Search() {
         supabase.from("profiles").select("id,display_name,mc_username,bio").or(`display_name.ilike.${like},mc_username.ilike.${like}`).limit(20),
         supabase.from("posts").select("id,content").ilike("content", like).limit(20),
         (supabase.from("faqs" as any) as any).select("id,question,answer").eq("published", true).or(`question.ilike.${like},answer.ilike.${like}`).limit(20),
-        supabase.from("partners").select("id,name,slug,description,server_address").or(`name.ilike.${like},description.ilike.${like},server_address.ilike.${like}`).limit(20),
+        supabase.from("partners").select("id,label,url,description").eq("is_active", true).or(`label.ilike.${like},description.ilike.${like},url.ilike.${like}`).limit(20),
         supabase.from("changelog_entries").select("id,title,content,category").eq("published", true).or(`title.ilike.${like},content.ilike.${like}`).limit(20),
       ]);
       (plugins.data ?? []).forEach((p: any) =>
@@ -77,7 +77,7 @@ export default function Search() {
         results.push({ id: `po-${p.id}`, type: "Post", title: p.content.length > 80 ? `${p.content.slice(0, 80)}…` : p.content, to: "/posts" })
       );
       (partners.data ?? []).forEach((p: any) =>
-        results.push({ id: `pa-${p.id}`, type: "Partner", title: p.name, subtitle: p.server_address ?? p.description ?? undefined, to: `/partners/${p.slug ?? p.id}` })
+        results.push({ id: `pa-${p.id}`, type: "Partner", title: p.label, subtitle: p.url ?? p.description ?? undefined, to: `/partners/${partnerSlug(p.label)}` })
       );
       (faqs.data ?? []).forEach((f: any) =>
         results.push({ id: `q-${f.id}`, type: "FAQ", title: f.question, to: "/faq" })
