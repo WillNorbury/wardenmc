@@ -308,7 +308,7 @@ body::-webkit-scrollbar-thumb:hover,
 :root[data-palette="forest"] { --theme-hue: 145; }
 :root[data-palette="rose"] { --theme-hue: 340; }
 :root[data-palette="ember"] { --theme-hue: 25; }
-:root[data-palette]:not([data-palette="default"]) {
+:root[data-palette]:not([data-palette="default"]):not([data-palette="custom"]) {
   --background: var(--theme-hue) 24% 8%;
   --foreground: var(--theme-hue) 16% 96%;
   --card: var(--theme-hue) 23% 12%;
@@ -342,7 +342,7 @@ body::-webkit-scrollbar-thumb:hover,
   --shadow-elegant: 0 18px 44px -22px hsl(var(--theme-hue) 35% 2% / 0.9);
   --shadow-neon: 0 0 10px hsl(var(--primary) / 0.4), 0 0 26px hsl(var(--accent) / 0.2);
 }
-:root.light[data-palette]:not([data-palette="default"]) {
+:root.light[data-palette]:not([data-palette="default"]):not([data-palette="custom"]) {
   --background: var(--theme-hue) 30% 98%;
   --foreground: var(--theme-hue) 25% 12%;
   --card: var(--theme-hue) 28% 99%;
@@ -370,6 +370,40 @@ body::-webkit-scrollbar-thumb:hover,
 .theme-swatch-forest { --swatch: var(--palette-forest); }
 .theme-swatch-rose { --swatch: var(--palette-rose); }
 .theme-swatch-ember { --swatch: var(--palette-ember); }
+.theme-swatch-custom { --swatch: var(--custom-primary); }
+
+:root[data-palette="custom"], :root.light[data-palette="custom"] {
+  --ring: var(--custom-primary);
+  --sidebar-primary: var(--custom-primary);
+  --sidebar-primary-foreground: var(--custom-primary-foreground);
+  --sidebar-ring: var(--custom-primary);
+  --gradient-card: linear-gradient(180deg, hsl(var(--custom-surface)), hsl(var(--custom-background)));
+  --background: var(--custom-background);
+  --foreground: var(--custom-background-foreground);
+  --card: var(--custom-surface);
+  --card-foreground: var(--custom-surface-foreground);
+  --popover: var(--custom-surface);
+  --popover-foreground: var(--custom-surface-foreground);
+  --secondary: var(--custom-surface);
+  --secondary-foreground: var(--custom-surface-foreground);
+  --muted: var(--custom-surface);
+  --muted-foreground: var(--custom-background-foreground);
+  --primary: var(--custom-primary);
+  --primary-foreground: var(--custom-primary-foreground);
+  --primary-glow: var(--custom-primary);
+  --accent: var(--custom-primary);
+  --accent-foreground: var(--custom-primary-foreground);
+  --border: var(--custom-primary);
+  --input: var(--custom-primary);
+  --sidebar-background: var(--custom-sidebar);
+  --sidebar-foreground: var(--custom-sidebar-foreground);
+  --sidebar-accent: var(--custom-primary);
+  --sidebar-accent-foreground: var(--custom-primary-foreground);
+  --sidebar-border: var(--custom-primary);
+  --gradient-hero: linear-gradient(hsl(var(--background)), hsl(var(--background)));
+  --gradient-fire: linear-gradient(100deg, hsl(var(--primary)), hsl(var(--primary)));
+  --shadow-elegant: 0 18px 44px -22px hsl(var(--custom-background) / 0.5);
+}
 
 .goog-te-banner-frame,
 .skiptranslate iframe,

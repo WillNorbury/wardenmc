@@ -36,6 +36,8 @@ import MyPluginsPanel from "@/components/dashboard/MyPluginsPanel";
 import AvatarFilePicker from "@/components/profile/AvatarFilePicker";
 import { uploadAvatar } from "@/lib/avatarUpload";
 import BusinessProfileCard from "@/components/profile/BusinessProfileCard";
+import CustomThemeEditor from "@/components/profile/CustomThemeEditor";
+import { normalizeCustomTheme } from "@/lib/theme-colors";
 
 const Profile = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -124,9 +126,9 @@ const Profile = () => {
       setAvatarUrl(p?.avatar_url ?? "");
       setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
       const stored = ((privateRow as any)?.preferences as UserPreferences) ?? {};
-      const loaded = { ...DEFAULT_PREFS, ...stored, theme: normalizeTheme(stored.theme), palette: normalizePalette(stored.palette) };
+      const loaded = { ...DEFAULT_PREFS, ...stored, theme: normalizeTheme(stored.theme), palette: normalizePalette(stored.palette), custom_theme: normalizeCustomTheme(stored.custom_theme) };
       setPrefs(loaded);
-      saveAppearance(loaded.theme, loaded.palette);
+      saveAppearance(loaded.theme, loaded.palette, loaded.custom_theme);
       setLoading(false);
     })();
   }, [user, authLoading, navigate]);
@@ -134,7 +136,7 @@ const Profile = () => {
   const updatePref = <K extends keyof Required<UserPreferences>>(key: K, value: Required<UserPreferences>[K]) => {
     setPrefs((p) => {
       const next = { ...p, [key]: value };
-      if (key === "theme" || key === "palette") previewAppearance(next.theme, next.palette);
+      if (key === "theme" || key === "palette" || key === "custom_theme") previewAppearance(next.theme, next.palette, next.custom_theme);
       return next;
     });
   };
@@ -170,7 +172,7 @@ const Profile = () => {
     setSaving(false);
     if (error) return toast.error(error.message);
     if (prefError) return toast.error(prefError.message);
-    saveAppearance(prefs.theme, prefs.palette);
+    saveAppearance(prefs.theme, prefs.palette, prefs.custom_theme);
     setAvatarUrl(nextAvatar);
     setAvatarFile(null);
     setAvatarPreview(null);
@@ -185,7 +187,7 @@ const Profile = () => {
     const { error } = await supabase.rpc("set_my_preferences", { _prefs: prefs });
     setSaving(false);
     if (error) return toast.error(error.message);
-    saveAppearance(prefs.theme, prefs.palette);
+    saveAppearance(prefs.theme, prefs.palette, prefs.custom_theme);
     toast.success("Preferences saved");
   };
 
@@ -412,7 +414,7 @@ const Profile = () => {
               <Palette className="h-5 w-5 text-primary" />
               <h2 className="font-display font-bold text-lg">Appearance</h2>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4" role="group" aria-label="Theme palette">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4" role="group" aria-label="Theme palette">
               {THEME_PALETTES.map((palette) => (
                 <Button
                   key={palette.id}
@@ -427,6 +429,9 @@ const Profile = () => {
                 </Button>
               ))}
             </div>
+            {prefs.palette === "custom" && (
+              <CustomThemeEditor value={prefs.custom_theme} disabled={saving} onChange={(theme) => updatePref("custom_theme", theme)} />
+            )}
             <div className="max-w-xs">
               <Label htmlFor="theme">Theme</Label>
               <Select value={prefs.theme} onValueChange={(v) => updatePref("theme", v as typeof prefs.theme)}>
