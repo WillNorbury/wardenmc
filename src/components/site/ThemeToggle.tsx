@@ -21,11 +21,16 @@ export const ThemeToggle = ({ className }: { className?: string }) => {
 
   // Re-sync if another tab/page changes preference
   useEffect(() => {
+    const onAppearance = () => setTheme(document.documentElement.classList.contains("light") ? "light" : "dark");
     const onStorage = (e: StorageEvent) => {
       if (e.key === "zy-theme" && e.newValue) setTheme(e.newValue as ThemePref);
     };
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener("appearance-change", onAppearance);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("appearance-change", onAppearance);
+    };
   }, []);
 
   const light = isLightActive(theme);

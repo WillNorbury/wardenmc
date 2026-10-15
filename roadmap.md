@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add profile theme presets, explicit saving, and unsaved preview reset; verify and announce.
 - [x] Replace website rules and update the Discord /rules command
 - [ ] Sync existing Discord rules message — blocked by the current account's admin-only permission; use Rules → Sync to Discord from an admin account
 - [x] Changelog emails: let Founder / * ranks send them

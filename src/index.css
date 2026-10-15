@@ -302,6 +302,44 @@ body::-webkit-scrollbar-thumb:hover,
 }
 
 /* Google Translate widget cleanup */
+/* Profile palette presets inherit the selected light/dark surfaces. */
+:root { --palette-ocean: 199 88% 58%; --palette-forest: 145 64% 52%; --palette-rose: 340 82% 65%; --palette-ember: 25 94% 62%; --palette-warden: 189 100% 40%; }
+:root[data-palette="ocean"] { --theme-hue: 199; }
+:root[data-palette="forest"] { --theme-hue: 145; }
+:root[data-palette="rose"] { --theme-hue: 340; }
+:root[data-palette="ember"] { --theme-hue: 25; }
+:root[data-palette]:not([data-palette="default"]) {
+  --primary: var(--theme-hue) 78% 62%;
+  --primary-foreground: 240 28% 9%;
+  --primary-glow: var(--theme-hue) 82% 72%;
+  --accent: var(--theme-hue) 48% 75%;
+  --accent-foreground: 240 28% 9%;
+  --ring: var(--primary);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-ring: var(--primary);
+  --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--theme-hue) 24% 12%));
+  --gradient-fire: linear-gradient(100deg, hsl(var(--primary)), hsl(var(--accent)));
+  --shadow-glow: 0 0 24px hsl(var(--primary) / 0.24);
+}
+:root.light[data-palette]:not([data-palette="default"]) {
+  --primary: var(--theme-hue) 78% 32%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: var(--theme-hue) 82% 42%;
+  --accent: var(--theme-hue) 55% 94%;
+  --accent-foreground: var(--theme-hue) 78% 24%;
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --gradient-hero: linear-gradient(135deg, hsl(var(--background)), hsl(var(--theme-hue) 35% 96%));
+  --gradient-fire: linear-gradient(100deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+}
+.theme-swatch { display: block; width: 100%; height: 22px; border-radius: 4px; background: hsl(var(--swatch)); }
+.theme-swatch-default { --swatch: var(--palette-warden); }
+.theme-swatch-ocean { --swatch: var(--palette-ocean); }
+.theme-swatch-forest { --swatch: var(--palette-forest); }
+.theme-swatch-rose { --swatch: var(--palette-rose); }
+.theme-swatch-ember { --swatch: var(--palette-ember); }
+
 .goog-te-banner-frame,
 .skiptranslate iframe,
 #goog-gt-tt,

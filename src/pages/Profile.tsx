@@ -26,7 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { roleLabel, type AppRole } from "@/lib/roles";
 import { userProfilePath } from "@/lib/userSlug";
-import { applyTheme, DEFAULT_PREFS, type UserPreferences } from "@/lib/preferences";
+import { discardAppearancePreview, normalizePalette, normalizeTheme, previewAppearance, saveAppearance, THEME_PALETTES, DEFAULT_PREFS, type UserPreferences } from "@/lib/preferences";
 import { toast } from "sonner";
 import { Bell, ExternalLink, Loader2, Lock, MessageCircle, Palette, Unlink } from "lucide-react";
 import OrganizationsCard from "@/components/site/OrganizationsCard";
@@ -75,6 +75,7 @@ const Profile = () => {
 
   useEffect(() => {
     document.title = "My Profile — Warden Network";
+    return () => discardAppearancePreview();
   }, []);
 
   useEffect(() => {
@@ -122,9 +123,10 @@ const Profile = () => {
       });
       setAvatarUrl(p?.avatar_url ?? "");
       setRoles(((r ?? []) as { role: AppRole }[]).map((x) => x.role));
-      const loaded = { ...DEFAULT_PREFS, ...(((privateRow as any)?.preferences as UserPreferences) ?? {}) };
+      const stored = ((privateRow as any)?.preferences as UserPreferences) ?? {};
+      const loaded = { ...DEFAULT_PREFS, ...stored, theme: normalizeTheme(stored.theme), palette: normalizePalette(stored.palette) };
       setPrefs(loaded);
-      applyTheme(loaded.theme);
+      saveAppearance(loaded.theme, loaded.palette);
       setLoading(false);
     })();
   }, [user, authLoading, navigate]);
@@ -132,7 +134,7 @@ const Profile = () => {
   const updatePref = <K extends keyof Required<UserPreferences>>(key: K, value: Required<UserPreferences>[K]) => {
     setPrefs((p) => {
       const next = { ...p, [key]: value };
-      if (key === "theme") applyTheme(value as Required<UserPreferences>["theme"]);
+      if (key === "theme" || key === "palette") previewAppearance(next.theme, next.palette);
       return next;
     });
   };
@@ -168,12 +170,23 @@ const Profile = () => {
     setSaving(false);
     if (error) return toast.error(error.message);
     if (prefError) return toast.error(prefError.message);
+    saveAppearance(prefs.theme, prefs.palette);
     setAvatarUrl(nextAvatar);
     setAvatarFile(null);
     setAvatarPreview(null);
     setSavedMc(trimmedMc);
     setMcUsername(trimmedMc);
     toast.success("Profile saved");
+  };
+
+  const savePreferences = async () => {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase.rpc("set_my_preferences", { _prefs: prefs });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    saveAppearance(prefs.theme, prefs.palette);
+    toast.success("Preferences saved");
   };
 
   const unlinkMinecraft = async () => {
@@ -399,7 +412,21 @@ const Profile = () => {
               <Palette className="h-5 w-5 text-primary" />
               <h2 className="font-display font-bold text-lg">Appearance</h2>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">Choose how Warden Network looks on this device.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-4" role="group" aria-label="Theme palette">
+              {THEME_PALETTES.map((palette) => (
+                <Button
+                  key={palette.id}
+                  variant="outline"
+                  type="button"
+                  aria-pressed={prefs.palette === palette.id}
+                  onClick={() => updatePref("palette", palette.id)}
+                  className={`h-auto flex-col gap-2 py-3 ${prefs.palette === palette.id ? "border-primary ring-1 ring-primary" : ""}`}
+                >
+                  <span className={`theme-swatch theme-swatch-${palette.id}`} aria-hidden="true" />
+                  {palette.label}
+                </Button>
+              ))}
+            </div>
             <div className="max-w-xs">
               <Label htmlFor="theme">Theme</Label>
               <Select value={prefs.theme} onValueChange={(v) => updatePref("theme", v as typeof prefs.theme)}>
@@ -407,7 +434,7 @@ const Profile = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dark">Dark</SelectItem>
+                  <SelectItem value="dark">Dark (default)</SelectItem>
                   <SelectItem value="light">Light</SelectItem>
                   <SelectItem value="system">System</SelectItem>
                 </SelectContent>
@@ -442,7 +469,7 @@ const Profile = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={save} disabled={saving}>
+            <Button onClick={savePreferences} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Save preferences
             </Button>
