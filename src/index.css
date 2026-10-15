@@ -308,7 +308,7 @@ body::-webkit-scrollbar-thumb:hover,
 :root[data-palette="forest"] { --theme-hue: 145; }
 :root[data-palette="rose"] { --theme-hue: 340; }
 :root[data-palette="ember"] { --theme-hue: 25; }
-:root[data-palette]:not([data-palette="default"]) {
+:root[data-palette]:not([data-palette="default"]):not([data-palette="custom"]) {
   --background: var(--theme-hue) 24% 8%;
   --foreground: var(--theme-hue) 16% 96%;
   --card: var(--theme-hue) 23% 12%;
@@ -342,7 +342,7 @@ body::-webkit-scrollbar-thumb:hover,
   --shadow-elegant: 0 18px 44px -22px hsl(var(--theme-hue) 35% 2% / 0.9);
   --shadow-neon: 0 0 10px hsl(var(--primary) / 0.4), 0 0 26px hsl(var(--accent) / 0.2);
 }
-:root.light[data-palette]:not([data-palette="default"]) {
+:root.light[data-palette]:not([data-palette="default"]):not([data-palette="custom"]) {
   --background: var(--theme-hue) 30% 98%;
   --foreground: var(--theme-hue) 25% 12%;
   --card: var(--theme-hue) 28% 99%;
@@ -373,6 +373,11 @@ body::-webkit-scrollbar-thumb:hover,
 .theme-swatch-custom { --swatch: var(--custom-primary); }
 
 :root[data-palette="custom"], :root.light[data-palette="custom"] {
+  --ring: var(--custom-primary);
+  --sidebar-primary: var(--custom-primary);
+  --sidebar-primary-foreground: var(--custom-primary-foreground);
+  --sidebar-ring: var(--custom-primary);
+  --gradient-card: linear-gradient(180deg, hsl(var(--custom-surface)), hsl(var(--custom-background)));
   --background: var(--custom-background);
   --foreground: var(--custom-background-foreground);
   --card: var(--custom-surface);
