@@ -47,7 +47,7 @@ const Navbar = () => {
         scrolled ? "glass-strong border-b border-border/60" : "bg-transparent",
       )}
     >
-      <div className="container flex h-16 max-w-[1400px] items-center gap-4">
+      <div className="container flex h-[76px] sm:h-16 max-w-[1400px] items-center gap-4 pt-3 sm:pt-0">
         <SidebarTrigger
           aria-label="Toggle sidebar"
           className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"

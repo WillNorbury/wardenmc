@@ -15,7 +15,7 @@ export default function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <section className="aurora border-b border-border/60 pt-16">
+    <section className="aurora border-b border-border/60 pt-[76px] sm:pt-16">
       <div className="container max-w-[1400px] py-10 md:py-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl">
