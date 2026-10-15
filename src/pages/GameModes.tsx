@@ -145,7 +145,7 @@ const GameModes = () => {
               />
               <div className="flex flex-wrap justify-center gap-3">
                 <Button asChild size="lg">
-                  <Link to="/store">Visit the store</Link>
+                  <Link to="/plugins">Browse plugins</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
                   <Link to="/discord">Join Discord</Link>

@@ -51,6 +51,7 @@ const mainGroup: NavGroup = {
     { to: "/plugins/categories", label: "Categories", icon: Layers },
     { to: "/plugins/developers", label: "Developers", icon: Users },
     { to: "/posts", label: "Posts", icon: MessageSquare },
+    { to: "/gamemodes", label: "Game Modes", icon: Gamepad2 },
   ],
 };
 

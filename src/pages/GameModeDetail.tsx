@@ -117,7 +117,7 @@ const GameModeDetail = () => {
               <div className="flex flex-wrap gap-3 mt-8">
                 {mode.server_ip && <IpCopyButton ip={mode.server_ip} />}
                 <Button asChild size="lg">
-                  <Link to="/store">Get a rank</Link>
+                  <Link to="/plugins">Browse plugins</Link>
                 </Button>
                 <Button asChild size="lg" variant="ghost">
                   <Link to="/rules">Read the rules</Link>
@@ -145,10 +145,7 @@ const GameModeDetail = () => {
                 {mode.screenshots.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-border/70 p-10 text-center text-muted-foreground">
                     <ImageIcon className="h-6 w-6 mx-auto mb-2 opacity-60" />
-                    <p className="text-sm">No screenshots yet — check the community gallery.</p>
-                    <Button asChild variant="link" className="mt-1">
-                      <Link to="/gallery">Open gallery</Link>
-                    </Button>
+                    <p className="text-sm">No screenshots yet — check back soon.</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
