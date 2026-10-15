@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { userProfilePath } from "@/lib/userSlug";
+import { partnerSlug } from "@/lib/partnerSlug";
 import {
   Search,
   Puzzle,
@@ -74,7 +75,7 @@ export function GlobalSearch() {
         supabase.from("profiles").select("id,display_name,mc_username").or(`display_name.ilike.${like},mc_username.ilike.${like}`).limit(5),
         supabase.from("posts").select("id,content").ilike("content", like).limit(5),
         (supabase.from("faqs" as any) as any).select("id,question").eq("published", true).ilike("question", like).limit(5),
-        supabase.from("partners").select("id,name,slug,server_address").or(`name.ilike.${like},server_address.ilike.${like}`).limit(5),
+        supabase.from("partners").select("id,label,url,description").eq("is_active", true).or(`label.ilike.${like},url.ilike.${like}`).limit(5),
       ]);
       (plugins.data ?? []).forEach((p: any) =>
         results.push({ id: `pl-${p.id}`, type: "Plugin", title: p.name, subtitle: p.description ?? undefined, to: `/plugin/${p.slug ?? p.short_id}`, icon: Puzzle })
@@ -89,7 +90,7 @@ export function GlobalSearch() {
         results.push({ id: `q-${f.id}`, type: "FAQ", title: f.question, to: `/faq`, icon: HelpCircle })
       );
       (partners.data ?? []).forEach((p: any) =>
-        results.push({ id: `pa-${p.id}`, type: "Partner", title: p.name, subtitle: p.server_address ?? undefined, to: `/partners/${p.slug ?? p.id}`, icon: Handshake })
+        results.push({ id: `pa-${p.id}`, type: "Partner", title: p.label, subtitle: p.url ?? undefined, to: `/partners/${partnerSlug(p.label)}`, icon: Handshake })
       );
       if (!cancelled) setHits(results);
     }, 200);
