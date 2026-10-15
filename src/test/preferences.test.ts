@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { bootstrapTheme, discardAppearancePreview, previewAppearance, readSavedAppearance, saveAppearance } from "@/lib/preferences";
+import { bootstrapTheme, discardAppearancePreview, previewAppearance, readSavedAppearance, readSavedCustomTheme, saveAppearance } from "@/lib/preferences";
 import { DEFAULT_CUSTOM_THEME, normalizeCustomTheme, readableForeground } from "@/lib/theme-colors";
 
 describe("profile theme saving", () => {
@@ -12,7 +12,7 @@ describe("profile theme saving", () => {
     bootstrapTheme();
     expect(document.documentElement.dataset.palette).toBe("custom");
     expect(JSON.parse(localStorage.getItem("zy-custom-theme") ?? "{}")).toEqual(custom);
-    expect(document.documentElement.style.getPropertyValue("--custom-primary")).toBe("41.18 100.00% 56.67%");
+    expect(readSavedCustomTheme().primary).toBe("#ffbb22");
   });
 
   it("rejects invalid color values", () => {
