@@ -89,7 +89,9 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
         setStatus("ok");
         return;
       }
-      if (aal?.nextLevel === "aal2") {
+      // Google sign-ins skip the authenticator code (Google already verified them).
+      const viaOAuth = aal?.currentAuthenticationMethods?.some((m) => m.method === "oauth");
+      if (!viaOAuth && aal?.nextLevel === "aal2") {
         const { data: factors } = await supabase.auth.mfa.listFactors();
         const f = factors?.totp?.find((x) => x.status === "verified");
         if (f) {
