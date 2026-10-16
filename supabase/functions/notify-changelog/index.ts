@@ -160,7 +160,16 @@ Deno.serve(async (req) => {
           const { data, error } = await admin.functions.invoke('send-app-email', {
             body: sendBody,
           })
-          const rateLimited = !error && data?.reason === 'rate_limited'
+          // Rate limits come back as HTTP 429, so invoke reports an error;
+          // the response body still carries the reason and wait time.
+          let rateBody: { reason?: string; retryAfterSeconds?: number } | null = null
+          if (error) {
+            try {
+              const ctx = (error as { context?: Response }).context
+              if (ctx) rateBody = await ctx.json()
+            } catch { /* not a JSON error body */ }
+          }
+          const rateLimited = rateBody?.reason === 'rate_limited' || (!error && data?.reason === 'rate_limited')
           if (!error && !rateLimited) {
             queued += 1
             break
@@ -169,7 +178,7 @@ Deno.serve(async (req) => {
           // function never runs past its time limit).
           if (rateLimited && attempt < 3 && totalWaitedMs < MAX_TOTAL_WAIT_MS) {
             attempt += 1
-            const waitMs = Math.min((data?.retryAfterSeconds ?? 60) * 1000, 120000)
+            const waitMs = Math.min((rateBody?.retryAfterSeconds ?? data?.retryAfterSeconds ?? 60) * 1000, 120000)
             totalWaitedMs += waitMs
             await sleep(waitMs)
             continue
