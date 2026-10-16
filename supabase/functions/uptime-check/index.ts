@@ -28,7 +28,6 @@ const SERVICE_ENDPOINTS: Record<string, string> = {
   api: "",
   panel: "https://dash.nightly.host",
   discord: "https://discord.gg/V8xYY2DasZ",
-  portfolio: "https://portfolio.warden.rip",
 };
 
 async function checkHttp(
@@ -324,7 +323,6 @@ Deno.serve(async (req) => {
     checkHttp("api", apiHealth, false),
     checkHttp("panel", "https://dash.nightly.host"),
     checkHttp("discord", "https://discord.gg/V8xYY2DasZ"),
-    checkHttp("portfolio", "https://portfolio.warden.rip"),
   ]);
 
 
