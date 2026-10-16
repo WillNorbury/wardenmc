@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_uptime_checks_checked_at_cover ON public.uptime_checks (checked_at) INCLUDE (service_key, is_up);
