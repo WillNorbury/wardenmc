@@ -60,6 +60,7 @@ const Index = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [counts, setCounts] = useState({ plugins: 0, members: 0, posts: 0, downloads: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -70,11 +71,12 @@ const Index = () => {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [pl, po, ch, pa, plCount, memCount, poCount, dlSum] = await Promise.all([
+      const [pl, po, ch, pa, mem, plCount, memCount, poCount, dlSum] = await Promise.all([
         supabase.from("plugins").select("id,name,slug,short_id,description").eq("published", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("posts").select("id,content,created_at").order("created_at", { ascending: false }).limit(5),
         supabase.from("changelog_entries").select("id,title,category,entry_date").eq("published", true).order("entry_date", { ascending: false }).limit(4),
         supabase.from("partners").select("id,label,url,description").eq("is_active", true).order("sort_order", { ascending: true }).limit(6),
+        supabase.from("profiles").select("id,display_name,mc_username,avatar_url,created_at").order("created_at", { ascending: false }).limit(8),
         supabase.from("plugins").select("id", { count: "exact", head: true }).eq("published", true),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("posts").select("id", { count: "exact", head: true }),
@@ -85,6 +87,7 @@ const Index = () => {
       setPosts((po.data ?? []) as Post[]);
       setEntries((ch.data ?? []) as Entry[]);
       setPartners((pa.data ?? []) as Partner[]);
+      setMembers((mem.data ?? []) as Member[]);
       setCounts({
         plugins: plCount.count ?? 0,
         members: memCount.count ?? 0,
