@@ -30,6 +30,7 @@ import {
   User as UserIcon,
   Shield,
   LogIn,
+  Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
