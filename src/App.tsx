@@ -113,6 +113,7 @@ const Shell = () => {
               <Route path="/gamemodes/:slug" element={<GameModeDetail />} />
 
               <Route path="*" element={<NotFound />} />
+              <Route path="/404" element={<NotFound />} />
             </Routes>
           </div>
         </div>
