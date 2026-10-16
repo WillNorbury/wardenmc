@@ -61,6 +61,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://warden.rip/support</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://warden.rip/apply</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
