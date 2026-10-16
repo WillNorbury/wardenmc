@@ -9,11 +9,14 @@ import { cn } from "@/lib/utils";
 // Keep the signed-in user's saved preference in sync so the toggle's choice
 // isn't overwritten by the server-stored theme on the next page load.
 const persistTheme = (theme: ThemePref) => {
-  supabase.rpc("get_my_private_profile").then(({ data }) => {
-    const row = Array.isArray(data) ? data[0] : null;
-    const prefs = { ...((row?.preferences as Record<string, unknown>) ?? {}), theme };
-    return supabase.rpc("set_my_preferences", { _prefs: prefs });
-  }).catch(() => {});
+  void (async () => {
+    try {
+      const { data } = await supabase.rpc("get_my_private_profile");
+      const row = Array.isArray(data) ? data[0] : null;
+      const prefs = { ...((row?.preferences as Record<string, unknown>) ?? {}), theme };
+      await supabase.rpc("set_my_preferences", { _prefs: prefs });
+    } catch { /* keep the local choice if the save fails */ }
+  })();
 };
 
 const readStored = (): ThemePref => {
