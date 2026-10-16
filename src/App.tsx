@@ -71,6 +71,7 @@ const Shell = () => {
         <Route path="/admin/*" element={<AdminTabRedirect />} />
 
         <Route path="/staff" element={<Staff />} />
+        <Route path="/users" element={<Users />} />
         <Route path="/discord" element={<Discord />} />
         <Route path="/posts" element={<Posts />} />
         <Route path="/post" element={<PostCompose />} />
