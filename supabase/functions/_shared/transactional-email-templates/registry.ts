@@ -19,6 +19,7 @@ import { template as orderConfirmation } from './order-confirmation.tsx'
 import { template as loginVerification } from './login-verification.tsx'
 import { template as postPublished } from './post-published.tsx'
 import { template as postReply } from './post-reply.tsx'
+import { template as supportAdmin } from './support-admin.tsx'
 
 export interface TemplateEntry {
   component: React.ComponentType<any>
@@ -29,6 +30,7 @@ export interface TemplateEntry {
 }
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
+  'support-admin': supportAdmin,
   'ban-appeal-received': banAppealReceived,
   'ban-appeal-status': banAppealStatus,
   'ban-appeal-admin': banAppealAdmin,
