@@ -31,6 +31,7 @@ import {
   Shield,
   LogIn,
   Activity,
+  Headset,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -69,6 +70,7 @@ const communityGroup: NavGroup = {
     { to: "/changelog", label: "Changelog", icon: FileText },
     { to: "/status", label: "Status", icon: Activity },
     { to: "/faq", label: "FAQ", icon: HelpCircle },
+    { to: "/support", label: "Support", icon: Headset },
   ],
 };
 

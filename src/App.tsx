@@ -35,6 +35,7 @@ import Partners from "./pages/Partners.tsx";
 import PartnerDetail from "./pages/PartnerDetail.tsx";
 import Changelog from "./pages/Changelog.tsx";
 import Search from "./pages/Search.tsx";
+import Support from "./pages/Support.tsx";
 import GameModes from "./pages/GameModes.tsx";
 import Status from "./pages/Status.tsx";
 import StatusIncident from "./pages/StatusIncident.tsx";
@@ -105,6 +106,7 @@ const Shell = () => {
 
               <Route path="/changelog" element={<Changelog />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/support" element={<Support />} />
 
               <Route path="/status" element={<Status />} />
               <Route path="/status/unsubscribe" element={<StatusUnsubscribe />} />
