@@ -14,7 +14,6 @@ const SERVICE_NAMES: Record<string, string> = {
   api: "API & Database",
   panel: "Panel",
   discord: "Discord",
-  portfolio: "Portfolio",
 };
 
 type Incident = {
