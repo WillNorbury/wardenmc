@@ -10,6 +10,8 @@ import ServerStatusWidget from "@/components/site/ServerStatusWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { partnerSlug } from "@/lib/partnerSlug";
 import { changelogSlug } from "@/lib/changelog-slug";
+import { userProfilePath } from "@/lib/userSlug";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ArrowRight,
   BookOpen,
@@ -37,6 +39,7 @@ type Plugin = { id: string; name: string; slug: string | null; short_id: string;
 type Post = { id: string; content: string; created_at: string };
 type Entry = { id: string; title: string; category: string; entry_date: string };
 type Partner = { id: string; label: string; url: string; description: string | null };
+type Member = { id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null; created_at: string };
 
 const SectionHeading = ({ eyebrow, title, to }: { eyebrow: string; title: string; to: string }) => (
   <div className="mb-6 flex items-end justify-between gap-4">
@@ -57,6 +60,7 @@ const Index = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [counts, setCounts] = useState({ plugins: 0, members: 0, posts: 0, downloads: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -67,11 +71,12 @@ const Index = () => {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [pl, po, ch, pa, plCount, memCount, poCount, dlSum] = await Promise.all([
+      const [pl, po, ch, pa, mem, plCount, memCount, poCount, dlSum] = await Promise.all([
         supabase.from("plugins").select("id,name,slug,short_id,description").eq("published", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("posts").select("id,content,created_at").order("created_at", { ascending: false }).limit(5),
         supabase.from("changelog_entries").select("id,title,category,entry_date").eq("published", true).order("entry_date", { ascending: false }).limit(4),
         supabase.from("partners").select("id,label,url,description").eq("is_active", true).order("sort_order", { ascending: true }).limit(6),
+        supabase.from("profiles").select("id,display_name,mc_username,avatar_url,created_at").order("created_at", { ascending: false }).limit(8),
         supabase.from("plugins").select("id", { count: "exact", head: true }).eq("published", true),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("posts").select("id", { count: "exact", head: true }),
@@ -82,6 +87,7 @@ const Index = () => {
       setPosts((po.data ?? []) as Post[]);
       setEntries((ch.data ?? []) as Entry[]);
       setPartners((pa.data ?? []) as Partner[]);
+      setMembers((mem.data ?? []) as Member[]);
       setCounts({
         plugins: plCount.count ?? 0,
         members: memCount.count ?? 0,
@@ -266,6 +272,39 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Newest members */}
+        {!loading && members.length > 0 && (
+          <section className="container mt-20 max-w-[1400px]">
+            <SectionHeading eyebrow="Fresh faces" title="NEWEST MEMBERS" to="/users" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {members.map((m) => {
+                const name = m.display_name ?? m.mc_username ?? "Unknown";
+                const skin = m.mc_username
+                  ? `https://mc-heads.net/avatar/${m.mc_username}/96`
+                  : null;
+                return (
+                  <Link
+                    key={m.id}
+                    to={userProfilePath({ id: m.id, display_name: m.display_name, mc_username: m.mc_username })}
+                    className="glass group flex items-center gap-4 rounded-2xl p-5 transition-all hover:-translate-y-1 hover:border-primary/50"
+                  >
+                    <Avatar className="h-12 w-12 ring-2 ring-primary/30">
+                      <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
+                      <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <h3 className="truncate font-semibold">{name}</h3>
+                      <p className="truncate text-xs text-muted-foreground">
+                        Joined {new Date(m.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Partners */}
         {partners.length > 0 && (
