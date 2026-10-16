@@ -13,7 +13,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-type Status = "idle" | "checking" | "required" | "ok";
+type Status = "idle" | "checking" | "required" | "mfa" | "ok";
 
 const okKey = (uid: string) => `cmc_dv_ok_${uid}`;
 
@@ -29,6 +29,8 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
   const checkedFor = useRef<string | null>(null);
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
 
   const runCheck = useCallback(
     async (action: "check" | "resend") => {
@@ -79,23 +81,44 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
     }
     setStatus("checking");
 
-    // Members with 2FA already proved who they are with their code — skip the email check.
+    // Members with 2FA must enter their authenticator code before anything unlocks.
     void (async () => {
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (aal?.currentLevel === "aal2" || aal?.nextLevel === "aal2") {
-        if (aal.currentLevel === "aal2") {
-          sessionStorage.setItem(okKey(uid), "1");
-          setStatus("ok");
-        }
-        // aal1 with 2FA enrolled: the sign-in page asks for the 2FA code first.
-        else setStatus("ok");
+      if (aal?.currentLevel === "aal2") {
+        sessionStorage.setItem(okKey(uid), "1");
+        setStatus("ok");
         return;
+      }
+      if (aal?.nextLevel === "aal2") {
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const f = factors?.totp?.find((x) => x.status === "verified");
+        if (f) {
+          setMfaFactorId(f.id);
+          setStatus("mfa");
+          return;
+        }
       }
       runCheck("check");
     })();
-    return;
-    runCheck("check");
   }, [uid, loading, runCheck]);
+
+  const verifyMfa = async () => {
+    if (!mfaFactorId || mfaCode.length !== 6) return;
+    setSubmitting(true);
+    const { data: challenge, error: cErr } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+    const { error: vErr } = cErr
+      ? { error: cErr }
+      : await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: challenge!.id, code: mfaCode });
+    setSubmitting(false);
+    if (vErr) {
+      toast.error("Incorrect code. Try again.");
+      setMfaCode("");
+      return;
+    }
+    if (uid) sessionStorage.setItem(okKey(uid), "1");
+    toast.success("Welcome back");
+    setStatus("ok");
+  };
 
   const confirm = async () => {
     if (code.length !== 8) return;
@@ -134,6 +157,53 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
     setCode("");
     toast.success("A new code is on its way.");
   };
+
+  if (status === "checking") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (status === "mfa") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-primary/20 bg-card/80 backdrop-blur">
+          <CardHeader className="space-y-3 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <ShieldCheck className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle className="text-xl">Two-factor authentication</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Enter the 6-digit code from your authenticator app to finish signing in.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="flex justify-center">
+              <InputOTP maxLength={6} value={mfaCode} onChange={setMfaCode}>
+                <InputOTPGroup>
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <InputOTPSlot key={i} index={i} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+            <Button className="w-full" onClick={verifyMfa} disabled={submitting || mfaCode.length !== 6}>
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify and sign in"}
+            </Button>
+            <button
+              type="button"
+              onClick={() => supabase.auth.signOut()}
+              className="block w-full text-center text-xs text-muted-foreground hover:text-foreground"
+            >
+              Sign out
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (status !== "required") return <>{children}</>;
 
