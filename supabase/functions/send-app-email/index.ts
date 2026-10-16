@@ -228,7 +228,7 @@ Deno.serve(async (req) => {
       await log('rate_limited', message.slice(0, 500))
       return new Response(
         JSON.stringify({ success: false, reason: 'rate_limited', retryAfterSeconds }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
