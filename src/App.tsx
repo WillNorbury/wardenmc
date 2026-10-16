@@ -15,6 +15,7 @@ import ResetPassword from "./pages/ResetPassword.tsx";
 import OAuthConsent from "./pages/OAuthConsent.tsx";
 import Admin from "./pages/Admin.tsx";
 import Staff from "./pages/Staff.tsx";
+import Users from "./pages/Users.tsx";
 import Discord from "./pages/Discord.tsx";
 import Posts from "./pages/Posts.tsx";
 import PostCompose from "./pages/PostCompose.tsx";
