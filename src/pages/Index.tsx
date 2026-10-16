@@ -10,6 +10,8 @@ import ServerStatusWidget from "@/components/site/ServerStatusWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { partnerSlug } from "@/lib/partnerSlug";
 import { changelogSlug } from "@/lib/changelog-slug";
+import { userProfilePath } from "@/lib/userSlug";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ArrowRight,
   BookOpen,
@@ -37,6 +39,7 @@ type Plugin = { id: string; name: string; slug: string | null; short_id: string;
 type Post = { id: string; content: string; created_at: string };
 type Entry = { id: string; title: string; category: string; entry_date: string };
 type Partner = { id: string; label: string; url: string; description: string | null };
+type Member = { id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null; created_at: string };
 
 const SectionHeading = ({ eyebrow, title, to }: { eyebrow: string; title: string; to: string }) => (
   <div className="mb-6 flex items-end justify-between gap-4">
