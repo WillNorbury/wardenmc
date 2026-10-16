@@ -70,7 +70,8 @@ const Auth = () => {
     (async () => {
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (cancelled) return;
-      if (aal?.currentLevel === "aal1" && aal.nextLevel === "aal2") {
+      const viaOAuth = aal?.currentAuthenticationMethods?.some((m) => m.method === "oauth");
+      if (!viaOAuth && aal?.currentLevel === "aal1" && aal.nextLevel === "aal2") {
         const { data: factors } = await supabase.auth.mfa.listFactors();
         const totp = factors?.totp?.find((f) => f.status === "verified");
         if (totp) {
