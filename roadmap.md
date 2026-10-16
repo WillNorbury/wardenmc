@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add Support page with stored questions, team replies, navigation, sitemap and end-to-end verification.
 - [ ] Send personal theme creator announcement emails — notification attempted; email service rejected all 24 sends.
 - [x] Add personal theme color editor and verify custom theme saving and reset.
 - [x] Add profile theme presets, explicit saving, and unsaved preview reset; verify and announce.
