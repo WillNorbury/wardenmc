@@ -30,6 +30,7 @@ const isLightActive = (t: ThemePref) =>
 
 export const ThemeToggle = ({ className }: { className?: string }) => {
   const [theme, setTheme] = useState<ThemePref>(() => readStored());
+  const { user } = useAuth();
 
   // Re-sync if another tab/page changes preference
   useEffect(() => {
