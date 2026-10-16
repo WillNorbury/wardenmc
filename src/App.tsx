@@ -58,64 +58,66 @@ const Shell = () => {
   // The Admin console has its own navigation sidebar — hide the site sidebar there.
   const hideSidebar = pathname.startsWith("/admin");
   return (
-  <MaintenanceGate>
-    <SidebarProvider>
-      <div className="flex min-h-svh w-full">
-        {!hideSidebar && <AppSidebar />}
-        <div className="flex min-h-svh w-full min-w-0 flex-1 flex-col">
-          <VersionChecker />
-          <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+    <MaintenanceGate>
+      <SidebarProvider>
+        <div className="flex min-h-svh w-full">
+          {!hideSidebar && <AppSidebar />}
+          <div className="flex min-h-svh w-full min-w-0 flex-1 flex-col">
+            <VersionChecker />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
 
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/*" element={<AdminTabRedirect />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/*" element={<AdminTabRedirect />} />
 
-        <Route path="/staff" element={<Staff />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/discord" element={<Discord />} />
-        <Route path="/posts" element={<Posts />} />
-        <Route path="/post" element={<PostCompose />} />
-        <Route path="/rules" element={<Rules />} />
-        <Route path="/faq" element={<Faq />} />
+              <Route path="/staff" element={<Staff />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/members" element={<Users />} />
+              <Route path="/discord" element={<Discord />} />
+              <Route path="/server" element={<Discord />} />
+              <Route path="/posts" element={<Posts />} />
+              <Route path="/post" element={<PostCompose />} />
+              <Route path="/rules" element={<Rules />} />
+              <Route path="/faq" element={<Faq />} />
 
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/user/:slug" element={<UserProfile />} />
-        <Route path="/user/:slug/:tab" element={<UserProfile />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/user/:slug" element={<UserProfile />} />
+              <Route path="/user/:slug/:tab" element={<UserProfile />} />
 
-        <Route path="/plugins" element={<Plugins />} />
-        <Route path="/plugins/categories" element={<PluginCategories />} />
-        <Route path="/plugins/developers" element={<PluginDevelopers />} />
-        <Route path="/plugin/:slug" element={<PluginDetail />} />
-        <Route path="/plugins/:slug" element={<PluginDetail />} />
-        <Route path="/plugin/:slug/settings" element={<PluginSettings />} />
-        <Route path="/plugins/:slug/settings" element={<PluginSettings />} />
+              <Route path="/plugins" element={<Plugins />} />
+              <Route path="/plugins/categories" element={<PluginCategories />} />
+              <Route path="/plugins/developers" element={<PluginDevelopers />} />
+              <Route path="/plugin/:slug" element={<PluginDetail />} />
+              <Route path="/plugins/:slug" element={<PluginDetail />} />
+              <Route path="/plugin/:slug/settings" element={<PluginSettings />} />
+              <Route path="/plugins/:slug/settings" element={<PluginSettings />} />
 
-        <Route path="/apply" element={<Apply />} />
-        <Route path="/apply/:slug" element={<Apply />} />
-        <Route path="/applications" element={<ApplicationStatus />} />
-        <Route path="/applications/:id" element={<ApplicationStatus />} />
+              <Route path="/apply" element={<Apply />} />
+              <Route path="/apply/:slug" element={<Apply />} />
+              <Route path="/applications" element={<ApplicationStatus />} />
+              <Route path="/applications/:id" element={<ApplicationStatus />} />
 
-        <Route path="/partners" element={<Partners />} />
-        <Route path="/partners/:slug" element={<PartnerDetail />} />
+              <Route path="/partners" element={<Partners />} />
+              <Route path="/partners/:slug" element={<PartnerDetail />} />
 
-        <Route path="/changelog" element={<Changelog />} />
-        <Route path="/search" element={<Search />} />
+              <Route path="/changelog" element={<Changelog />} />
+              <Route path="/search" element={<Search />} />
 
-        <Route path="/status" element={<Status />} />
-        <Route path="/status/unsubscribe" element={<StatusUnsubscribe />} />
-        <Route path="/status/:number" element={<StatusIncident />} />
-        <Route path="/gamemodes" element={<GameModes />} />
-        <Route path="/gamemodes/:slug" element={<GameModeDetail />} />
+              <Route path="/status" element={<Status />} />
+              <Route path="/status/unsubscribe" element={<StatusUnsubscribe />} />
+              <Route path="/status/:number" element={<StatusIncident />} />
+              <Route path="/gamemodes" element={<GameModes />} />
+              <Route path="/gamemodes/:slug" element={<GameModeDetail />} />
 
-        <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
-  </MaintenanceGate>
+      </SidebarProvider>
+    </MaintenanceGate>
   );
 };
 
