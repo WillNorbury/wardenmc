@@ -66,6 +66,7 @@ const communityGroup: NavGroup = {
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/changelog", label: "Changelog", icon: FileText },
+    { to: "/status", label: "Status", icon: Activity },
     { to: "/faq", label: "FAQ", icon: HelpCircle },
   ],
 };
