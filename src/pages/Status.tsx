@@ -450,7 +450,7 @@ const Status = () => {
       <Navbar />
 
       {/* Top ticker */}
-      <div className="border-y border-border bg-background font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+      <div className="mt-[76px] sm:mt-16 border-y border-border bg-background font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
         <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-2 flex flex-wrap items-center gap-x-6 gap-y-1">
           <span className="flex items-center gap-2">
             <span
