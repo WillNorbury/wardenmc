@@ -20,7 +20,6 @@ const SERVICE_NAMES: Record<string, string> = {
   api: "API",
   panel: "Panel",
   discord: "Discord",
-  portfolio: "Portfolio",
 };
 
 const SERVICE_ENDPOINTS: Record<string, string> = {
