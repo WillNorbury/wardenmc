@@ -273,6 +273,39 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Newest members */}
+        {!loading && members.length > 0 && (
+          <section className="container mt-20 max-w-[1400px]">
+            <SectionHeading eyebrow="Fresh faces" title="NEWEST MEMBERS" to="/users" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {members.map((m) => {
+                const name = m.display_name ?? m.mc_username ?? "Unknown";
+                const skin = m.mc_username
+                  ? `https://mc-heads.net/avatar/${m.mc_username}/96`
+                  : null;
+                return (
+                  <Link
+                    key={m.id}
+                    to={userProfilePath({ id: m.id, display_name: m.display_name, mc_username: m.mc_username })}
+                    className="glass group flex items-center gap-4 rounded-2xl p-5 transition-all hover:-translate-y-1 hover:border-primary/50"
+                  >
+                    <Avatar className="h-12 w-12 ring-2 ring-primary/30">
+                      <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
+                      <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <h3 className="truncate font-semibold">{name}</h3>
+                      <p className="truncate text-xs text-muted-foreground">
+                        Joined {new Date(m.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* Partners */}
         {partners.length > 0 && (
           <section className="container mt-20 max-w-[1400px]">
