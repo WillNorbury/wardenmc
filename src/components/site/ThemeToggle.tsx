@@ -52,6 +52,7 @@ export const ThemeToggle = ({ className }: { className?: string }) => {
     const next: ThemePref = light ? "dark" : "light";
     setTheme(next);
     applyTheme(next);
+    if (user) persistTheme(next);
   };
 
   return (
