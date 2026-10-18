@@ -1,6 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { STATUS_URL } from '../_shared/site-urls.ts'
-import { syncStatusPanels } from '../_shared/discord-status.ts'
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -275,28 +274,6 @@ Deno.serve(async (req) => {
   const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-  // Preserve the existing scheduled secret while preventing public callers
-  // from triggering writes to Discord channels.
-  const cronSecret = req.headers.get("x-cron-secret");
-  let authorized = false;
-  if (cronSecret) {
-    const { data } = await supabase.from("site_content").select("value").eq("key", "cron_secret").maybeSingle();
-    const expected = (data?.value as Record<string, unknown> | null)?.value;
-    authorized = typeof expected === "string" && expected.length > 0 && cronSecret === expected;
-  } else {
-    const bearer = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
-    if (bearer) {
-      const { data } = await supabase.auth.getUser(bearer);
-      if (data.user) {
-        const { data: role } = await supabase.from("user_roles").select("role").eq("user_id", data.user.id).in("role", ["admin", "owner", "star", "founder"]).limit(1).maybeSingle();
-        authorized = !!role;
-      }
-    }
-  }
-  if (!authorized) return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
-    status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-
   // Load alert settings
   const { data: alertSettings } = await supabase
     .from("alert_settings")
@@ -356,9 +333,6 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-
-  try { await syncStatusPanels(supabase); }
-  catch { console.warn("Discord status panel refresh failed; will retry next check"); }
 
   // Compute uptime window (last 24h) for each service
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
