@@ -14,6 +14,7 @@ import { Plus, Trash2, Save, RefreshCw, Hash, MessageSquare, Terminal } from "lu
 const COMMANDS_KEY = "discord_commands";
 const CHANNELS_KEY = "discord_channels";
 const TEMPLATES_KEY = "discord_templates";
+const PRESENCE_KEY = "discord_presence_texts";
 
 type CommandKind = "builtin" | "text";
 type BotCommand = {
@@ -62,13 +63,14 @@ export const DiscordConfigSection = () => {
   const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
   const [botToken, setBotToken] = useState("");
   const [botTokenSet, setBotTokenSet] = useState(false);
+  const [presenceTexts, setPresenceTexts] = useState("");
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase
         .from("site_content")
         .select("key, value")
-        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY]);
+        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY, PRESENCE_KEY]);
       const byKey: Record<string, any> = {};
       (data ?? []).forEach((r: any) => (byKey[r.key] = r.value));
 
@@ -118,6 +120,11 @@ export const DiscordConfigSection = () => {
           if (!merged.some((t) => t.key === d.key)) merged.push(d);
         });
         setTemplates(merged);
+      }
+
+      const savedPresence = byKey[PRESENCE_KEY]?.texts;
+      if (Array.isArray(savedPresence) && savedPresence.length) {
+        setPresenceTexts(savedPresence.filter((t: any) => typeof t === "string").join("\n"));
       }
 
       setLoading(false);
@@ -191,6 +198,22 @@ export const DiscordConfigSection = () => {
     persist(TEMPLATES_KEY, { entries: clean }, "Templates");
   };
 
+  const savePresenceTexts = () => {
+    const lines = presenceTexts
+      .split("\n")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+    if (lines.some((t) => t.length > 128)) {
+      toast.error("Each status line must be 128 characters or fewer");
+      return;
+    }
+    if (lines.length > 10) {
+      toast.error("Keep it to 10 status lines or fewer");
+      return;
+    }
+    persist(PRESENCE_KEY, { texts: lines }, "Bot status lines");
+  };
+
   const syncCommands = async () => {
     setSyncing(true);
     const { data, error } = await supabase.functions.invoke("discord-register-commands", { body: {} });
@@ -243,6 +266,9 @@ export const DiscordConfigSection = () => {
         </TabsTrigger>
         <TabsTrigger value="templates" className="gap-2">
           <MessageSquare className="h-4 w-4" /> Templates
+        </TabsTrigger>
+        <TabsTrigger value="status" className="gap-2">
+          <RefreshCw className="h-4 w-4" /> Bot status
         </TabsTrigger>
       </TabsList>
 
@@ -493,6 +519,33 @@ export const DiscordConfigSection = () => {
           >
             <Plus className="h-4 w-4 mr-2" /> Add template
           </Button>
+        </Card>
+      </TabsContent>
+
+      {/* ---------------- Bot status ---------------- */}
+      <TabsContent value="status" className="space-y-4">
+        <Card className="p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-bold">Rotating status lines</h2>
+              <p className="text-sm text-muted-foreground">
+                One line per row — the bot shows the next line each minute under its name in the member
+                list. Leave empty to use the default "🛡️ Protecting warden.rip | /help".
+              </p>
+            </div>
+            <Button onClick={savePresenceTexts} disabled={saving === PRESENCE_KEY}>
+              <Save className="h-4 w-4 mr-2" /> Save
+            </Button>
+          </div>
+          <Textarea
+            rows={6}
+            value={presenceTexts}
+            onChange={(e) => setPresenceTexts(e.target.value)}
+            placeholder={"🛡️ Protecting warden.rip | /help\n🎮 play.warden.rip\n💬 discord.warden.rip"}
+          />
+          <p className="text-xs text-muted-foreground">
+            Up to 10 lines, 128 characters each. Changes take effect within a minute.
+          </p>
         </Card>
       </TabsContent>
       </Tabs>

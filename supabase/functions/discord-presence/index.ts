@@ -9,6 +9,12 @@ import { createClient } from 'npm:@supabase/supabase-js@2.108.2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { getDiscordBotToken } from '../_shared/discord-token.ts'
 import { syncStatusPanels } from '../_shared/discord-status.ts'
+import {
+  DEFAULT_PRESENCE_TEXTS,
+  PRESENCE_TEXTS_KEY,
+  normalizePresenceTexts,
+  pickPresenceText,
+} from '../_shared/discord-presence-texts.ts'
 
 const GATEWAY_URL = 'wss://gateway.discord.gg/?v=10&encoding=json'
 const INTENTS = 1 << 0 // GUILDS — enough to set presence
@@ -17,7 +23,8 @@ const MIN_HOLD_MS = 3000
 const MAX_HOLD_MS = 55000
 
 // Shown under the bot's name in the member list, like other bots' status lines.
-export const PRESENCE_TEXT = '🛡️ Protecting warden.rip | /help'
+// Admins can save several lines; the keepalive rotates one per minute.
+export const PRESENCE_TEXT = DEFAULT_PRESENCE_TEXTS[0]
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -27,7 +34,7 @@ const json = (body: unknown, status = 200) =>
 
 // Opens the gateway session, announces presence, heartbeats, and keeps
 // the socket open for `holdMs`. Resolves true if presence was announced.
-async function holdPresence(token: string, holdMs: number): Promise<boolean> {
+async function holdPresence(token: string, holdMs: number, presenceText: string): Promise<boolean> {
   return await new Promise((resolve) => {
     const ws = new WebSocket(GATEWAY_URL)
     let seq: number | null = null
@@ -75,7 +82,7 @@ async function holdPresence(token: string, holdMs: number): Promise<boolean> {
               status: 'online',
               since: null,
               afk: false,
-              activities: [{ name: 'Custom Status', type: 4, state: PRESENCE_TEXT }],
+              activities: [{ name: 'Custom Status', type: 4, state: presenceText }],
             },
           },
         }))
@@ -158,11 +165,23 @@ Deno.serve(async (req) => {
       if (Number.isFinite(n)) holdMs = Math.min(Math.max(Math.round(n), MIN_HOLD_MS), MAX_HOLD_MS)
     } catch { /* no body — use default hold */ }
 
-    const announced = await holdPresence(botToken, holdMs)
+    // Rotating status lines saved by admins; falls back to the default line.
+    let presenceTexts: string[] = []
+    try {
+      const { data: presenceSetting } = await admin
+        .from('site_content')
+        .select('value')
+        .eq('key', PRESENCE_TEXTS_KEY)
+        .maybeSingle()
+      presenceTexts = normalizePresenceTexts(presenceSetting?.value)
+    } catch { /* keep default */ }
+    const presenceText = pickPresenceText(presenceTexts, Date.now())
+
+    const announced = await holdPresence(botToken, holdMs, presenceText)
     if (!announced) {
       return json({ ok: false, error: 'Discord gateway session was not established' }, 502)
     }
-    return json({ ok: true, presence: PRESENCE_TEXT, heldMs: holdMs })
+    return json({ ok: true, presence: presenceText, heldMs: holdMs })
   } catch (e) {
     return json({ ok: false, error: e instanceof Error ? e.message : String(e) }, 500)
   }
