@@ -267,6 +267,9 @@ export const DiscordConfigSection = () => {
         <TabsTrigger value="templates" className="gap-2">
           <MessageSquare className="h-4 w-4" /> Templates
         </TabsTrigger>
+        <TabsTrigger value="status" className="gap-2">
+          <RefreshCw className="h-4 w-4" /> Bot status
+        </TabsTrigger>
       </TabsList>
 
       {/* ---------------- Commands ---------------- */}
@@ -516,6 +519,33 @@ export const DiscordConfigSection = () => {
           >
             <Plus className="h-4 w-4 mr-2" /> Add template
           </Button>
+        </Card>
+      </TabsContent>
+
+      {/* ---------------- Bot status ---------------- */}
+      <TabsContent value="status" className="space-y-4">
+        <Card className="p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-bold">Rotating status lines</h2>
+              <p className="text-sm text-muted-foreground">
+                One line per row — the bot shows the next line each minute under its name in the member
+                list. Leave empty to use the default "🛡️ Protecting warden.rip | /help".
+              </p>
+            </div>
+            <Button onClick={savePresenceTexts} disabled={saving === PRESENCE_KEY}>
+              <Save className="h-4 w-4 mr-2" /> Save
+            </Button>
+          </div>
+          <Textarea
+            rows={6}
+            value={presenceTexts}
+            onChange={(e) => setPresenceTexts(e.target.value)}
+            placeholder={"🛡️ Protecting warden.rip | /help\n🎮 play.warden.rip\n💬 discord.warden.rip"}
+          />
+          <p className="text-xs text-muted-foreground">
+            Up to 10 lines, 128 characters each. Changes take effect within a minute.
+          </p>
         </Card>
       </TabsContent>
       </Tabs>
