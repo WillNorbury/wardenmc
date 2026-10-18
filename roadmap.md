@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Add and register /status setup with live channel panels, permission checks, and tests.
+- [x] Add and register /status setup; real Discord create/read/repeat/refresh verified and temporary channel removed.
+- [ ] Send Discord status setup announcement emails — blocked by missing staff session; published entry is ready for Send in Admin → Changelog.
 - [x] Add Support page with stored questions, team replies, navigation, sitemap and end-to-end verification; owner notification send confirmed and test entries removed.
 - [ ] Send personal theme creator announcement emails — notification attempted; email service rejected all 24 sends.
 - [x] Add personal theme color editor and verify custom theme saving and reset.
