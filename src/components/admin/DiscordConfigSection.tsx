@@ -14,6 +14,7 @@ import { Plus, Trash2, Save, RefreshCw, Hash, MessageSquare, Terminal } from "lu
 const COMMANDS_KEY = "discord_commands";
 const CHANNELS_KEY = "discord_channels";
 const TEMPLATES_KEY = "discord_templates";
+const PRESENCE_KEY = "discord_presence_texts";
 
 type CommandKind = "builtin" | "text";
 type BotCommand = {
@@ -62,13 +63,14 @@ export const DiscordConfigSection = () => {
   const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
   const [botToken, setBotToken] = useState("");
   const [botTokenSet, setBotTokenSet] = useState(false);
+  const [presenceTexts, setPresenceTexts] = useState("");
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase
         .from("site_content")
         .select("key, value")
-        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY]);
+        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY, PRESENCE_KEY]);
       const byKey: Record<string, any> = {};
       (data ?? []).forEach((r: any) => (byKey[r.key] = r.value));
 
