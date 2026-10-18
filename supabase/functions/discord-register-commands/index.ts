@@ -3,6 +3,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { getDiscordBotToken } from "../_shared/discord-token.ts";
 import { moderationRegistrations } from "../_shared/moderation-commands.ts";
+import { statusRegistration } from "../_shared/discord-status-model.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -50,7 +51,7 @@ Deno.serve(async (req) => {
       { name: "unsubscribe", description: "Unsubscribe from email notifications from Warden Network", type: 1 },
     ];
     const modNames = new Set(moderationRegistrations().map((m) => m.name));
-    const allCmds = [...cmds.filter((c) => !modNames.has(c.name)), ...moderationRegistrations()];
+    const allCmds = [...cmds.filter((c) => !modNames.has(c.name) && c.name !== "status"), ...moderationRegistrations(), statusRegistration];
     const r = await fetch(`https://discord.com/api/v10/applications/${appId}/commands`, {
       method: "PUT",
       headers: { Authorization: `Bot ${token}`, "Content-Type": "application/json" },

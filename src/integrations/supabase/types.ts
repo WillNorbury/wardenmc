@@ -656,6 +656,30 @@ export type Database = {
         }
         Relationships: []
       }
+      discord_status_panels: {
+        Row: {
+          channel_id: string
+          configured_by: string
+          guild_id: string
+          message_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel_id: string
+          configured_by: string
+          guild_id: string
+          message_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel_id?: string
+          configured_by?: string
+          guild_id?: string
+          message_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discover_items: {
         Row: {
           author: string | null

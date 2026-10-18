@@ -8,6 +8,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.108.2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { getDiscordBotToken } from '../_shared/discord-token.ts'
+import { syncStatusPanels } from '../_shared/discord-status.ts'
 
 const GATEWAY_URL = 'wss://gateway.discord.gg/?v=10&encoding=json'
 const INTENTS = 1 << 0 // GUILDS — enough to set presence
@@ -145,6 +146,10 @@ Deno.serve(async (req) => {
 
     const botToken = await getDiscordBotToken()
     if (!botToken) return json({ ok: false, error: 'Bot token is not configured' }, 500)
+
+    // Reuse the authenticated existing keepalive; no new polling schedule.
+    try { await syncStatusPanels(admin) }
+    catch { console.warn('Status panels could not refresh; will retry next keepalive') }
 
     let holdMs = DEFAULT_HOLD_MS
     try {
