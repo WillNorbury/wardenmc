@@ -54,16 +54,20 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const [presenceRes, incidentsRes, minecraft] = await Promise.all([
+    const [presenceRes, serverRes, incidentsRes] = await Promise.all([
       admin.from("site_content").select("value").eq("key", "wardenbot_presence").maybeSingle(),
+      admin.from("site_content").select("value").eq("key", "server").maybeSingle(),
       admin
         .from("status_incidents")
         .select("id, incident_number, service_key, opened_at, last_error")
         .is("closed_at", null)
         .order("opened_at", { ascending: false })
         .limit(10),
-      fetchMinecraft(),
     ]);
+
+    const serverValue = (serverRes.data?.value ?? null) as { ip?: string } | null;
+    const mcAddress = typeof serverValue?.ip === "string" && serverValue.ip ? serverValue.ip : DEFAULT_MC_ADDRESS;
+    const minecraft = await fetchMinecraft(mcAddress);
 
     const presence = (presenceRes.data?.value ?? null) as { at?: string; text?: string } | null;
     const lastSeenAt = typeof presence?.at === "string" ? presence.at : null;
