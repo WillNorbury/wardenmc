@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     const appId = Deno.env.get("DISCORD_APPLICATION_ID") ?? me.id;
     // ViewChannel, SendMessages, EmbedLinks, ReadHistory, ManageMessages,
     // Kick, Ban, ManageNicknames, ManageRoles, Mute, Deafen, Move, Moderate
-    const permissions = "1099511986262";
+    const permissions = "1099943734278";
     const inviteUrl =
       `https://discord.com/oauth2/authorize?client_id=${appId}&scope=bot%20applications.commands&permissions=${permissions}`;
 
