@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add and register /status setup with live channel panels, permission checks, and tests.
 - [x] Add Support page with stored questions, team replies, navigation, sitemap and end-to-end verification; owner notification send confirmed and test entries removed.
 - [ ] Send personal theme creator announcement emails — notification attempted; email service rejected all 24 sends.
 - [x] Add personal theme color editor and verify custom theme saving and reset.
