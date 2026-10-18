@@ -122,6 +122,11 @@ export const DiscordConfigSection = () => {
         setTemplates(merged);
       }
 
+      const savedPresence = byKey[PRESENCE_KEY]?.texts;
+      if (Array.isArray(savedPresence) && savedPresence.length) {
+        setPresenceTexts(savedPresence.filter((t: any) => typeof t === "string").join("\n"));
+      }
+
       setLoading(false);
     })();
   }, []);
@@ -191,6 +196,22 @@ export const DiscordConfigSection = () => {
       .filter((t) => t.key && t.label);
     setTemplates(clean);
     persist(TEMPLATES_KEY, { entries: clean }, "Templates");
+  };
+
+  const savePresenceTexts = () => {
+    const lines = presenceTexts
+      .split("\n")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+    if (lines.some((t) => t.length > 128)) {
+      toast.error("Each status line must be 128 characters or fewer");
+      return;
+    }
+    if (lines.length > 10) {
+      toast.error("Keep it to 10 status lines or fewer");
+      return;
+    }
+    persist(PRESENCE_KEY, { texts: lines }, "Bot status lines");
   };
 
   const syncCommands = async () => {
