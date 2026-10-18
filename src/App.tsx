@@ -18,6 +18,7 @@ import Staff from "./pages/Staff.tsx";
 import Users from "./pages/Users.tsx";
 import Discord from "./pages/Discord.tsx";
 import Bot from "./pages/Bot.tsx";
+import BotStatus from "./pages/BotStatus.tsx";
 import Posts from "./pages/Posts.tsx";
 import PostCompose from "./pages/PostCompose.tsx";
 import Rules from "./pages/Rules.tsx";
@@ -80,6 +81,7 @@ const Shell = () => {
               <Route path="/members" element={<Users />} />
               <Route path="/discord" element={<Discord />} />
               <Route path="/bot" element={<Bot />} />
+              <Route path="/bot/status" element={<BotStatus />} />
               <Route path="/server" element={<Discord />} />
               <Route path="/posts" element={<Posts />} />
               <Route path="/post" element={<PostCompose />} />
