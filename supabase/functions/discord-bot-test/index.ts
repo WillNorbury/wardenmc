@@ -67,11 +67,21 @@ Deno.serve(async (req) => {
       else guildError = `Bot is not in guild ${guildId} (${gRes.status})`;
     }
 
+    // Invite link works for any server — no guild ID needed. Uses the
+    // application ID when set, otherwise the bot's own user ID.
+    const appId = Deno.env.get("DISCORD_APPLICATION_ID") ?? me.id;
+    // ViewChannel, SendMessages, EmbedLinks, ReadHistory, ManageMessages,
+    // Kick, Ban, ManageNicknames, ManageRoles, Mute, Deafen, Move, Moderate
+    const permissions = "1099943734278";
+    const inviteUrl =
+      `https://discord.com/oauth2/authorize?client_id=${appId}&scope=bot%20applications.commands&permissions=${permissions}`;
+
     return new Response(JSON.stringify({
       ok: true,
       bot: { id: me.id, username: me.username, discriminator: me.discriminator, avatar: me.avatar },
       guild,
       guildError,
+      inviteUrl,
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ ok: false, error: (e as Error).message }), {
