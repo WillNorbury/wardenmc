@@ -34,7 +34,7 @@ const json = (body: unknown, status = 200) =>
 
 // Opens the gateway session, announces presence, heartbeats, and keeps
 // the socket open for `holdMs`. Resolves true if presence was announced.
-async function holdPresence(token: string, holdMs: number): Promise<boolean> {
+async function holdPresence(token: string, holdMs: number, presenceText: string): Promise<boolean> {
   return await new Promise((resolve) => {
     const ws = new WebSocket(GATEWAY_URL)
     let seq: number | null = null
@@ -82,7 +82,7 @@ async function holdPresence(token: string, holdMs: number): Promise<boolean> {
               status: 'online',
               since: null,
               afk: false,
-              activities: [{ name: 'Custom Status', type: 4, state: PRESENCE_TEXT }],
+              activities: [{ name: 'Custom Status', type: 4, state: presenceText }],
             },
           },
         }))
