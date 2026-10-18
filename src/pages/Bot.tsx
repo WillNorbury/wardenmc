@@ -77,12 +77,19 @@ const Bot = () => {
               everyone.
             </p>
             {invite.status === "ready" && (
-              <Button asChild size="lg" className="mt-8 rounded-full px-8 text-base glow">
-                <a href={invite.inviteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
-                  <BotIcon className="mr-2 h-5 w-5" /> Add to Discord
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Button asChild size="lg" className="rounded-full px-8 text-base glow">
+                  <a href={invite.inviteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
+                    <BotIcon className="mr-2 h-5 w-5" /> Add to Discord
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
+                  <Link to="/bot/status" className="inline-flex items-center">
+                    <Activity className="mr-2 h-5 w-5" /> Live status
+                  </Link>
+                </Button>
+              </div>
             )}
             {invite.status === "ready" && (
               <div className="mt-3 flex items-center justify-center gap-3 text-sm text-muted-foreground">
