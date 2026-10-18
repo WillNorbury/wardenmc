@@ -32,6 +32,7 @@ import {
   LogIn,
   Activity,
   Headset,
+  Bot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
