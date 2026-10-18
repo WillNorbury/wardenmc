@@ -13,7 +13,7 @@ const json = (body: unknown, status = 200) =>
 
 // The presence keepalive runs every minute; allow a small grace window.
 const ONLINE_GRACE_MS = 3 * 60 * 1000;
-const MC_SERVER_ADDRESS = "mc.warden.rip";
+const DEFAULT_MC_ADDRESS = "warden.rip";
 
 type MinecraftStatus = {
   online: boolean;
@@ -23,9 +23,9 @@ type MinecraftStatus = {
   motd: string | null;
 };
 
-async function fetchMinecraft(): Promise<MinecraftStatus> {
+async function fetchMinecraft(address: string): Promise<MinecraftStatus> {
   try {
-    const res = await fetch(`https://api.mcsrvstat.us/3/${encodeURIComponent(MC_SERVER_ADDRESS)}`, {
+    const res = await fetch(`https://api.mcsrvstat.us/3/${encodeURIComponent(address)}`, {
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) throw new Error(`mcsrvstat ${res.status}`);
