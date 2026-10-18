@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     const modReply = await handleModeration(body);
     if (modReply !== null) {
       // Record moderation actions so they show on the Admin dashboard.
-      if (!isFunCommand(body.data?.name)) try {
+      if (!isFunCommand(body.data?.name) && body.data?.name !== "help") try {
         const opts = Object.fromEntries((body.data?.options ?? []).map((x: any) => [x.name, x.value]));
         const failed = /^[⛔⚠❌]/.test(modReply);
         await createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!)
@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
             response: { reply: modReply.slice(0, 300) },
           });
       } catch (e) { console.warn("mod log failed", e); }
-      const pub = !/^[⛔⚠❌]|^Nothing/.test(modReply);
+      const pub = !/^[⛔⚠❌]|^Nothing/.test(modReply) && body.data?.name !== "help";
       return say(modReply, !pub);
     }
 
