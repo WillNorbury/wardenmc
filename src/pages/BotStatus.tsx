@@ -26,6 +26,7 @@ type BotStatusData = {
     playersMax: number | null;
     version: string | null;
     motd: string | null;
+    address?: string;
   };
   incidents: {
     id: string;

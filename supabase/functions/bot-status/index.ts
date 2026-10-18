@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         statusText: typeof presence?.text === "string" ? presence.text : null,
         lastSeenAt,
       },
-      minecraft,
+      minecraft: { ...minecraft, address: mcAddress },
       incidents: incidentsRes.data ?? [],
       checkedAt: new Date().toISOString(),
     });
