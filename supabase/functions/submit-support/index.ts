@@ -6,7 +6,7 @@ import { sendTemplateEmail } from '../_shared/transactional-email-templates/send
 const schema = z.object({
   subject: z.string().trim().min(3).max(150),
   category: z.enum(['General question', 'Server help', 'Account help', 'Plugin help', 'Bug report']),
-  body: z.string().trim().min(1).max(5000),
+  body: z.string().trim().min(5).max(4000),
 }).strict()
 const respond = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     const { data: { user }, error: authError } = await client.auth.getUser()
     if (authError || !user) return respond({ error: 'Please sign in to send a question.' }, 401)
     const parsed = schema.safeParse(await req.json())
-    if (!parsed.success) return respond({ error: 'Please check your subject, category and message.' }, 400)
+    if (!parsed.success) return respond({ error: parsed.error.issues[0]?.message ?? 'Please check your subject, category and message.' }, 400)
     const { data: ticket, error } = await client.from('support_tickets').insert({ ...parsed.data, user_id: user.id }).select('id').single()
     if (error) return respond({ error: error.message.includes('Too many') ? 'Too many questions. Please try again later.' : 'Your question could not be saved. Please try again.' }, error.message.includes('Too many') ? 429 : 400)
     let notified = false
