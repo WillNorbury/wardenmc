@@ -227,7 +227,7 @@ const BotStatus = () => {
                       {data.minecraft.playersOnline ?? 0}
                       {data.minecraft.playersMax != null && ` / ${data.minecraft.playersMax}`}
                     </span>
-                    <span>players on mc.warden.rip</span>
+                    <span>players on {data.minecraft.address ?? "warden.rip"}</span>
                   </div>
                   {data.minecraft.version && (
                     <p className="mt-1 text-sm text-muted-foreground">
