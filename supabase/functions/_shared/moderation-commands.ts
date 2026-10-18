@@ -41,7 +41,23 @@ export const MODERATION_COMMANDS = [
   { name: "avatar", description: "Show someone's avatar", perm: P.NONE, category: "fun", options: [opt(USER, "user", "Member (default: you)")] },
   { name: "hug", description: "Give someone a hug", perm: P.NONE, category: "fun", options: [opt(USER, "user", "Who to hug", true)] },
   { name: "joke", description: "Hear a Minecraft joke", perm: P.NONE, category: "fun", options: [] },
+  { name: "help", description: "See all the commands you can use", perm: P.NONE, category: "help", options: [] },
 ] as { name: string; description: string; perm: bigint; category?: string; options: any[] }[];
+
+const helpReply = () => {
+  const fun = MODERATION_COMMANDS.filter((c) => c.perm === 0n && c.name !== "help")
+    .map((c) => `\`/${c.name}\` — ${c.description}`);
+  return [
+    "🛡️ **WardenBot — commands everyone can use**",
+    "",
+    ...fun,
+    "`/rules` — Show the Warden Network server rules",
+    "`/subscribe` — Get website email updates",
+    "`/unsubscribe` — Stop website email updates",
+    "",
+    "_Moderation and voice commands are for staff only._ Questions? DM **will_norbury** or visit https://warden.rip/bot",
+  ].join("\n");
+};
 
 export const isFunCommand = (name?: string) => MODERATION_COMMANDS.some((c) => c.name === name && c.category === "fun");
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
