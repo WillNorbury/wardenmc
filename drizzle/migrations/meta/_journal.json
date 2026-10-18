@@ -50,6 +50,13 @@
       "when": 1792356184553,
       "tag": "0006_discord_status_panels",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792356479480,
+      "tag": "0007_discord_status_server_address",
+      "breakpoints": true
     }
   ]
 }

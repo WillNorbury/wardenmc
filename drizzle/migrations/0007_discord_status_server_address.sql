@@ -1,0 +1,2 @@
+ALTER TABLE public.discord_status_panels ADD COLUMN server_address text;
+COMMENT ON COLUMN public.discord_status_panels.server_address IS 'Validated Minecraft hostname or IPv4 with optional port; NULL preserves legacy website service panels.';
