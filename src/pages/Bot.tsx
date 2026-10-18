@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot as BotIcon, ExternalLink, Globe, Gavel, Mic, PartyPopper, Copy, Check, Loader2, Users } from "lucide-react";
+import { Activity, Bot as BotIcon, ExternalLink, Globe, Gavel, Mic, PartyPopper, Copy, Check, Loader2, Users } from "lucide-react";
 import DiscordMark from "@/components/site/DiscordMark";
 
 type InviteState =
