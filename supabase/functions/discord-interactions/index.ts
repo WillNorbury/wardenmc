@@ -5,6 +5,8 @@ import nacl from "https://esm.sh/tweetnacl@1.0.3";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { buildRulesEmbed as formatRulesEmbed } from "../_shared/rules-embed.ts";
 import { handleModeration, isFunCommand } from "../_shared/moderation-commands.ts";
+import { completeStatusInteraction } from "../_shared/discord-status.ts";
+import { canSetupStatus, statusSetupInput } from "../_shared/discord-status-model.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -51,7 +53,8 @@ Deno.serve(async (req) => {
   const raw = await req.text();
   if (!(await verify(req, raw))) return new Response("invalid request signature", { status: 401 });
 
-  const body = JSON.parse(raw);
+  let body: any;
+  try { body = JSON.parse(raw); } catch { return new Response("Invalid JSON", { status: 400 }); }
   if (body.type === InteractionType.PING) {
     return new Response(JSON.stringify({ type: InteractionResponseType.PONG }), {
       headers: { "Content-Type": "application/json" },
@@ -60,6 +63,17 @@ Deno.serve(async (req) => {
 
   if (body.type === InteractionType.APPLICATION_COMMAND) {
     const name = body.data?.name;
+
+    if (name === "status") {
+      const valid = statusSetupInput(body);
+      const allowed = canSetupStatus(body.member?.permissions);
+      if (!valid || !allowed) return new Response(JSON.stringify({ type: 4, data: {
+        content: !valid ? "⚠️ Use /status setup in a server text channel." : "⛔ You need Manage Server permission to set up a status panel.", flags: 64,
+      } }), { headers: { "Content-Type": "application/json" } });
+      // Acknowledge before doing network work: Discord requires a reply within 3 seconds.
+      EdgeRuntime.waitUntil(completeStatusInteraction(body));
+      return new Response(JSON.stringify({ type: 5, data: { flags: 64 } }), { headers: { "Content-Type": "application/json" } });
+    }
 
     // Admin-configured commands (site_content -> discord_commands)
     const cfgClient = createClient(

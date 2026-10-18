@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { STATUS_URL } from '../_shared/site-urls.ts'
+import { syncStatusPanels } from '../_shared/discord-status.ts'
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -528,6 +529,9 @@ Deno.serve(async (req) => {
       }
     }
   }
+
+  try { await syncStatusPanels(supabase); }
+  catch { console.warn("Discord status panel refresh failed; will retry next check"); }
 
   return new Response(JSON.stringify({ ok: true, checks, alerts }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
