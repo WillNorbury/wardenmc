@@ -181,6 +181,15 @@ Deno.serve(async (req) => {
     if (!announced) {
       return json({ ok: false, error: 'Discord gateway session was not established' }, 502)
     }
+    // Record a heartbeat so the public /bot/status page can show live presence.
+    try {
+      await admin
+        .from('site_content')
+        .upsert(
+          { key: 'wardenbot_presence', value: { at: new Date().toISOString(), text: presenceText } },
+          { onConflict: 'key' },
+        )
+    } catch { /* heartbeat is best-effort */ }
     return json({ ok: true, presence: presenceText, heldMs: holdMs })
   } catch (e) {
     return json({ ok: false, error: e instanceof Error ? e.message : String(e) }, 500)
