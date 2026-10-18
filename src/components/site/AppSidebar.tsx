@@ -32,6 +32,7 @@ import {
   LogIn,
   Activity,
   Headset,
+  Bot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -65,6 +66,7 @@ const communityGroup: NavGroup = {
     { to: "/staff", label: "Staff", icon: ShieldCheck },
     { to: "/users", label: "Members", icon: Users },
     { to: "/discord", label: "Discord", icon: DiscordMark },
+    { to: "/bot", label: "Bot", icon: Bot },
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/changelog", label: "Changelog", icon: FileText },
