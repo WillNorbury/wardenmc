@@ -165,11 +165,23 @@ Deno.serve(async (req) => {
       if (Number.isFinite(n)) holdMs = Math.min(Math.max(Math.round(n), MIN_HOLD_MS), MAX_HOLD_MS)
     } catch { /* no body — use default hold */ }
 
-    const announced = await holdPresence(botToken, holdMs)
+    // Rotating status lines saved by admins; falls back to the default line.
+    let presenceTexts: string[] = []
+    try {
+      const { data: presenceSetting } = await admin
+        .from('site_content')
+        .select('value')
+        .eq('key', PRESENCE_TEXTS_KEY)
+        .maybeSingle()
+      presenceTexts = normalizePresenceTexts(presenceSetting?.value)
+    } catch { /* keep default */ }
+    const presenceText = pickPresenceText(presenceTexts, Date.now())
+
+    const announced = await holdPresence(botToken, holdMs, presenceText)
     if (!announced) {
       return json({ ok: false, error: 'Discord gateway session was not established' }, 502)
     }
-    return json({ ok: true, presence: PRESENCE_TEXT, heldMs: holdMs })
+    return json({ ok: true, presence: presenceText, heldMs: holdMs })
   } catch (e) {
     return json({ ok: false, error: e instanceof Error ? e.message : String(e) }, 500)
   }
