@@ -662,6 +662,7 @@ export type Database = {
           configured_by: string
           guild_id: string
           message_id: string | null
+          server_address: string | null
           updated_at: string
         }
         Insert: {
@@ -669,6 +670,7 @@ export type Database = {
           configured_by: string
           guild_id: string
           message_id?: string | null
+          server_address?: string | null
           updated_at?: string
         }
         Update: {
@@ -676,6 +678,7 @@ export type Database = {
           configured_by?: string
           guild_id?: string
           message_id?: string | null
+          server_address?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add required IP to /status setup and verify live Minecraft server panels and repeat setup.
 - [x] Add and register /status setup; real Discord create/read/repeat/refresh verified and temporary channel removed.
 - [ ] Send Discord status setup announcement emails — blocked by missing staff session; published entry is ready for Send in Admin → Changelog.
 - [x] Add Support page with stored questions, team replies, navigation, sitemap and end-to-end verification; owner notification send confirmed and test entries removed.
