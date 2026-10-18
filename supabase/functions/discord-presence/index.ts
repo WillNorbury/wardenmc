@@ -9,6 +9,12 @@ import { createClient } from 'npm:@supabase/supabase-js@2.108.2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { getDiscordBotToken } from '../_shared/discord-token.ts'
 import { syncStatusPanels } from '../_shared/discord-status.ts'
+import {
+  DEFAULT_PRESENCE_TEXTS,
+  PRESENCE_TEXTS_KEY,
+  normalizePresenceTexts,
+  pickPresenceText,
+} from '../_shared/discord-presence-texts.ts'
 
 const GATEWAY_URL = 'wss://gateway.discord.gg/?v=10&encoding=json'
 const INTENTS = 1 << 0 // GUILDS — enough to set presence
@@ -17,7 +23,8 @@ const MIN_HOLD_MS = 3000
 const MAX_HOLD_MS = 55000
 
 // Shown under the bot's name in the member list, like other bots' status lines.
-export const PRESENCE_TEXT = '🛡️ Protecting warden.rip | /help'
+// Admins can save several lines; the keepalive rotates one per minute.
+export const PRESENCE_TEXT = DEFAULT_PRESENCE_TEXTS[0]
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
