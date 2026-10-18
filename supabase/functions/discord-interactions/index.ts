@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
             response: { reply: modReply.slice(0, 300) },
           });
       } catch (e) { console.warn("mod log failed", e); }
-      const pub = !/^[⛔⚠❌]|^Nothing/.test(modReply);
+      const pub = !/^[⛔⚠❌]|^Nothing/.test(modReply) && body.data?.name !== "help";
       return say(modReply, !pub);
     }
 
