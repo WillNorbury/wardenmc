@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
       const valid = statusSetupInput(body);
       const allowed = canSetupStatus(body.member?.permissions);
       if (!valid || !allowed) return new Response(JSON.stringify({ type: 4, data: {
-        content: !valid ? "⚠️ Use /status setup in a server text channel." : "⛔ You need Manage Server permission to set up a status panel.", flags: 64,
+        content: !valid ? "⚠️ Use /status setup ip:play.example.com in a server text channel (optional :port)." : "⛔ You need Manage Server permission to set up a status panel.", flags: 64,
       } }), { headers: { "Content-Type": "application/json" } });
       // Acknowledge before doing network work: Discord requires a reply within 3 seconds.
       EdgeRuntime.waitUntil(completeStatusInteraction(body));
