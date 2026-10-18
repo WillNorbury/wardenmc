@@ -3,7 +3,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot as BotIcon, ExternalLink, Globe, Gavel, Mic, PartyPopper, Copy, Check, Loader2 } from "lucide-react";
+import { Bot as BotIcon, ExternalLink, Globe, Gavel, Mic, PartyPopper, Copy, Check, Loader2, Users } from "lucide-react";
 import DiscordMark from "@/components/site/DiscordMark";
 
 type InviteState =
