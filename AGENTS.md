@@ -1,5 +1,5 @@
 # Project architecture
-- Discord status panels are service-only per-channel records; signed Manage Server interactions configure them, and the authenticated presence keepalive refreshes them from latest uptime checks without a separate polling job.
+- Discord status panels are service-only per-channel records; signed Manage Server interactions configure a validated Minecraft address, fetched only via the fixed mcsrvstat provider and refreshed by the authenticated presence keepalive without a new polling job; NULL addresses preserve legacy website panels.
 - Support uses the existing private ticket and message tables and Admin ticket inbox; a dedicated authenticated submission function validates, saves and sends one fixed owner notification, while database triggers validate and rate-limit all insert paths.
 - Profile appearance previews never write browser storage; only successful preference saves commit them, and profile exit restores saved appearance. Palette tokens live in global CSS and are hydrated from private account preferences on sign-in.
 - Personal themes store validated hex colors in private preferences; the theme color module converts them into root CSS tokens and computes contrasting foregrounds, never accepting user CSS.
