@@ -131,6 +131,7 @@ export async function handleModeration(body: any): Promise<string | null> {
     }
     case "hug": return id(o.user) === me ? `🤗 <@${me}> hugs themselves. It's okay, we all need one sometimes.` : `🤗 <@${me}> gives <@${id(o.user)}> a big hug!`;
     case "joke": return `😂 ${pick(JOKES)}`;
+    case "help": return helpReply();
   }
 
   token = await getDiscordBotToken();
