@@ -2322,6 +2322,29 @@ const BotDashboardSection = () => {
               </div>
             )}
             {result.ok && result.guildError && <div className="text-amber-400">Warning: {result.guildError}</div>}
+            {result.ok && result.inviteUrl && (
+              <div className="pt-1 space-y-1">
+                <div className="text-muted-foreground">
+                  Invite link — works in any server, no guild ID needed:
+                </div>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 truncate rounded bg-background/60 px-2 py-1 text-xs">{result.inviteUrl}</code>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(result.inviteUrl);
+                      toast.success("Invite link copied");
+                    }}
+                  >
+                    Copy
+                  </Button>
+                  <Button size="sm" asChild>
+                    <a href={result.inviteUrl} target="_blank" rel="noopener noreferrer">Open</a>
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Card>
@@ -2759,11 +2782,11 @@ const BotManagementSection = () => {
           <Label>Mark as online</Label>
         </div>
         <div>
-          <Label>Guild ID</Label>
+          <Label>Guild ID <span className="text-muted-foreground font-normal">(optional — only for role sync and the supporter role on your own server)</span></Label>
           <Input value={cfg.guildId} onChange={(e) => setCfg({ ...cfg, guildId: e.target.value })} />
         </div>
         <div>
-          <Label>Bot invite URL</Label>
+          <Label>Bot invite URL <span className="text-muted-foreground font-normal">(run a connection test to generate one that works in any server)</span></Label>
           <Input value={cfg.inviteUrl} onChange={(e) => setCfg({ ...cfg, inviteUrl: e.target.value })} />
         </div>
       </Card>
