@@ -76,6 +76,16 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ type: 5, data: { flags: 64 } }), { headers: { "Content-Type": "application/json" } });
     }
 
+    if (name === "setapply") {
+      const reply = await setApplyUrl(body);
+      const ok = reply.startsWith("✅");
+      return new Response(JSON.stringify({ type: 4, data: { content: reply, ...(ok ? {} : { flags: 64 }) } }), { headers: { "Content-Type": "application/json" } });
+    }
+    if (name === "apply") {
+      const reply = await getApplyUrl(body);
+      return new Response(JSON.stringify({ type: 4, data: { content: reply, flags: 64 } }), { headers: { "Content-Type": "application/json" } });
+    }
+
     // Admin-configured commands (site_content -> discord_commands)
     const cfgClient = createClient(
       Deno.env.get("SUPABASE_URL")!,

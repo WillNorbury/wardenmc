@@ -52,7 +52,8 @@ Deno.serve(async (req) => {
       { name: "unsubscribe", description: "Unsubscribe from email notifications from Warden Network", type: 1 },
     ];
     const modNames = new Set(moderationRegistrations().map((m) => m.name));
-    const allCmds = [...cmds.filter((c) => !modNames.has(c.name) && c.name !== "status"), ...moderationRegistrations(), statusRegistration];
+    const builtIn = new Set([...modNames, "status", "setapply", "apply"]);
+    const allCmds = [...cmds.filter((c) => !builtIn.has(c.name)), ...moderationRegistrations(), statusRegistration, setApplyRegistration, applyRegistration];
     const r = await fetch(`https://discord.com/api/v10/applications/${appId}/commands`, {
       method: "PUT",
       headers: { Authorization: `Bot ${token}`, "Content-Type": "application/json" },
