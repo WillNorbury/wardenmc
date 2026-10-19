@@ -7,6 +7,7 @@ import { buildRulesEmbed as formatRulesEmbed } from "../_shared/rules-embed.ts";
 import { handleModeration, isFunCommand } from "../_shared/moderation-commands.ts";
 import { completeStatusInteraction } from "../_shared/discord-status.ts";
 import { canSetupStatus, statusSetupInput } from "../_shared/discord-status-model.ts";
+import { getApplyUrl, setApplyUrl } from "../_shared/discord-apply.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -73,6 +74,16 @@ Deno.serve(async (req) => {
       // Acknowledge before doing network work: Discord requires a reply within 3 seconds.
       EdgeRuntime.waitUntil(completeStatusInteraction(body));
       return new Response(JSON.stringify({ type: 5, data: { flags: 64 } }), { headers: { "Content-Type": "application/json" } });
+    }
+
+    if (name === "setapply") {
+      const reply = await setApplyUrl(body);
+      const ok = reply.startsWith("✅");
+      return new Response(JSON.stringify({ type: 4, data: { content: reply, ...(ok ? {} : { flags: 64 }) } }), { headers: { "Content-Type": "application/json" } });
+    }
+    if (name === "apply") {
+      const reply = await getApplyUrl(body);
+      return new Response(JSON.stringify({ type: 4, data: { content: reply, flags: 64 } }), { headers: { "Content-Type": "application/json" } });
     }
 
     // Admin-configured commands (site_content -> discord_commands)

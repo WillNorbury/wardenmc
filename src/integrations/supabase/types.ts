@@ -590,6 +590,27 @@ export type Database = {
         }
         Relationships: []
       }
+      discord_apply_settings: {
+        Row: {
+          apply_url: string
+          configured_by: string | null
+          guild_id: string
+          updated_at: string
+        }
+        Insert: {
+          apply_url: string
+          configured_by?: string | null
+          guild_id: string
+          updated_at?: string
+        }
+        Update: {
+          apply_url?: string
+          configured_by?: string | null
+          guild_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discord_bot_action_logs: {
         Row: {
           action: string
