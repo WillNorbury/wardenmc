@@ -7,6 +7,7 @@ import { buildRulesEmbed as formatRulesEmbed } from "../_shared/rules-embed.ts";
 import { handleModeration, isFunCommand } from "../_shared/moderation-commands.ts";
 import { completeStatusInteraction } from "../_shared/discord-status.ts";
 import { canSetupStatus, statusSetupInput } from "../_shared/discord-status-model.ts";
+import { getApplyUrl, setApplyUrl } from "../_shared/discord-apply.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
