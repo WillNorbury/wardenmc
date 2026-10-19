@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { getDiscordBotToken } from "../_shared/discord-token.ts";
 import { moderationRegistrations } from "../_shared/moderation-commands.ts";
 import { statusRegistration } from "../_shared/discord-status-model.ts";
-import { applyRegistration, setApplyRegistration } from "../_shared/discord-apply.ts";
+import { applyRegistration, setApplyRegistration } from "../_shared/discord-apply-model.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
