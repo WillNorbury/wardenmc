@@ -6,7 +6,7 @@ import {
   normalizeApplyUrl,
   setApplyInput,
   setApplyRegistration,
-} from "../../supabase/functions/_shared/discord-apply.ts";
+} from "../../supabase/functions/_shared/discord-apply-model.ts";
 
 const MANAGE_SERVER = "32";
 const NONE = "0";
