@@ -33,6 +33,7 @@ import {
   Activity,
   Headset,
   Bot,
+  Radio,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -67,6 +68,7 @@ const communityGroup: NavGroup = {
     { to: "/users", label: "Members", icon: Users },
     { to: "/discord", label: "Discord", icon: DiscordMark },
     { to: "/bot", label: "Bot", icon: Bot },
+    { to: "/live", label: "Live", icon: Radio },
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/changelog", label: "Changelog", icon: FileText },

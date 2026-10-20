@@ -2,7 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twitch";
 const DEFAULT_LOGIN = "will_norbury";
-const ALLOWED_LOGINS = new Set(["will_norbury", "voxelisadev"]);
+const ALLOWED_LOGINS = new Set(["will_norbury", "spectordev"]);
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
