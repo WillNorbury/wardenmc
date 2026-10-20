@@ -11,7 +11,7 @@ function loadChecker(fetchImpl: () => Promise<Response>) {
     readFileSync("supabase/functions/uptime-check/index.ts", "utf8").replace(/^import[^\n]*\n/gm, "") +
     "\n;globalThis.__checkBot = checkBot; globalThis.__names = SERVICE_NAMES;";
 
-  runInNewContext(ts.transpile(source, { target: ts.ScriptTarget.ES2022 }), {
+  const context: Record<string, unknown> = {
     createClient: () => ({}),
     STATUS_URL: "https://warden.rip/status",
     getDiscordBotToken: async () => null,
@@ -22,13 +22,13 @@ function loadChecker(fetchImpl: () => Promise<Response>) {
     clearTimeout,
     fetch: fetchImpl,
     console: { log: vi.fn(), error: vi.fn() },
-  });
+  };
 
-  const scope = globalThis as unknown as { __checkBot?: (k: string, t: string) => Promise<Check>; __names?: Record<string, string> };
-  if (!scope.__checkBot || !scope.__names) throw new Error("uptime-check internals were not exposed");
-  const { __checkBot: checkBot, __names: names } = scope;
-  delete scope.__checkBot;
-  delete scope.__names;
+  runInNewContext(ts.transpile(source, { target: ts.ScriptTarget.ES2022 }), context);
+
+  const checkBot = context.__checkBot as ((k: string, t: string) => Promise<Check>) | undefined;
+  const names = context.__names as Record<string, string> | undefined;
+  if (!checkBot || !names) throw new Error("uptime-check internals were not exposed");
   return { checkBot, names };
 }
 
