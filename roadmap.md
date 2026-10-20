@@ -1,5 +1,7 @@
 # Roadmap
-- [ ] Stop WardenBot’s excessive gateway connections, preserve REST-only panel refresh, verify and announce; new Discord token and persistent online hosting may require user action.
+- [x] Stop WardenBot’s excessive gateway connections; deployed REST-only refresh, authenticated refresh returned 200, 12 tests passed, public offline status verified, changelog published.
+- [ ] Restore WardenBot after Discord token reset — user must save a replacement token in Admin → Discord → Bot token; continuous online presence requires persistent external hosting.
+- [ ] Email connection safety announcement — blocked by missing staff session; notification returned 401, published entry is ready in Admin → Changelog.
 - [x] Add required IP to /status setup; real Discord panel creation, repeat setup, changed IP and refresh verified.
 - [x] Add and register /status setup; real Discord create/read/repeat/refresh verified and temporary channel removed.
 - [ ] Send Discord status setup announcement emails — blocked by missing staff session; published entry is ready for Send in Admin → Changelog.
