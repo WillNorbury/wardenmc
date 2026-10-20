@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { STATUS_URL } from '../_shared/site-urls.ts'
+import { getDiscordBotToken } from '../_shared/discord-token.ts'
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,6 +21,7 @@ const SERVICE_NAMES: Record<string, string> = {
   api: "API",
   panel: "Panel",
   discord: "Discord",
+  bot: "WardenBot",
 };
 
 const SERVICE_ENDPOINTS: Record<string, string> = {
@@ -28,7 +30,40 @@ const SERVICE_ENDPOINTS: Record<string, string> = {
   api: "",
   panel: "https://dash.nightly.host",
   discord: "https://discord.gg/V8xYY2DasZ",
+  bot: "https://warden.rip/bot",
 };
+
+// WardenBot counts as up while Discord still accepts its credentials — that is
+// what lets it answer commands. The gateway presence client runs elsewhere, so
+// a heartbeat is not available to check from here.
+async function checkBot(service_key: string, token: string): Promise<Check> {
+  const start = Date.now();
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 10_000);
+    const r = await fetch("https://discord.com/api/v10/applications/@me", {
+      signal: ctrl.signal,
+      headers: { Authorization: `Bot ${token}` },
+    });
+    clearTimeout(t);
+    await r.arrayBuffer().catch(() => {});
+    return {
+      service_key,
+      is_up: r.status === 200,
+      latency_ms: Date.now() - start,
+      status_code: r.status,
+      error: r.status === 200 ? null : `Discord API HTTP ${r.status}`,
+    };
+  } catch (e) {
+    return {
+      service_key,
+      is_up: false,
+      latency_ms: Date.now() - start,
+      status_code: null,
+      error: String((e as Error).message || e).slice(0, 300),
+    };
+  }
+}
 
 async function checkHttp(
   service_key: string,
@@ -314,6 +349,8 @@ Deno.serve(async (req) => {
   SERVICE_ENDPOINTS.minecraft = mcHost;
   SERVICE_ENDPOINTS.api = apiHealth;
 
+  const botToken = await getDiscordBotToken();
+
   const checks = await Promise.all([
     // Do NOT follow redirects on the website check — the lovable.app edge sometimes
     // 3xx-redirects to the custom domain (warden.rip) whose cert can flap while
@@ -323,6 +360,9 @@ Deno.serve(async (req) => {
     checkHttp("api", apiHealth, false),
     checkHttp("panel", "https://dash.nightly.host"),
     checkHttp("discord", "https://discord.gg/V8xYY2DasZ"),
+    // Without a saved bot token there is nothing to verify, so the service is
+    // left unreported rather than recorded as an outage.
+    ...(botToken ? [checkBot("bot", botToken)] : []),
   ]);
 
 
