@@ -109,6 +109,7 @@ import {
 } from "@/components/admin/tools/ModerationTools";
 import { AdminSkriptsSection } from "@/components/admin/AdminSkriptsSection";
 import { DiscordConfigSection } from "@/components/admin/DiscordConfigSection";
+import { LiveAnnouncementDraftSection } from "@/components/admin/LiveAnnouncementDraftSection";
 
 
 type Profile = { id: string; display_name: string | null; mc_username: string | null; created_at: string };
@@ -157,6 +158,7 @@ const sectionMeta: Record<AdminSection, { title: string; description: string }> 
   quizzes: { title: "Quizzes", description: "Create, edit, and publish scored quizzes." },
   reports: { title: "Reports", description: "Review reports submitted by users about accounts, plugins, or other content." },
   "send-email": { title: "Send Email", description: "Broadcast emails to all users, admins, or owners only." },
+  "live-announcement": { title: "Live Email Draft", description: "" },
   "email-diagnostics": { title: "Email Diagnostics", description: "Verify the notify.warden.rip sender domain and From-address allowlist." },
   punishments: { title: "Punishments", description: "Browse bans, mutes, kicks, and warnings from the network database. Unban or unmute players from the web (silent by default)." },
   console: { title: "Owner Console", description: "Terminal-style admin console. Type `help` for available commands." },
@@ -325,6 +327,7 @@ const Admin = () => {
           {section === "reports" && <ReportsAdminSection />}
           {section === "punishments" && <PunishmentsAdminSection />}
           {section === "send-email" && <SendEmailAdminSection isOwner={isOwner} />}
+          {section === "live-announcement" && <LiveAnnouncementDraftSection />}
           {section === "email-diagnostics" && <EmailDiagnosticsSection />}
           {section === "permissions" && (isOwner ? <PermissionsTab /> : denied)}
           {section === "bot-dashboard" && (isOwner ? <BotDashboardSection /> : denied)}

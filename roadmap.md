@@ -1,6 +1,6 @@
 # Roadmap
-- [ ] Connect a marketing email service and verify streams@warden.rip as its sender — blocked because the Brevo connection was declined; keep existing notify.warden.rip account email delegation unchanged.
-- [ ] Build opt-in live announcements and automatic Twitch live detection, verify delivery and publish the update — blocked pending marketing service connection.
+- [x] Add an Admin live announcement draft editor with preview, browser saves, copy and download controls; 7 workflow/safety/navigation tests passed, build OK; no sending or automatic detection.
+- [ ] Verify the live announcement editor in signed-in Admin — blocked because no preview session could be minted for the requester; sign in to the preview to complete the visual check.
 - [x] Add WardenBot to the public status page as a tracked service; live check returned HTTP 200, page row and details panel verified.
 - [x] Fix WardenBot ongoing issues lookup; deployed endpoint checked, outage/failure tests passed, submitted UI verified with fixtures (preview served previous source).
 - [ ] Email ongoing issues fix announcement — blocked by missing staff session; notification returned 401, published entry is ready in Admin → Changelog.
