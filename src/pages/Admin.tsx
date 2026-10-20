@@ -1682,6 +1682,7 @@ const StatusTab = () => {
             { key: "api", name: "API & Database", desc: "Backend services", url: "" },
             { key: "panel", name: "Panel", desc: "dash.nightly.host", url: "" },
             { key: "discord", name: "Discord Server", desc: "https://discord.warden.rip", url: "https://discord.warden.rip" },
+            { key: "bot", name: "WardenBot", desc: "Discord bot · warden.rip/bot", url: "https://warden.rip/bot" },
           ],
         }));
       });
