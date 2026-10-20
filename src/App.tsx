@@ -112,6 +112,7 @@ const Shell = () => {
               <Route path="/search" element={<Search />} />
               <Route path="/support" element={<Support />} />
 
+              <Route path="/live" element={<Live />} />
               <Route path="/status" element={<Status />} />
               <Route path="/status/unsubscribe" element={<StatusUnsubscribe />} />
               <Route path="/status/:number" element={<StatusIncident />} />
