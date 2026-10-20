@@ -1,30 +1,9 @@
-// Keeps WardenBot showing "online" in Discord 24/7.
-// Discord only shows a bot online while it has a live gateway session,
-// and serverless functions cannot stay connected forever. This function
-// opens a short-lived gateway session that announces an online presence
-// (custom status text), holds it for up to ~55 seconds, then exits.
-// A pg_cron job calls it every minute, so a fresh session always
-// overlaps the previous one and the bot stays green in the member list.
+// REST-only maintenance for Discord status panels. Never Identify here:
+// short-lived gateway sessions exhaust Discord's session-start allowance.
+// Continuous online presence requires a persistent external gateway client.
 import { createClient } from 'npm:@supabase/supabase-js@2.108.2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
-import { getDiscordBotToken } from '../_shared/discord-token.ts'
 import { syncStatusPanels } from '../_shared/discord-status.ts'
-import {
-  DEFAULT_PRESENCE_TEXTS,
-  PRESENCE_TEXTS_KEY,
-  normalizePresenceTexts,
-  pickPresenceText,
-} from '../_shared/discord-presence-texts.ts'
-
-const GATEWAY_URL = 'wss://gateway.discord.gg/?v=10&encoding=json'
-const INTENTS = 1 << 0 // GUILDS — enough to set presence
-const DEFAULT_HOLD_MS = 55000
-const MIN_HOLD_MS = 3000
-const MAX_HOLD_MS = 55000
-
-// Shown under the bot's name in the member list, like other bots' status lines.
-// Admins can save several lines; the keepalive rotates one per minute.
-export const PRESENCE_TEXT = DEFAULT_PRESENCE_TEXTS[0]
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -32,85 +11,11 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 
-// Opens the gateway session, announces presence, heartbeats, and keeps
-// the socket open for `holdMs`. Resolves true if presence was announced.
-async function holdPresence(token: string, holdMs: number, presenceText: string): Promise<boolean> {
-  return await new Promise((resolve) => {
-    const ws = new WebSocket(GATEWAY_URL)
-    let seq: number | null = null
-    let heartbeat: number | undefined
-    let announced = false
-    let settled = false
-
-    const cleanup = (result: boolean) => {
-      if (settled) return
-      settled = true
-      if (heartbeat) clearInterval(heartbeat)
-      try { ws.close() } catch { /* ignore */ }
-      resolve(result)
-    }
-
-    const timer = setTimeout(() => cleanup(announced), holdMs)
-
-    ws.onerror = () => {
-      clearTimeout(timer)
-      cleanup(announced)
-    }
-    ws.onclose = () => {
-      clearTimeout(timer)
-      cleanup(announced)
-    }
-
-    ws.onmessage = (ev) => {
-      let msg: any
-      try { msg = JSON.parse(ev.data) } catch { return }
-      if (msg.s != null) seq = msg.s
-
-      if (msg.op === 10) {
-        // Hello: start heartbeating, then identify with the presence.
-        const interval = msg.d.heartbeat_interval
-        heartbeat = setInterval(() => {
-          try { ws.send(JSON.stringify({ op: 1, d: seq })) } catch { /* ignore */ }
-        }, Math.floor(interval * 0.8))
-        ws.send(JSON.stringify({
-          op: 2,
-          d: {
-            token,
-            intents: INTENTS,
-            properties: { os: 'linux', browser: 'wardenmc-presence', device: 'wardenmc-presence' },
-            presence: {
-              status: 'online',
-              since: null,
-              afk: false,
-              activities: [{ name: 'Custom Status', type: 4, state: presenceText }],
-            },
-          },
-        }))
-        return
-      }
-      if (msg.op === 1) {
-        try { ws.send(JSON.stringify({ op: 1, d: seq })) } catch { /* ignore */ }
-        return
-      }
-      if (msg.op === 11) return
-      if (msg.t === 'READY') {
-        announced = true
-        return
-      }
-      if (msg.op === 9 || msg.op === 7) {
-        // Invalid session / reconnect requested — let this run end.
-        clearTimeout(timer)
-        cleanup(announced)
-      }
-    }
-  })
-}
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   try {
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-    const admin = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
+    const admin = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '', {
       auth: { persistSession: false },
     })
 
@@ -151,46 +56,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    const botToken = await getDiscordBotToken()
-    if (!botToken) return json({ ok: false, error: 'Bot token is not configured' }, 500)
-
-    // Reuse the authenticated existing keepalive; no new polling schedule.
-    try { await syncStatusPanels(admin) }
-    catch { console.warn('Status panels could not refresh; will retry next keepalive') }
-
-    let holdMs = DEFAULT_HOLD_MS
-    try {
-      const body = await req.json()
-      const n = Number((body as Record<string, unknown>)?.holdMs)
-      if (Number.isFinite(n)) holdMs = Math.min(Math.max(Math.round(n), MIN_HOLD_MS), MAX_HOLD_MS)
-    } catch { /* no body — use default hold */ }
-
-    // Rotating status lines saved by admins; falls back to the default line.
-    let presenceTexts: string[] = []
-    try {
-      const { data: presenceSetting } = await admin
-        .from('site_content')
-        .select('value')
-        .eq('key', PRESENCE_TEXTS_KEY)
-        .maybeSingle()
-      presenceTexts = normalizePresenceTexts(presenceSetting?.value)
-    } catch { /* keep default */ }
-    const presenceText = pickPresenceText(presenceTexts, Date.now())
-
-    const announced = await holdPresence(botToken, holdMs, presenceText)
-    if (!announced) {
-      return json({ ok: false, error: 'Discord gateway session was not established' }, 502)
-    }
-    // Record a heartbeat so the public /bot/status page can show live presence.
-    try {
-      await admin
-        .from('site_content')
-        .upsert(
-          { key: 'wardenbot_presence', value: { at: new Date().toISOString(), text: presenceText } },
-          { onConflict: 'key' },
-        )
-    } catch { /* heartbeat is best-effort */ }
-    return json({ ok: true, presence: presenceText, heldMs: holdMs })
+    // Keep existing panels fresh without connecting to the Discord gateway.
+    await syncStatusPanels(admin)
+    const { error } = await admin.from('site_content').upsert(
+      { key: 'wardenbot_presence', value: { at: null, text: null, connectionMode: 'rest_only' } },
+      { onConflict: 'key' },
+    )
+    if (error) throw new Error('Could not update bot connection status')
+    return json({ ok: true, online: false, connectionMode: 'rest_only', panelsRefreshed: true })
   } catch (e) {
     return json({ ok: false, error: e instanceof Error ? e.message : String(e) }, 500)
   }
