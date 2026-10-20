@@ -65,7 +65,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = "WardenMC — Minecraft Community";
+    document.title = "WardenMC — Minecraft Community & Plugin Directory";
   }, []);
 
   useEffect(() => {
