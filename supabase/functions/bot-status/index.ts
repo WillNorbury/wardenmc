@@ -11,7 +11,7 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
-// The presence keepalive runs every minute; allow a small grace window.
+// A future persistent gateway client may supply heartbeats; REST refreshes are not presence.
 const ONLINE_GRACE_MS = 3 * 60 * 1000;
 const DEFAULT_MC_ADDRESS = "warden.rip";
 
@@ -69,10 +69,10 @@ Deno.serve(async (req) => {
     const mcAddress = typeof serverValue?.ip === "string" && serverValue.ip ? serverValue.ip : DEFAULT_MC_ADDRESS;
     const minecraft = await fetchMinecraft(mcAddress);
 
-    const presence = (presenceRes.data?.value ?? null) as { at?: string; text?: string } | null;
+    const presence = (presenceRes.data?.value ?? null) as { at?: string; text?: string; connectionMode?: string } | null;
     const lastSeenAt = typeof presence?.at === "string" ? presence.at : null;
     const lastSeenMs = lastSeenAt ? Date.parse(lastSeenAt) : NaN;
-    const botOnline = Number.isFinite(lastSeenMs) && Date.now() - lastSeenMs < ONLINE_GRACE_MS;
+    const botOnline = presence?.connectionMode !== "rest_only" && Number.isFinite(lastSeenMs) && Date.now() - lastSeenMs >= 0 && Date.now() - lastSeenMs < ONLINE_GRACE_MS;
 
     return json({
       ok: true,

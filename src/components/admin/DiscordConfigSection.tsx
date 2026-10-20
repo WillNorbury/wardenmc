@@ -529,8 +529,8 @@ export const DiscordConfigSection = () => {
             <div>
               <h2 className="font-bold">Rotating status lines</h2>
               <p className="text-sm text-muted-foreground">
-                One line per row — the bot shows the next line each minute under its name in the member
-                list. Leave empty to use the default "🛡️ Protecting warden.rip | /help".
+                Saved status lines. Automatic online presence is paused to prevent Discord from resetting
+                the bot token; these lines require a continuously hosted bot connection.
               </p>
             </div>
             <Button onClick={savePresenceTexts} disabled={saving === PRESENCE_KEY}>
@@ -544,7 +544,7 @@ export const DiscordConfigSection = () => {
             placeholder={"🛡️ Protecting warden.rip | /help\n🎮 play.warden.rip\n💬 discord.warden.rip"}
           />
           <p className="text-xs text-muted-foreground">
-            Up to 10 lines, 128 characters each. Changes take effect within a minute.
+            Up to 10 lines, 128 characters each. Saving does not reconnect the bot.
           </p>
         </Card>
       </TabsContent>
