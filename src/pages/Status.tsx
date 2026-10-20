@@ -122,7 +122,7 @@ const statusMeta: Record<
   none: {
     label: "No data",
     summary: "Checks are still being collected.",
-    tone: "bg-white/5",
+    tone: "bg-muted/40",
     dot: "bg-muted-foreground",
     text: "text-muted-foreground",
     border: "border-border",
@@ -134,7 +134,7 @@ const dayColor = (status: DayStatus) => {
   if (status === "up") return "bg-emerald-500/80";
   if (status === "degraded") return "bg-amber-500/80";
   if (status === "down") return "bg-red-500/80";
-  return "bg-white/10";
+  return "bg-muted";
 };
 
 const getUptime = (days?: Map<string, { pct: number | null; total: number }>) => {
@@ -192,12 +192,12 @@ const StatusPill = ({ status, className }: { status: DayStatus; className?: stri
 };
 
 const MiniMetric = ({ icon: Icon, label, value }: { icon: typeof Activity; label: string; value: string | number }) => (
-  <div className="rounded-lg border border-border bg-card/70 p-4 min-w-0">
+  <div className="min-w-0 rounded-xl border border-border/60 bg-card/60 p-4">
     <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
       <Icon className="h-3.5 w-3.5 shrink-0" />
       <span className="truncate">{label}</span>
     </div>
-    <div className="font-display text-2xl font-bold leading-none truncate">{value}</div>
+    <div className="truncate font-display text-2xl leading-none">{value}</div>
   </div>
 );
 
@@ -208,7 +208,7 @@ const Status = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [autoInterval, setAutoInterval] = useState<number>(0);
   const [isOwner, setIsOwner] = useState(false);
-  const [pageTitle, setPageTitle] = useState("Warden Network Status");
+  const [pageTitle, setPageTitle] = useState("WardenMC Status");
   const [pageSubtitle, setPageSubtitle] = useState("Live uptime — automated checks every 5 minutes.");
   const [pageFootnote, setPageFootnote] = useState("");
   const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
@@ -289,7 +289,7 @@ const Status = () => {
   };
 
   useEffect(() => {
-    document.title = "Status — Warden Network";
+    document.title = "Status — WardenMC";
 
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
@@ -437,182 +437,125 @@ const Status = () => {
     return summary;
   }, [selectedDays, range]);
 
-  const nowStamp = new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC";
   const totalChecksWindow = rows.reduce((sum, r) => sum + Number(r.total_checks), 0);
   const totalUpWindow = rows.reduce((sum, r) => sum + Number(r.up_checks), 0);
   const totalDownWindow = Math.max(0, totalChecksWindow - totalUpWindow);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
-        rel="stylesheet"
-      />
+    <div className="flex min-h-screen flex-col">
       <Navbar />
 
-      {/* Top ticker */}
-      <div className="mt-[76px] sm:mt-16 border-y border-border bg-background font-['JetBrains_Mono'] text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-        <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-2 flex flex-wrap items-center gap-x-6 gap-y-1">
-          <span className="flex items-center gap-2">
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full animate-pulse",
-                currentStatus === "up" && "bg-emerald-400",
-                currentStatus === "degraded" && "bg-amber-400",
-                currentStatus === "down" && "bg-red-400",
-                currentStatus === "none" && "bg-white/30",
-              )}
-            />
-            <span className="text-primary">SYS://</span> {currentMeta.label}
-          </span>
-          <span>
-            T: <span className="text-slate-200">{nowStamp}</span>
-          </span>
-          <span>
-            WINDOW: <span className="text-slate-200">{range}D</span>
-          </span>
-          <span>
-            SVC: <span className="text-emerald-400">{statusCounts.up}</span>/
-            <span className="text-slate-200">{services.length}</span>
-          </span>
-          <span>
-            INC: <span className={cn(activeIncidents ? "text-red-400" : "text-slate-200")}>{activeIncidents}</span> OPEN
-          </span>
-          <span className="ml-auto">
-            UPTIME: <span className="text-slate-200">{overall !== null ? `${overall.toFixed(3)}%` : "—"}</span>
-          </span>
-        </div>
-      </div>
-
-      <main className="flex-1 w-full">
-        <div className="max-w-7xl w-full mx-auto px-4 md:px-8 py-8 md:py-10 flex flex-col gap-8">
-          {/* Command header */}
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <div className="border border-border bg-background p-6 md:p-8">
-              <div className="flex items-center gap-2 text-[10px] font-['JetBrains_Mono'] tracking-[0.35em] uppercase text-primary">
-                <span className="h-px w-6 bg-primary" /> Command Center · Node 01
-              </div>
-              <h1 className="mt-3 font-display text-5xl md:text-7xl font-bold tracking-tighter italic leading-none">
-                STATUS<span className="text-primary">.</span>
-              </h1>
-              <p className="mt-3 max-w-xl text-sm text-muted-foreground">{pageSubtitle}</p>
-              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 border border-border">
-                {[
-                  { label: "Checks", value: totalChecksWindow.toLocaleString() },
-                  { label: "OK", value: totalUpWindow.toLocaleString(), tone: "text-emerald-400" },
-                  {
-                    label: "Fail",
-                    value: totalDownWindow.toLocaleString(),
-                    tone: totalDownWindow ? "text-red-400" : "text-slate-200",
-                  },
-                  { label: "Services", value: `${statusCounts.up}/${services.length}` },
-                ].map((s) => (
-                  <div key={s.label} className="bg-background px-4 py-3">
-                    <div className="text-[10px] font-['JetBrains_Mono'] uppercase tracking-widest text-muted-foreground">
-                      {s.label}
-                    </div>
-                    <div className={cn("mt-1 font-display text-xl font-bold", s.tone ?? "text-foreground")}>
-                      {s.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div
-              className={cn(
-                "relative border p-6 flex flex-col justify-between overflow-hidden",
-                currentStatus === "up" && "border-emerald-500/40 bg-emerald-500/[0.04]",
-                currentStatus === "degraded" && "border-amber-500/40 bg-amber-500/[0.04]",
-                currentStatus === "down" && "border-red-500/40 bg-red-500/[0.04]",
-                currentStatus === "none" && "border-border bg-background",
-              )}
+      {/* Hero */}
+      <section className="aurora relative overflow-hidden pt-36 pb-16">
+        <div className="container max-w-[1100px] text-center">
+          <Activity className="mx-auto mb-5 h-14 w-14 text-primary drop-shadow-[0_0_28px_rgba(45,212,191,0.45)]" />
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-accent">Live status</p>
+          <h1 className="font-display text-7xl leading-none tracking-wide md:text-9xl">
+            NETWORK <span className="text-gradient">STATUS</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">{pageSubtitle}</p>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <Button
+              variant="outline"
+              className="rounded-full"
+              onClick={() => {
+                setSubDone(false);
+                setSubOpen(true);
+              }}
             >
-              <div
-                className="absolute inset-0 pointer-events-none opacity-[0.06]"
-                style={{
-                  backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 3px,#fff 3px,#fff 4px)",
-                }}
+              <Bell className="mr-2 h-4 w-4" /> Subscribe
+            </Button>
+            <Button variant="outline" className="rounded-full" onClick={handleRefresh} disabled={refreshing}>
+              <RefreshCw className={cn("mr-2 h-4 w-4", refreshing && "animate-spin")} /> Refresh
+            </Button>
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-2">
+              <span
+                className={cn(
+                  "h-2 w-2 rounded-full",
+                  currentStatus === "up" && "animate-pulse bg-emerald-400",
+                  currentStatus === "degraded" && "animate-pulse bg-amber-400",
+                  currentStatus === "down" && "animate-pulse bg-red-400",
+                  currentStatus === "none" && "bg-muted-foreground",
+                )}
               />
-              <div className="relative">
-                <div className="flex items-center gap-2 text-[10px] font-['JetBrains_Mono'] uppercase tracking-[0.3em] text-muted-foreground">
-                  <CurrentIcon
-                    className={cn(
-                      "h-3.5 w-3.5",
-                      currentStatus === "up" && "text-emerald-400",
-                      currentStatus === "degraded" && "text-amber-400",
-                      currentStatus === "down" && "text-red-400",
-                    )}
-                  />
-                  Global Health
-                </div>
-                <div className="mt-4 font-display text-6xl font-bold leading-none tracking-tighter">
-                  {overall !== null ? `${overall.toFixed(2)}` : "—"}
-                  <span className="text-2xl text-muted-foreground">%</span>
-                </div>
-                <div
-                  className={cn(
-                    "mt-2 text-[10px] font-['JetBrains_Mono'] uppercase tracking-[0.35em]",
-                    currentStatus === "up" && "text-emerald-400",
-                    currentStatus === "degraded" && "text-amber-400",
-                    currentStatus === "down" && "text-red-400",
-                    currentStatus === "none" && "text-muted-foreground",
-                  )}
-                >
-                  &gt;&gt; {currentMeta.label}
-                </div>
-                <p className="mt-3 text-xs text-muted-foreground">{currentMeta.summary}</p>
+              <span className="text-foreground">{currentMeta.label}</span>
+            </span>
+            <span>
+              Uptime <span className="text-foreground">{overall !== null ? `${overall.toFixed(3)}%` : "—"}</span>
+            </span>
+            <span>
+              <span className="text-foreground">{statusCounts.up}</span> of {services.length} services operational
+            </span>
+            <span>
+              <span className={cn(activeIncidents > 0 && "text-red-400")}>{activeIncidents}</span> open incidents
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <main className="flex-1">
+        <section className="container max-w-[1100px] space-y-4 pb-20">
+          {/* Global health */}
+          <div className={cn("glass flex flex-col gap-6 rounded-2xl border p-6 lg:flex-row lg:items-center", currentMeta.border)}>
+            <div className="shrink-0">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
+                <CurrentIcon className="h-4 w-4" /> Overall health
               </div>
-              <div className="relative mt-6 grid grid-cols-3 gap-2 text-[10px] font-['JetBrains_Mono'] uppercase tracking-widest">
-                <div>
-                  <span className="text-muted-foreground">UP </span>
-                  <span className="text-emerald-400">{statusCounts.up}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">DEG </span>
-                  <span className="text-amber-400">{statusCounts.degraded}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">DWN </span>
-                  <span className="text-red-400">{statusCounts.down}</span>
-                </div>
+              <div className="mt-2 font-display text-6xl leading-none tracking-wide">
+                {overall !== null ? `${overall.toFixed(2)}` : "—"}
+                <span className="text-2xl text-muted-foreground">%</span>
               </div>
+              <p className="mt-2 max-w-xs text-sm text-muted-foreground">{currentMeta.summary}</p>
+            </div>
+            <div className="grid flex-1 grid-cols-2 gap-3 md:grid-cols-4">
+              {[
+                { label: "Checks", value: totalChecksWindow.toLocaleString(), tone: "" },
+                { label: "Passed", value: totalUpWindow.toLocaleString(), tone: "text-emerald-400" },
+                {
+                  label: "Failed",
+                  value: totalDownWindow.toLocaleString(),
+                  tone: totalDownWindow ? "text-red-400" : "",
+                },
+                { label: "Operational", value: `${statusCounts.up}/${services.length}`, tone: "text-emerald-400" },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border border-border/60 bg-background/40 p-4">
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">{s.label}</div>
+                  <div className={cn("mt-1 font-display text-2xl tracking-wide", s.tone)}>{s.value}</div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Controls bar */}
-          <div className="flex flex-col gap-3 border border-border bg-background p-3">
+          {/* Controls */}
+          <div className="glass rounded-2xl p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <span className="text-[10px] font-['JetBrains_Mono'] tracking-[0.3em] uppercase text-primary shrink-0">
-                  / query
-                </span>
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search services…"
-                    className="w-full bg-background border border-border pl-8 pr-8 py-2 text-xs font-['JetBrains_Mono'] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition"
-                  />
-                  {query && (
-                    <button
-                      type="button"
-                      onClick={() => setQuery("")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary"
-                      aria-label="Clear search"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </div>
+              <div className="relative w-full max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search services…"
+                  className="h-9 w-full rounded-full border border-border bg-background/60 pl-9 pr-9 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
-              <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1 border border-border p-1">
+                      <div className="flex items-center gap-1 rounded-full border border-border p-1">
                         <Timer className="ml-2 h-3.5 w-3.5 text-muted-foreground" />
                         {[0, 1, 5, 15].map((min) => (
                           <button
@@ -621,9 +564,11 @@ const Status = () => {
                             onClick={() => isOwner && setAutoInterval(min)}
                             disabled={!isOwner}
                             className={cn(
-                              "px-2.5 py-1 text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase transition",
-                              autoInterval === min ? "bg-primary text-foreground" : "text-muted-foreground hover:text-primary",
-                              !isOwner && "opacity-40 cursor-not-allowed hover:text-muted-foreground",
+                              "rounded-full px-2.5 py-1 text-xs transition",
+                              autoInterval === min
+                                ? "bg-primary text-primary-foreground"
+                                : "text-muted-foreground hover:text-foreground",
+                              !isOwner && "cursor-not-allowed opacity-40 hover:text-muted-foreground",
                             )}
                           >
                             {min === 0 ? "Off" : `${min}m`}
@@ -638,35 +583,37 @@ const Status = () => {
                     )}
                   </Tooltip>
                 </TooltipProvider>
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
                   onClick={() => {
                     setSubDone(false);
                     setSubOpen(true);
                   }}
-                  className="inline-flex items-center gap-2 border border-primary/60 bg-primary/10 px-3 py-2 text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase text-primary hover:bg-primary hover:text-primary-foreground transition"
                 >
-                  <Bell className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Subscribe</span>
-                </button>
-                <button
-                  type="button"
+                  <Bell className="mr-2 h-4 w-4" /> Alerts
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
                   onClick={handleRefresh}
                   disabled={refreshing}
-                  className="inline-flex items-center gap-2 border border-border px-3 py-2 text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase text-muted-foreground hover:border-primary hover:text-primary transition disabled:opacity-40"
                 >
-                  <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} />
-                  <span className="hidden sm:inline">{refreshing ? "Running" : "Refresh"}</span>
-                </button>
-                <div className="flex items-center border border-border p-1">
+                  <RefreshCw className={cn("mr-2 h-4 w-4", refreshing && "animate-spin")} /> Refresh
+                </Button>
+                <div className="flex items-center gap-1 rounded-full border border-border p-1">
                   {RANGES.map((item) => (
                     <button
                       key={item.value}
                       type="button"
                       onClick={() => setRange(item.value)}
                       className={cn(
-                        "px-3 py-1 text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase transition",
-                        range === item.value ? "bg-primary text-foreground" : "text-muted-foreground hover:text-primary",
+                        "rounded-full px-3 py-1 text-xs transition",
+                        range === item.value
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground",
                       )}
                     >
                       {item.label}
@@ -676,18 +623,15 @@ const Status = () => {
               </div>
             </div>
             {/* State filter chips */}
-            <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
-              <span className="text-[10px] font-['JetBrains_Mono'] tracking-[0.3em] uppercase text-primary">
-                / filter
-              </span>
+            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">
               {(
                 [
                   {
                     key: "all",
                     label: "All",
                     count: services.length,
-                    tone: "text-slate-200",
-                    active: "bg-primary text-foreground border-primary",
+                    tone: "text-muted-foreground",
+                    active: "bg-primary text-primary-foreground border-primary",
                   },
                   {
                     key: "up",
@@ -712,10 +656,10 @@ const Status = () => {
                   },
                   {
                     key: "none",
-                    label: "No Data",
+                    label: "No data",
                     count: statusCounts.none,
                     tone: "text-muted-foreground",
-                    active: "bg-white/10 text-slate-200 border-white/30",
+                    active: "bg-muted text-foreground border-border",
                   },
                 ] as const
               ).map((f) => {
@@ -726,12 +670,17 @@ const Status = () => {
                     type="button"
                     onClick={() => setStateFilter(f.key)}
                     className={cn(
-                      "inline-flex items-center gap-2 border px-2.5 py-1 text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase transition",
+                      "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs transition",
                       on ? f.active : cn("border-border hover:border-primary/50", f.tone),
                     )}
                   >
                     <span>{f.label}</span>
-                    <span className={cn("px-1 border", on ? "border-current/40" : "border-border text-muted-foreground")}>
+                    <span
+                      className={cn(
+                        "rounded-full border px-1.5",
+                        on ? "border-current/40" : "border-border text-muted-foreground",
+                      )}
+                    >
                       {f.count}
                     </span>
                   </button>
@@ -744,7 +693,7 @@ const Status = () => {
                     setQuery("");
                     setStateFilter("all");
                   }}
-                  className="ml-auto inline-flex items-center gap-1 text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase text-muted-foreground hover:text-primary"
+                  className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
                 >
                   <X className="h-3 w-3" /> Reset
                 </button>
@@ -753,240 +702,223 @@ const Status = () => {
           </div>
 
           {loadError && rows.length === 0 ? (
-            <div className="border border-border bg-background p-12 text-center">
-              <AlertTriangle className="h-6 w-6 mx-auto mb-3 text-amber-400" />
-              <p className="font-['JetBrains_Mono'] text-sm text-muted-foreground mb-5">
-                Couldn't load status data right now.
-              </p>
-              <button
-                type="button"
-                onClick={() => loadData(range)}
-                className="inline-flex items-center gap-2 border border-border px-3 py-2 text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase text-muted-foreground hover:border-primary hover:text-primary transition"
-              >
-                <RefreshCw className="h-3.5 w-3.5" /> Try again
-              </button>
+            <div className="glass rounded-2xl p-12 text-center">
+              <AlertTriangle className="mx-auto mb-3 h-8 w-8 text-amber-400" />
+              <p className="text-muted-foreground">Couldn't load status data right now.</p>
+              <Button variant="outline" className="mt-5 rounded-full" onClick={() => loadData(range)}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Try again
+              </Button>
             </div>
           ) : loading && rows.length === 0 ? (
-            <div className="border border-border bg-background divide-y divide-white/5">
+            <div className="glass divide-y divide-border/60 rounded-2xl p-2">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-4 px-4 py-4">
-                  <div className="h-2 w-2 rounded-full bg-white/5" />
-                  <div className="h-4 w-32 bg-white/5 rounded" />
-                  <div className="flex-1 h-8 bg-white/5 rounded" />
-                  <div className="h-5 w-16 bg-white/5 rounded" />
+                  <div className="h-2 w-2 rounded-full bg-muted" />
+                  <div className="h-4 w-32 rounded bg-muted" />
+                  <div className="h-8 flex-1 rounded bg-muted" />
+                  <div className="h-5 w-16 rounded bg-muted" />
                 </div>
               ))}
             </div>
           ) : (
             <>
-          {/* Services table */}
-          <section className="border border-border bg-background">
-            <div className="hidden lg:grid grid-cols-[2rem_16rem_minmax(0,1fr)_6rem_7rem_10rem] items-center gap-4 px-4 py-2 border-b border-border text-[10px] font-['JetBrains_Mono'] uppercase tracking-[0.25em] text-muted-foreground">
-              <span>#</span>
-              <span>Service</span>
-              <span>Timeline · {range}d</span>
-              <span className="text-right">Uptime</span>
-              <span className="text-right">State</span>
-              <span className="text-right">Actions</span>
-            </div>
-            <div className="divide-y divide-white/5">
-              {(() => {
-                const q = query.trim().toLowerCase();
-                const filtered = services
-                  .map((service, idx) => ({
-                    service,
-                    idx,
-                    status: serviceCurrent[service.key] ?? ("none" as DayStatus),
-                  }))
-                  .filter(({ service, status }) => {
-                    if (stateFilter !== "all" && status !== stateFilter) return false;
-                    if (!q) return true;
-                    return (
-                      service.name.toLowerCase().includes(q) ||
-                      service.desc.toLowerCase().includes(q) ||
-                      service.key.toLowerCase().includes(q)
-                    );
-                  });
-                if (filtered.length === 0) {
-                  return (
-                    <div className="px-4 py-10 text-center font-['JetBrains_Mono'] text-xs uppercase tracking-widest text-muted-foreground">
-                      No services match your filter.
-                    </div>
-                  );
-                }
-                return filtered.map(({ service, idx, status }) => {
-                  const meta = statusMeta[status];
-                  const days = byService.get(service.key) ?? new Map<string, { pct: number | null; total: number }>();
-                  const uptime = getUptime(days);
-                  return (
-                    <div
-                      key={service.key}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setDetailKey(service.key)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          setDetailKey(service.key);
-                        }
-                      }}
-                      className="group grid lg:grid-cols-[2rem_16rem_minmax(0,1fr)_6rem_7rem_10rem] grid-cols-1 items-center gap-4 px-4 py-3 cursor-pointer hover:bg-card transition focus:outline-none focus-visible:bg-card"
-                    >
-                      <span className="hidden lg:block font-['JetBrains_Mono'] text-[10px] text-muted-foreground">
-                        {String(idx + 1).padStart(2, "0")}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", meta.dot)} />
-                          <span className="font-display font-bold truncate group-hover:text-primary transition-colors">
-                            {service.name}
+              {/* Services table */}
+              <section className="glass overflow-hidden rounded-2xl">
+                <div className="hidden border-b border-border/60 px-4 py-2 text-[10px] uppercase tracking-widest text-muted-foreground lg:grid lg:grid-cols-[2rem_16rem_minmax(0,1fr)_6rem_7rem_10rem] lg:items-center lg:gap-4">
+                  <span>#</span>
+                  <span>Service</span>
+                  <span>Timeline · {range}d</span>
+                  <span className="text-right">Uptime</span>
+                  <span className="text-right">State</span>
+                  <span className="text-right">Actions</span>
+                </div>
+                <div className="divide-y divide-border/60">
+                  {(() => {
+                    const q = query.trim().toLowerCase();
+                    const filtered = services
+                      .map((service, idx) => ({
+                        service,
+                        idx,
+                        status: serviceCurrent[service.key] ?? ("none" as DayStatus),
+                      }))
+                      .filter(({ service, status }) => {
+                        if (stateFilter !== "all" && status !== stateFilter) return false;
+                        if (!q) return true;
+                        return (
+                          service.name.toLowerCase().includes(q) ||
+                          service.desc.toLowerCase().includes(q) ||
+                          service.key.toLowerCase().includes(q)
+                        );
+                      });
+                    if (filtered.length === 0) {
+                      return (
+                        <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+                          No services match your filter.
+                        </div>
+                      );
+                    }
+                    return filtered.map(({ service, idx, status }) => {
+                      const meta = statusMeta[status];
+                      const days = byService.get(service.key) ?? new Map<string, { pct: number | null; total: number }>();
+                      const uptime = getUptime(days);
+                      return (
+                        <div
+                          key={service.key}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setDetailKey(service.key)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              setDetailKey(service.key);
+                            }
+                          }}
+                          className="group grid cursor-pointer grid-cols-1 items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/40 focus:outline-none focus-visible:bg-muted/40 lg:grid-cols-[2rem_16rem_minmax(0,1fr)_6rem_7rem_10rem]"
+                        >
+                          <span className="hidden text-xs text-muted-foreground lg:block">
+                            {String(idx + 1).padStart(2, "0")}
                           </span>
-                          {service.url && (
-                            <a
-                              href={service.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              aria-label={`Open ${service.name}`}
-                              className="shrink-0 text-muted-foreground hover:text-primary"
+                          <div className="min-w-0">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", meta.dot)} />
+                              <span className="truncate font-display text-xl tracking-wide transition-colors group-hover:text-primary">
+                                {service.name}
+                              </span>
+                              {service.url && (
+                                <a
+                                  href={service.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  aria-label={`Open ${service.name}`}
+                                  className="shrink-0 text-muted-foreground hover:text-primary"
+                                >
+                                  <ArrowUpRight className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                            </div>
+                            <div className="mt-1 truncate text-xs text-muted-foreground">{service.desc}</div>
+                          </div>
+                          <div className="min-w-0">
+                            <DayGrid days={range} byDay={days} />
+                          </div>
+                          <div className={cn("font-display text-lg tracking-wide lg:text-right", meta.text)}>
+                            {uptime !== null ? `${uptime.toFixed(2)}%` : loading ? "…" : "—"}
+                          </div>
+                          <div className="lg:flex lg:justify-end">
+                            <StatusPill status={status} />
+                          </div>
+                          <div className="flex items-center gap-1 lg:justify-end" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyText(service.url || service.desc, service.name);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-muted-foreground transition hover:border-primary hover:text-primary"
+                              title="Copy link/IP"
                             >
-                              <ArrowUpRight className="h-3.5 w-3.5" />
-                            </a>
-                          )}
+                              <Copy className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDetailKey(service.key);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition hover:border-primary hover:text-primary"
+                            >
+                              Details <ChevronRight className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="truncate font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
-                          {service.desc}
-                        </div>
-                      </div>
-                      <div className="min-w-0">
-                        <DayGrid days={range} byDay={days} />
-                      </div>
-                      <div className={cn("font-display text-base font-bold lg:text-right", meta.text)}>
-                        {uptime !== null ? `${uptime.toFixed(2)}%` : loading ? "…" : "—"}
-                      </div>
-                      <div className="lg:flex lg:justify-end">
-                        <StatusPill status={status} />
-                      </div>
-                      <div className="flex items-center gap-1 lg:justify-end" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyText(service.url || service.desc, service.name);
-                          }}
-                          className="inline-flex items-center gap-1 border border-border px-2 py-1 text-[10px] font-['JetBrains_Mono'] uppercase tracking-widest text-muted-foreground hover:border-primary hover:text-primary transition"
-                          title="Copy link/IP"
-                        >
-                          <Copy className="h-3 w-3" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDetailKey(service.key);
-                          }}
-                          className="inline-flex items-center gap-1 border border-border px-2 py-1 text-[10px] font-['JetBrains_Mono'] uppercase tracking-widest text-muted-foreground hover:border-primary hover:text-primary transition"
-                        >
-                          Details <ChevronRight className="h-3 w-3" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-          </section>
+                      );
+                    });
+                  })()}
+                </div>
+              </section>
 
-          {/* Incidents feed */}
-          {incidents.length > 0 && (
-            <section className="border border-border bg-background">
-              <div className="flex items-center gap-3 border-b border-border px-4 py-2">
-                <span className="text-[10px] font-['JetBrains_Mono'] tracking-[0.3em] uppercase text-primary">
-                  / incident log
-                </span>
-                <div className="flex-1 h-px bg-white/5" />
-                <span className="text-[10px] font-['JetBrains_Mono'] uppercase tracking-widest text-muted-foreground">
-                  {incidents.length} entries
-                </span>
-              </div>
-              <div className="divide-y divide-white/5 font-['JetBrains_Mono'] text-xs">
-                {incidents.map((incident) => {
-                  const service = services.find((item) => item.key === incident.service_key);
-                  const ongoing = !incident.closed_at;
-                  const duration = Math.max(
-                    1,
-                    Math.round(
-                      ((incident.closed_at ? new Date(incident.closed_at).getTime() : Date.now()) -
-                        new Date(incident.opened_at).getTime()) /
-                        60000,
-                    ),
-                  );
-                  return (
-                    <Link
-                      key={incident.id}
-                      to={`/status/${incident.incident_number}`}
-                      className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2 hover:bg-card group"
-                    >
-                      <span
-                        className={cn(
-                          "h-1.5 w-1.5 shrink-0 rounded-full",
-                          ongoing ? "bg-red-500 animate-pulse" : "bg-muted-foreground",
-                        )}
-                      />
-                      <span
-                        className={cn(
-                          "shrink-0 text-[10px] uppercase tracking-widest",
-                          ongoing ? "text-red-400" : "text-emerald-400",
-                        )}
-                      >
-                        {ongoing ? "OPEN" : "RESOLVED"}
-                      </span>
-                      <span className="min-w-0 flex items-center gap-3">
-                        <span className="text-muted-foreground shrink-0">{formatDateTime(incident.opened_at)}</span>
-                        <span className="text-slate-200 shrink-0">#{incident.incident_number}</span>
-                        <span className="text-slate-300 shrink-0">{service?.name ?? incident.service_key}</span>
-                        <span className="text-muted-foreground truncate">
-                          · {duration < 60 ? `${duration}m` : `${Math.floor(duration / 60)}h ${duration % 60}m`}
-                          {incident.last_error ? ` · ${incident.last_error}` : ""}
-                        </span>
-                      </span>
-                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+              {/* Incidents feed */}
+              {incidents.length > 0 && (
+                <section className="glass rounded-2xl p-6">
+                  <div className="flex items-center gap-3">
+                    <h2 className="font-display text-3xl tracking-wide">INCIDENT LOG</h2>
+                    <span className="text-sm text-muted-foreground">{incidents.length} entries</span>
+                  </div>
+                  <div className="mt-4 divide-y divide-border/60">
+                    {incidents.map((incident) => {
+                      const service = services.find((item) => item.key === incident.service_key);
+                      const ongoing = !incident.closed_at;
+                      const duration = Math.max(
+                        1,
+                        Math.round(
+                          ((incident.closed_at ? new Date(incident.closed_at).getTime() : Date.now()) -
+                            new Date(incident.opened_at).getTime()) /
+                            60000,
+                        ),
+                      );
+                      return (
+                        <Link
+                          key={incident.id}
+                          to={`/status/${incident.incident_number}`}
+                          className="group flex flex-wrap items-center gap-x-4 gap-y-1 px-2 py-3 text-sm transition-colors hover:bg-muted/40"
+                        >
+                          <span
+                            className={cn(
+                              "h-2 w-2 shrink-0 rounded-full",
+                              ongoing ? "animate-pulse bg-red-400" : "bg-muted-foreground",
+                            )}
+                          />
+                          <span
+                            className={cn(
+                              "shrink-0 text-xs font-semibold uppercase tracking-wider",
+                              ongoing ? "text-red-400" : "text-emerald-400",
+                            )}
+                          >
+                            {ongoing ? "Open" : "Resolved"}
+                          </span>
+                          <span className="shrink-0 font-medium text-foreground">
+                            #{incident.incident_number} · {service?.name ?? incident.service_key}
+                          </span>
+                          <span className="min-w-0 truncate text-xs text-muted-foreground">
+                            {formatDateTime(incident.opened_at)} ·{" "}
+                            {duration < 60 ? `${duration}m` : `${Math.floor(duration / 60)}h ${duration % 60}m`}
+                            {incident.last_error ? ` · ${incident.last_error}` : ""}
+                          </span>
+                          <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary" />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
 
-          {/* Legend footer */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-xs">
-            <div className="flex flex-wrap items-center gap-4 font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-muted-foreground">
-              <span className="text-muted-foreground">// legend</span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 bg-emerald-500" /> Up
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 bg-amber-500" /> Degraded
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 bg-red-500" /> Outage
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 bg-white/10" /> No data
-              </span>
-            </div>
-            <div className="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest text-muted-foreground">
-              Auto: {autoInterval === 0 ? "OFF" : `${autoInterval}m`} · Poll: 5m
-            </div>
-          </div>
-          {pageFootnote && (
-            <p className="whitespace-pre-wrap text-center text-xs text-muted-foreground font-['JetBrains_Mono']">
-              {pageFootnote}
-            </p>
-          )}
+              {/* Legend footer */}
+              <div className="flex flex-wrap items-center justify-between gap-3 px-2 pb-2 text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-4">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/80" /> Up
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-sm bg-amber-500/80" /> Degraded
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-sm bg-red-500/80" /> Outage
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-sm bg-muted" /> No data
+                  </span>
+                </div>
+                <div>
+                  Auto-refresh: {autoInterval === 0 ? "Off" : `${autoInterval}m`} · Checks every 5 minutes
+                </div>
+              </div>
+              {pageFootnote && (
+                <p className="whitespace-pre-wrap text-center text-xs text-muted-foreground">{pageFootnote}</p>
+              )}
             </>
           )}
-        </div>
+        </section>
       </main>
       <Footer />
 
@@ -996,7 +928,7 @@ const Status = () => {
             <>
               <DialogHeader className="pr-8 text-left">
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <DialogTitle className="font-display text-2xl leading-tight break-words">
+                  <DialogTitle className="font-display text-3xl leading-tight tracking-wide break-words">
                     {selectedService.name}
                   </DialogTitle>
                   <StatusPill status={selectedStatus} />
@@ -1055,9 +987,9 @@ const Status = () => {
                   {(["up", "degraded", "down", "none"] as DayStatus[]).map((status) => (
                     <div
                       key={status}
-                      className={cn("rounded-lg border p-3", statusMeta[status].border, statusMeta[status].tone)}
+                      className={cn("rounded-xl border p-3", statusMeta[status].border, statusMeta[status].tone)}
                     >
-                      <div className={cn("font-display text-xl font-bold", statusMeta[status].text)}>
+                      <div className={cn("font-display text-2xl tracking-wide", statusMeta[status].text)}>
                         {daySummary[status]}
                       </div>
                       <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -1071,9 +1003,9 @@ const Status = () => {
               <section className="mt-5">
                 <div className="mb-2 text-sm font-semibold">Recent checks</div>
                 {detailLoading ? (
-                  <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">Loading…</div>
+                  <div className="rounded-xl border border-border p-4 text-sm text-muted-foreground">Loading…</div>
                 ) : detailChecks.length === 0 ? (
-                  <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
+                  <div className="rounded-xl border border-border p-4 text-sm text-muted-foreground">
                     No recent checks recorded.
                   </div>
                 ) : (
@@ -1131,7 +1063,7 @@ const Status = () => {
                           <span
                             className={cn(
                               "h-2 w-2 shrink-0 rounded-full",
-                              ongoing ? "bg-destructive animate-pulse" : "bg-muted-foreground",
+                              ongoing ? "animate-pulse bg-destructive" : "bg-muted-foreground",
                             )}
                           />
                           <span className="shrink-0 font-semibold">#{incident.incident_number}</span>
@@ -1155,7 +1087,7 @@ const Status = () => {
       <Dialog open={subOpen} onOpenChange={setSubOpen}>
         <DialogContent className="sm:max-w-md bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle className="font-display text-2xl flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 font-display text-3xl tracking-wide">
               <Bell className="h-5 w-5 text-primary" /> Incident alerts
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
@@ -1163,8 +1095,8 @@ const Status = () => {
             </DialogDescription>
           </DialogHeader>
           {subDone ? (
-            <div className="mt-2 rounded border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300 flex items-start gap-2">
-              <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
+            <div className="mt-2 flex items-start gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
               <div>
                 You're on the list. We'll email <span className="font-mono">{subEmail}</span> when incidents are posted
                 or updated.
@@ -1179,27 +1111,22 @@ const Status = () => {
                   value={subEmail}
                   onChange={(e) => setSubEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="pl-9 bg-background border-border text-foreground"
+                  className="border-border bg-background pl-9 text-foreground"
                 />
               </div>
-              <button
-                type="button"
-                onClick={submitSubscribe}
-                disabled={subSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-50 text-foreground px-4 py-2.5 text-xs font-mono tracking-widest uppercase transition"
-              >
-                {subSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
+              <Button type="button" onClick={submitSubscribe} disabled={subSubmitting} className="w-full rounded-full">
+                {subSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Bell className="mr-2 h-4 w-4" />}
                 {subSubmitting ? "Subscribing" : "Notify me"}
-              </button>
+              </Button>
               <button
                 type="button"
                 onClick={unsubscribeMe}
                 disabled={subSubmitting}
-                className="w-full text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-primary transition disabled:opacity-40"
+                className="w-full text-center text-xs text-muted-foreground transition hover:text-primary disabled:opacity-40"
               >
                 Already subscribed? Unsubscribe this email
               </button>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground text-center">
+              <p className="text-center text-xs text-muted-foreground">
                 Email notifications are currently off — we're collecting subscribers and will turn them on soon.
               </p>
             </div>
