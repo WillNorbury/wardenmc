@@ -17,6 +17,7 @@ function loadChecker(fetchImpl: () => Promise<Response>) {
     getDiscordBotToken: async () => null,
     Deno: { env: { get: () => "test" }, serve: () => {} },
     Response,
+    AbortController,
     AbortSignal,
     setTimeout,
     clearTimeout,
