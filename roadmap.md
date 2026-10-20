@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Fix WardenBot ongoing issues lookup; deployed endpoint checked, outage/failure tests passed, submitted UI verified with fixtures (preview served previous source).
+- [ ] Email ongoing issues fix announcement — blocked by missing staff session; notification returned 401, published entry is ready in Admin → Changelog.
 - [x] Stop WardenBot’s excessive gateway connections; deployed REST-only refresh, authenticated refresh returned 200, 12 tests passed, public offline status verified, changelog published.
 - [ ] Restore continuous WardenBot online presence — blocked by persistent external hosting; the currently saved token successfully authenticates with Discord, so replacement is not currently required.
 - [ ] Email connection safety announcement — blocked by missing staff session; notification returned 401, published entry is ready in Admin → Changelog.

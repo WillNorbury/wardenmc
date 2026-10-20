@@ -57,13 +57,13 @@ Deno.serve(async (req) => {
     const [presenceRes, serverRes, incidentsRes] = await Promise.all([
       admin.from("site_content").select("value").eq("key", "wardenbot_presence").maybeSingle(),
       admin.from("site_content").select("value").eq("key", "server").maybeSingle(),
-      admin
-        .from("status_incidents")
-        .select("id, incident_number, service_key, opened_at, last_error")
-        .is("closed_at", null)
-        .order("opened_at", { ascending: false })
-        .limit(10),
+      admin.rpc("get_public_active_uptime_incidents", { _limit: 10 }),
     ]);
+
+    if (incidentsRes.error) {
+      console.error("Active incident lookup failed:", incidentsRes.error.message);
+      return json({ ok: false, error: "Ongoing issues could not be checked. Please try again." }, 503);
+    }
 
     const serverValue = (serverRes.data?.value ?? null) as { ip?: string } | null;
     const mcAddress = typeof serverValue?.ip === "string" && serverValue.ip ? serverValue.ip : DEFAULT_MC_ADDRESS;

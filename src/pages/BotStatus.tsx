@@ -69,6 +69,7 @@ const BotStatus = () => {
     else setRefreshing(true);
     const { data: d, error: e } = await supabase.functions.invoke("bot-status");
     if (e || !d?.ok) {
+      setData(null);
       setError(d?.error ?? "Status is not available right now.");
     } else {
       setData(d as BotStatusData);
