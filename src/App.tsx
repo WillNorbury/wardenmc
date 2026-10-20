@@ -39,6 +39,7 @@ import Changelog from "./pages/Changelog.tsx";
 import Search from "./pages/Search.tsx";
 import Support from "./pages/Support.tsx";
 import GameModes from "./pages/GameModes.tsx";
+import Live from "./pages/Live.tsx";
 import Status from "./pages/Status.tsx";
 import StatusIncident from "./pages/StatusIncident.tsx";
 import StatusUnsubscribe from "./pages/StatusUnsubscribe.tsx";
