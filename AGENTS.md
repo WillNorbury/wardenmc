@@ -2,6 +2,7 @@
 - Live announcement drafts are client-only Admin tools with per-account explicit browser saves and escaped HTML exports; never route them through app email sending because stream announcements are marketing.
 - Discord status panels are service-only per-channel records; signed Manage Server interactions configure a validated Minecraft address, fetched only via the fixed mcsrvstat provider and refreshed by the authenticated presence keepalive without a new polling job; NULL addresses preserve legacy website panels.
 - Support uses the existing private ticket and message tables and Admin ticket inbox; a dedicated authenticated submission function validates, saves and sends one fixed owner notification, while database triggers validate and rate-limit all insert paths.
+- The Support Centre request cards prefill the existing supported ticket topics and subjects; published FAQ content is reused, so the presentation does not introduce parallel report or appeal storage.
 - Profile appearance previews never write browser storage; only successful preference saves commit them, and profile exit restores saved appearance. Palette tokens live in global CSS and are hydrated from private account preferences on sign-in.
 - Personal themes store validated hex colors in private preferences; the theme color module converts them into root CSS tokens and computes contrasting foregrounds, never accepting user CSS.
 - Discord rules messages and slash-command replies share one formatter and read published website rule sections, so both channels stay consistent.
