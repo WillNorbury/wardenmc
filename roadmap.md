@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Redesign /support as the Player Support Centre with four request options, existing private tickets and a published FAQ section; verify desktop and phone views.
+- [x] Redesign /support as the Player Support Centre with four request options, existing private tickets and published FAQs; six support tests pass, desktop/phone public views checked without overflow or runtime errors.
+- [ ] Verify redesigned Support Centre ticket submission signed in — blocked because the requester has no matching account for managed preview sign-in.
 - [x] Add an Admin live announcement draft editor with preview, browser saves, copy and download controls; 7 workflow/safety/navigation tests passed, build OK; no sending or automatic detection.
 - [ ] Verify the live announcement editor in signed-in Admin — blocked because no preview session could be minted for the requester; sign in to the preview to complete the visual check.
 - [x] Add WardenBot to the public status page as a tracked service; live check returned HTTP 200, page row and details panel verified.

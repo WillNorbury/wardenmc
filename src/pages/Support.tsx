@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Headset, Send, ArrowLeft, ArrowUpRight, RefreshCw, Loader2, MessageSquare, ShieldCheck } from "lucide-react";
+import { Send, ArrowLeft, RefreshCw, Loader2, MessageSquare, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { SEO } from "@/components/site/SEO";
