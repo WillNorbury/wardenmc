@@ -17,6 +17,7 @@ import Admin from "./pages/Admin.tsx";
 import Staff from "./pages/Staff.tsx";
 import Users from "./pages/Users.tsx";
 import Discord from "./pages/Discord.tsx";
+import Yapin from "./pages/Yapin.tsx";
 import Bot from "./pages/Bot.tsx";
 import BotStatus from "./pages/BotStatus.tsx";
 import Posts from "./pages/Posts.tsx";
@@ -81,6 +82,8 @@ const Shell = () => {
               <Route path="/users" element={<Users />} />
               <Route path="/members" element={<Users />} />
               <Route path="/discord" element={<Discord />} />
+              <Route path="/yapin" element={<Yapin />} />
+              <Route path="/yapper" element={<Yapin />} />
               <Route path="/bot" element={<Bot />} />
               <Route path="/bot/status" element={<BotStatus />} />
               <Route path="/server" element={<Discord />} />

@@ -34,6 +34,7 @@ import {
   Headset,
   Bot,
   Radio,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -67,6 +68,7 @@ const communityGroup: NavGroup = {
     { to: "/staff", label: "Staff", icon: ShieldCheck },
     { to: "/users", label: "Members", icon: Users },
     { to: "/discord", label: "Discord", icon: DiscordMark },
+    { to: "/yapin", label: "Yapin'", icon: Sparkles },
     { to: "/bot", label: "Bot", icon: Bot },
     { to: "/live", label: "Live", icon: Radio },
     { to: "/partners", label: "Partners", icon: Users },
