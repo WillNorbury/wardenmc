@@ -221,17 +221,17 @@ export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAU
       let msgs: any[] = (await lr.json()).filter((m: any) => Date.parse(m.timestamp) > cutoff);
       if (o.user) msgs = msgs.filter((m) => m.author?.id === id(o.user));
       const ids = msgs.slice(0, amount).map((m) => m.id);
-      if (ids.length === 0) return "Nothing to delete (messages older than 14 days can't be bulk-deleted).";
+      if (ids.length === 0) return t("purge_none");
       const r = ids.length === 1
         ? await api("DELETE", `/channels/${ch}/messages/${ids[0]}`, undefined, "purge")
         : await api("POST", `/channels/${ch}/messages/bulk-delete`, { messages: ids }, "purge");
-      return r.ok ? `🧹 Deleted ${ids.length} message${ids.length === 1 ? "" : "s"}.` : fail(r, "delete messages");
+      return r.ok ? (ids.length === 1 ? t("purge_one") : t("purge_many", { count: String(ids.length) })) : fail(r, "delete messages");
     }
     case "slowmode": {
       const ch = body.channel_id ?? body.channel?.id;
       const s = Math.max(0, Math.min(21600, Number(o.seconds)));
       const r = await api("PATCH", `/channels/${ch}`, { rate_limit_per_user: s }, "slowmode");
-      return r.ok ? (s ? `🐢 Slowmode set to ${s}s.` : "Slowmode turned off.") : fail(r, "change slowmode");
+      return r.ok ? (s ? t("slowmode_set", { seconds: String(s) }) : t("slowmode_off")) : fail(r, "change slowmode");
     }
     case "lock":
     case "unlock": {
@@ -242,7 +242,7 @@ export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAU
       let allow = BigInt(ow?.allow ?? "0"), deny = BigInt(ow?.deny ?? "0");
       if (def.name === "lock") { deny |= SEND; allow &= ~SEND; } else { deny &= ~SEND; }
       const r = await api("PUT", `/channels/${ch}/permissions/${guild}`, { type: 0, allow: allow.toString(), deny: deny.toString() }, def.name === "lock" ? why : "unlock");
-      return r.ok ? (def.name === "lock" ? `🔒 Locked <#${ch}> — ${why}` : `🔓 Unlocked <#${ch}>`) : fail(r, `${def.name} that channel`);
+      return r.ok ? t(def.name === "lock" ? "lock" : "unlock", { channel: ch, reason: why }) : fail(r, `${def.name} that channel`);
     }
   }
   return null;
