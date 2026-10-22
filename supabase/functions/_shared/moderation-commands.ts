@@ -107,109 +107,110 @@ export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAU
 
   const me = body.member?.user?.id;
   switch (def.name) {
-    case "8ball": return `🎱 **${String(o.question).slice(0, 200)}**\n${pick(BALL)}`;
-    case "coinflip": return `🪙 ${Math.random() < 0.5 ? "Heads" : "Tails"}!`;
+    case "8ball": return t("eightball", { question: String(o.question).slice(0, 200), answer: pickReplyLine(texts, "eightball_answers") });
+    case "coinflip": return t(Math.random() < 0.5 ? "coinflip_heads" : "coinflip_tails");
     case "roll": {
       const sides = Math.max(2, Math.min(1000, Number(o.sides ?? 6))), n = Math.max(1, Math.min(20, Number(o.count ?? 1)));
       const r = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * sides));
-      return `🎲 Rolled ${n}d${sides}: ${r.join(", ")}${n > 1 ? ` (total ${r.reduce((a, b) => a + b, 0)})` : ""}`;
+      const vars = { n: String(n), sides: String(sides), rolls: r.join(", "), total: String(r.reduce((a, b) => a + b, 0)) };
+      return t(n > 1 ? "roll_multi" : "roll_single", vars);
     }
     case "rps": {
       const bot = pick(["rock", "paper", "scissors"]), you = String(o.choice);
       const beats: Record<string, string> = { rock: "scissors", paper: "rock", scissors: "paper" };
-      return `✊ You: **${you}** · Bot: **${bot}** — ${you === bot ? "It's a tie!" : beats[you] === bot ? "You win! 🎉" : "I win! 😎"}`;
+      const result = you === bot ? t("rps_tie") : beats[you] === bot ? t("rps_win") : t("rps_lose");
+      return t("rps", { you, bot, result });
     }
     case "choose": {
       const list = String(o.options).split(",").map((x) => x.trim()).filter(Boolean);
-      return list.length < 2 ? "⚠️ Give at least two options, separated by commas." : `🤔 I choose: **${pick(list)}**`;
+      return list.length < 2 ? t("choose_too_few") : t("choose", { choice: pick(list) });
     }
     case "avatar": {
       const u = id(o.user) || me;
       const user = body.data?.resolved?.users?.[u] ?? body.member?.user;
       const url = user?.avatar ? `https://cdn.discordapp.com/avatars/${u}/${user.avatar}.png?size=1024` : `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(u) >> 22n) % 6n)}.png`;
-      return `🖼️ <@${u}>'s avatar: ${url}`;
+      return t("avatar", { user: u, url });
     }
-    case "hug": return id(o.user) === me ? `🤗 <@${me}> hugs themselves. It's okay, we all need one sometimes.` : `🤗 <@${me}> gives <@${id(o.user)}> a big hug!`;
-    case "joke": return `😂 ${pick(JOKES)}`;
-    case "help": return helpReply();
+    case "hug": return id(o.user) === me ? t("hug_self", { user: me }) : t("hug", { from: me, to: id(o.user) });
+    case "joke": return t("joke", { joke: pickReplyLine(texts, "jokes") });
+    case "help": return helpReply(texts);
   }
 
   token = await getDiscordBotToken();
-  if (!token) return "❌ Bot token is not configured.";
+  if (!token) return t("mod_no_token");
   switch (def.name) {
     case "softban": {
       const u = id(o.user);
       const r = await api("PUT", `/guilds/${guild}/bans/${u}`, { delete_message_seconds: 7 * 86400 }, `softban: ${why}`);
       if (!r.ok) return fail(r, "softban that member");
       await api("DELETE", `/guilds/${guild}/bans/${u}`, undefined, "softban");
-      return `🧽 Softbanned <@${u}> (messages wiped, they can rejoin) — ${why}`;
+      return t("softban", { user: u, reason: why });
     }
     case "nick": {
       const u = id(o.user), nick = String(o.nickname ?? "").trim();
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { nick: nick || null }, "nickname");
-      return r.ok ? (nick ? `✏️ Renamed <@${u}> to **${nick}**` : `✏️ Reset <@${u}>'s nickname`) : fail(r, "change that nickname");
+      return r.ok ? (nick ? t("nick_set", { user: u, nick }) : t("nick_reset", { user: u })) : fail(r, "change that nickname");
     }
     case "addrole":
     case "removerole": {
       const u = id(o.user), role = id(o.role), add = def.name === "addrole";
       const r = await api(add ? "PUT" : "DELETE", `/guilds/${guild}/members/${u}/roles/${role}`, undefined, why);
-      return r.ok ? (add ? `➕ Gave <@&${role}> to <@${u}>` : `➖ Removed <@&${role}> from <@${u}>`) : fail(r, add ? "add that role" : "remove that role");
+      return r.ok ? t(add ? "role_add" : "role_remove", { user: u, role }) : fail(r, add ? "add that role" : "remove that role");
     }
     case "vcmute": case "vcunmute": case "deafen": case "undeafen": {
       const u = id(o.user), field = def.name.includes("mute") ? "mute" : "deaf", on = !def.name.startsWith("vcun") && !def.name.startsWith("un");
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { [field]: on }, why);
-      const label = { vcmute: "🔇 Voice-muted", vcunmute: "🔊 Voice-unmuted", deafen: "🙉 Deafened", undeafen: "👂 Undeafened" }[def.name];
-      return r.ok ? `${label} <@${u}>` : fail(r, `${def.name} that member (they must be in voice)`);
+      return r.ok ? t(def.name as "vcmute" | "vcunmute" | "deafen" | "undeafen", { user: u }) : fail(r, `${def.name} that member (they must be in voice)`);
     }
     case "vcmove": {
       const u = id(o.user), ch = id(o.channel);
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { channel_id: ch }, "vcmove");
-      return r.ok ? `➡️ Moved <@${u}> to <#${ch}>` : fail(r, "move that member (they must be in voice)");
+      return r.ok ? t("vcmove", { user: u, channel: ch }) : fail(r, "move that member (they must be in voice)");
     }
     case "vcdisconnect": {
       const u = id(o.user);
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { channel_id: null }, why);
-      return r.ok ? `📴 Disconnected <@${u}> from voice` : fail(r, "disconnect that member");
+      return r.ok ? t("vcdisconnect", { user: u }) : fail(r, "disconnect that member");
     }
     case "vclimit": {
       const ch = id(o.channel), n = Math.max(0, Math.min(99, Number(o.limit)));
       const r = await api("PATCH", `/channels/${ch}`, { user_limit: n }, "vclimit");
-      return r.ok ? (n ? `👥 <#${ch}> limited to ${n} users` : `👥 Removed the user limit on <#${ch}>`) : fail(r, "change that limit");
+      return r.ok ? (n ? t("vclimit_set", { channel: ch, limit: String(n) }) : t("vclimit_off", { channel: ch })) : fail(r, "change that limit");
     }
     case "ban": {
       const u = id(o.user);
-      await dm(u, `🔨 You were banned from the WardenMC server. Reason: ${why}`);
+      await dm(u, t("ban_dm", { reason: why }));
       const r = await api("PUT", `/guilds/${guild}/bans/${u}`, { delete_message_seconds: Math.min(7, Number(o.delete_days ?? 0)) * 86400 }, why);
-      return r.ok ? `🔨 Banned <@${u}> — ${why}` : fail(r, "ban that member");
+      return r.ok ? t("ban", { user: u, reason: why }) : fail(r, "ban that member");
     }
     case "unban": {
       const u = id(o.user_id);
-      if (!u) return "⚠️ Enter a valid user ID.";
+      if (!u) return t("unban_invalid");
       const r = await api("DELETE", `/guilds/${guild}/bans/${u}`, undefined, why);
-      return r.ok ? `✅ Unbanned <@${u}>` : fail(r, "unban that user");
+      return r.ok ? t("unban", { user: u }) : fail(r, "unban that user");
     }
     case "kick": {
       const u = id(o.user);
-      await dm(u, `👢 You were kicked from the WardenMC server. Reason: ${why}`);
+      await dm(u, t("kick_dm", { reason: why }));
       const r = await api("DELETE", `/guilds/${guild}/members/${u}`, undefined, why);
-      return r.ok ? `👢 Kicked <@${u}> — ${why}` : fail(r, "kick that member");
+      return r.ok ? t("kick", { user: u, reason: why }) : fail(r, "kick that member");
     }
     case "timeout": {
       const u = id(o.user);
       const mins = Math.max(1, Math.min(40320, Number(o.minutes)));
       const until = new Date(Date.now() + mins * 60000).toISOString();
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { communication_disabled_until: until }, why);
-      return r.ok ? `🔇 Timed out <@${u}> for ${mins} min — ${why}` : fail(r, "time out that member");
+      return r.ok ? t("timeout", { user: u, minutes: String(mins), reason: why }) : fail(r, "time out that member");
     }
     case "untimeout": {
       const u = id(o.user);
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { communication_disabled_until: null }, why);
-      return r.ok ? `🔊 Removed timeout for <@${u}>` : fail(r, "remove the timeout");
+      return r.ok ? t("untimeout", { user: u }) : fail(r, "remove the timeout");
     }
     case "warn": {
       const u = id(o.user);
-      const sent = await dm(u, `⚠️ You received a warning on the WardenMC server. Reason: ${why}`);
-      return `⚠️ Warned <@${u}> — ${why}${sent ? "" : " (couldn't DM them; their DMs may be closed)"}`;
+      const sent = await dm(u, t("warn_dm", { reason: why }));
+      return t(sent ? "warn" : "warn_no_dm", { user: u, reason: why });
     }
     case "purge": {
       const ch = body.channel_id ?? body.channel?.id;
