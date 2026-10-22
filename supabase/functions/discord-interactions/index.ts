@@ -172,7 +172,7 @@ Deno.serve(async (req) => {
         }),
         { headers: { "Content-Type": "application/json" } },
       );
-      if (!discordId) return reply("Could not determine your Discord account.");
+      if (!discordId) return reply(t("subscribe_no_account"));
 
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
@@ -185,7 +185,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (!link) {
-        return reply("⚠️ Your Discord account isn't linked to a Warden Network account yet. Sign in on the website and link Discord first.");
+        return reply(t("subscribe_not_linked"));
       }
 
       const prefs = { ...((link as any).preferences ?? {}), email_subscribed: subscribed };
@@ -195,10 +195,8 @@ Deno.serve(async (req) => {
         .eq("user_id", link.user_id);
 
 
-      if (error) return reply(`❌ Failed to update: ${error.message}`);
-      return reply(subscribed
-        ? "✅ You're subscribed to email notifications from Warden Network."
-        : "✅ You've been unsubscribed from email notifications.");
+      if (error) return reply(t("subscribe_failed", { error: error.message }));
+      return reply(subscribed ? t("subscribe_done") : t("unsubscribe_done"));
     }
     // Per-server custom reply commands (added with /addcommand).
     const customReply = await getCustomCommandResponse(body);
@@ -207,7 +205,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: { content: "Unknown command", flags: 64 },
+        data: { content: t("unknown_command"), flags: 64 },
       }),
       { headers: { "Content-Type": "application/json" } },
     );
