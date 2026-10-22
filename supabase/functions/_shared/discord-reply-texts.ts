@@ -93,19 +93,47 @@ export const DEFAULT_REPLY_TEXTS = {
 export type ReplyTextKey = keyof typeof DEFAULT_REPLY_TEXTS;
 export type ReplyTexts = Record<ReplyTextKey, string>;
 
-/** Merge saved overrides over the defaults. Unknown keys and invalid values are dropped. */
-export function mergeReplyTexts(saved: unknown): ReplyTexts {
-  const merged: ReplyTexts = { ...DEFAULT_REPLY_TEXTS };
-  const replies = (saved as any)?.replies;
-  if (!replies || typeof replies !== "object" || Array.isArray(replies)) return merged;
+/** Pick the valid overrides out of a raw { key: text } map; everything invalid is dropped. */
+export function sanitizeReplyOverrides(replies: unknown): Partial<ReplyTexts> {
+  const clean: Partial<ReplyTexts> = {};
+  if (!replies || typeof replies !== "object" || Array.isArray(replies)) return clean;
   for (const key of Object.keys(DEFAULT_REPLY_TEXTS) as ReplyTextKey[]) {
     const value = (replies as Record<string, unknown>)[key];
     if (typeof value !== "string") continue;
     const text = value.trim();
     if (!text || text.length > MAX_REPLY_TEXT_LEN) continue;
-    merged[key] = text;
+    clean[key] = text;
   }
-  return merged;
+  return clean;
+}
+
+/** Merge saved overrides over the defaults. Unknown keys and invalid values are dropped. */
+export function mergeReplyTexts(saved: unknown): ReplyTexts {
+  return { ...DEFAULT_REPLY_TEXTS, ...sanitizeReplyOverrides((saved as any)?.replies) };
+}
+
+/** Merge one server's own overrides over texts that already include the global overrides. */
+export function mergeGuildReplyTexts(base: ReplyTexts, replies: unknown): ReplyTexts {
+  return { ...base, ...sanitizeReplyOverrides(replies) };
+}
+
+/** Discord guild (server) IDs are snowflakes: 17-20 digit numbers; accept a little slack. */
+export function isValidGuildId(id: unknown): id is string {
+  return typeof id === "string" && /^\d{5,25}$/.test(id);
+}
+
+/** True when a /users/@me/guilds entry grants owner, Administrator or Manage Server. */
+export function canManageGuild(guild: unknown): boolean {
+  const g = guild as { owner?: unknown; permissions?: unknown } | null;
+  if (!g || typeof g !== "object") return false;
+  if (g.owner === true) return true;
+  try {
+    const perms = BigInt(String(g.permissions ?? "0"));
+    const ADMINISTRATOR = 0x8n, MANAGE_GUILD = 0x20n;
+    return (perms & ADMINISTRATOR) !== 0n || (perms & MANAGE_GUILD) !== 0n;
+  } catch {
+    return false;
+  }
 }
 
 /** Render one reply, replacing {placeholders} with the given values. */
@@ -123,12 +151,22 @@ export function pickReplyLine(texts: ReplyTexts, key: ReplyTextKey): string {
   return lines[Math.floor(Math.random() * lines.length)] ?? "";
 }
 
-/** Load saved overrides from site_content and merge them over the defaults. */
-export async function loadReplyTexts(client: any): Promise<ReplyTexts> {
+/**
+ * Load reply texts: defaults <- global site_content overrides <- per-server overrides
+ * (discord_guild_reply_texts) when a guild id is given.
+ */
+export async function loadReplyTexts(client: any, guildId?: string | null): Promise<ReplyTexts> {
   const { data } = await client
     .from("site_content")
     .select("value")
     .eq("key", REPLY_TEXTS_KEY)
     .maybeSingle();
-  return mergeReplyTexts(data?.value);
+  const base = mergeReplyTexts(data?.value);
+  if (!guildId) return base;
+  const { data: row } = await client
+    .from("discord_guild_reply_texts")
+    .select("replies")
+    .eq("guild_id", guildId)
+    .maybeSingle();
+  return mergeGuildReplyTexts(base, row?.replies);
 }

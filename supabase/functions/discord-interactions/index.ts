@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
     const texts = await loadReplyTexts(createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    ));
+    ), body.guild_id);
     const t = (key: Parameters<typeof renderReply>[1], vars: Record<string, string> = {}) => renderReply(texts, key, vars);
 
     if (name === "status") {
