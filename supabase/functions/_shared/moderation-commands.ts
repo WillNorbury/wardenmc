@@ -1,5 +1,6 @@
 // Discord moderation slash commands: definitions (for registration) and handler.
 import { getDiscordBotToken } from "./discord-token.ts";
+import { DEFAULT_REPLY_TEXTS, pickReplyLine, renderReply, type ReplyTexts } from "./discord-reply-texts.ts";
 
 const P = { KICK: 1n << 1n, BAN: 1n << 2n, MANAGE_CHANNELS: 1n << 4n, MANAGE_MESSAGES: 1n << 13n, MODERATE: 1n << 40n, NICK: 1n << 27n, ROLES: 1n << 28n, MUTE: 1n << 22n, DEAFEN: 1n << 23n, MOVE: 1n << 24n, NONE: 0n };
 const ROLE = 8;
@@ -44,25 +45,23 @@ export const MODERATION_COMMANDS = [
   { name: "help", description: "See all the commands you can use", perm: P.NONE, category: "help", options: [] },
 ] as { name: string; description: string; perm: bigint; category?: string; options: any[] }[];
 
-const helpReply = () => {
+const helpReply = (t: ReplyTexts) => {
   const fun = MODERATION_COMMANDS.filter((c) => c.perm === 0n && c.name !== "help")
     .map((c) => `\`/${c.name}\` — ${c.description}`);
   return [
-    "🛡️ **WardenBot — commands everyone can use**",
+    renderReply(t, "help_heading"),
     "",
     ...fun,
-    "`/rules` — Show the Warden Network server rules",
-    "`/subscribe` — Get website email updates",
-    "`/unsubscribe` — Stop website email updates",
+    renderReply(t, "help_rules"),
+    renderReply(t, "help_subscribe"),
+    renderReply(t, "help_unsubscribe"),
     "",
-    "_Moderation and voice commands are for staff only._ Questions? DM **will_norbury** or visit https://warden.rip/bot",
+    renderReply(t, "help_footer"),
   ].join("\n");
 };
 
 export const isFunCommand = (name?: string) => MODERATION_COMMANDS.some((c) => c.name === name && c.category === "fun");
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
-const BALL = ["It is certain.", "Without a doubt.", "Yes — definitely.", "Most likely.", "Signs point to yes.", "Ask again later.", "Cannot predict now.", "Don't count on it.", "My sources say no.", "Very doubtful.", "Outlook not so good.", "Creepers say yes. 💥"];
-const JOKES = ["Why did the creeper break up with his girlfriend? Because she was too explosive.", "What do you call a sleepy Enderman? An Ender-yawn.", "Why are Minecraft players bad at keeping secrets? They always spill the beans... and the lava.", "Why did Steve go to therapy? He had too many blocks.", "How does Steve stay fit? He runs around the block.", "What's a skeleton's favourite instrument? The trom-bone."];
 
 export const moderationRegistrations = () => MODERATION_COMMANDS.map((c) => ({
   name: c.name, description: c.description, type: 1, dm_permission: false,
@@ -71,13 +70,14 @@ export const moderationRegistrations = () => MODERATION_COMMANDS.map((c) => ({
 
 const SEND = 1n << 11n;
 
-export async function handleModeration(body: any): Promise<string | null> {
+export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAULT_REPLY_TEXTS }): Promise<string | null> {
+  const t = (key: Parameters<typeof renderReply>[1], vars: Record<string, string> = {}) => renderReply(texts, key, vars);
   const def = MODERATION_COMMANDS.find((c) => c.name === body.data?.name);
   if (!def) return null;
   const guild = body.guild_id;
-  if (!guild) return "⚠️ Use this command in a server.";
+  if (!guild) return t("mod_server_only");
   const perms = BigInt(body.member?.permissions ?? "0");
-  if (def.perm !== 0n && (perms & 8n) === 0n && (perms & def.perm) === 0n) return "⛔ You don't have permission to use this command.";
+  if (def.perm !== 0n && (perms & 8n) === 0n && (perms & def.perm) === 0n) return t("mod_no_permission");
 
   const o: Record<string, any> = Object.fromEntries((body.data.options ?? []).map((x: any) => [x.name, x.value]));
   const mod = body.member?.user?.username ?? "a moderator";
@@ -96,7 +96,7 @@ export async function handleModeration(body: any): Promise<string | null> {
       body: json === undefined ? undefined : JSON.stringify(json),
     });
   const fail = async (r: Response, what: string) =>
-    `❌ Couldn't ${what} (${r.status}). ${r.status === 403 ? "The bot needs the right permission and a higher role than the target." : (await r.text()).slice(0, 200)}`;
+    t("mod_api_fail", { what, status: String(r.status), detail: r.status === 403 ? t("mod_api_fail_403") : (await r.text()).slice(0, 200) });
   const id = (v: unknown) => String(v ?? "").replace(/\D/g, "");
   const dm = async (userId: string, content: string) => {
     const ch = await api("POST", "/users/@me/channels", { recipient_id: userId });
@@ -107,109 +107,110 @@ export async function handleModeration(body: any): Promise<string | null> {
 
   const me = body.member?.user?.id;
   switch (def.name) {
-    case "8ball": return `🎱 **${String(o.question).slice(0, 200)}**\n${pick(BALL)}`;
-    case "coinflip": return `🪙 ${Math.random() < 0.5 ? "Heads" : "Tails"}!`;
+    case "8ball": return t("eightball", { question: String(o.question).slice(0, 200), answer: pickReplyLine(texts, "eightball_answers") });
+    case "coinflip": return t(Math.random() < 0.5 ? "coinflip_heads" : "coinflip_tails");
     case "roll": {
       const sides = Math.max(2, Math.min(1000, Number(o.sides ?? 6))), n = Math.max(1, Math.min(20, Number(o.count ?? 1)));
       const r = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * sides));
-      return `🎲 Rolled ${n}d${sides}: ${r.join(", ")}${n > 1 ? ` (total ${r.reduce((a, b) => a + b, 0)})` : ""}`;
+      const vars = { n: String(n), sides: String(sides), rolls: r.join(", "), total: String(r.reduce((a, b) => a + b, 0)) };
+      return t(n > 1 ? "roll_multi" : "roll_single", vars);
     }
     case "rps": {
       const bot = pick(["rock", "paper", "scissors"]), you = String(o.choice);
       const beats: Record<string, string> = { rock: "scissors", paper: "rock", scissors: "paper" };
-      return `✊ You: **${you}** · Bot: **${bot}** — ${you === bot ? "It's a tie!" : beats[you] === bot ? "You win! 🎉" : "I win! 😎"}`;
+      const result = you === bot ? t("rps_tie") : beats[you] === bot ? t("rps_win") : t("rps_lose");
+      return t("rps", { you, bot, result });
     }
     case "choose": {
       const list = String(o.options).split(",").map((x) => x.trim()).filter(Boolean);
-      return list.length < 2 ? "⚠️ Give at least two options, separated by commas." : `🤔 I choose: **${pick(list)}**`;
+      return list.length < 2 ? t("choose_too_few") : t("choose", { choice: pick(list) });
     }
     case "avatar": {
       const u = id(o.user) || me;
       const user = body.data?.resolved?.users?.[u] ?? body.member?.user;
       const url = user?.avatar ? `https://cdn.discordapp.com/avatars/${u}/${user.avatar}.png?size=1024` : `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(u) >> 22n) % 6n)}.png`;
-      return `🖼️ <@${u}>'s avatar: ${url}`;
+      return t("avatar", { user: u, url });
     }
-    case "hug": return id(o.user) === me ? `🤗 <@${me}> hugs themselves. It's okay, we all need one sometimes.` : `🤗 <@${me}> gives <@${id(o.user)}> a big hug!`;
-    case "joke": return `😂 ${pick(JOKES)}`;
-    case "help": return helpReply();
+    case "hug": return id(o.user) === me ? t("hug_self", { user: me }) : t("hug", { from: me, to: id(o.user) });
+    case "joke": return t("joke", { joke: pickReplyLine(texts, "jokes") });
+    case "help": return helpReply(texts);
   }
 
   token = await getDiscordBotToken();
-  if (!token) return "❌ Bot token is not configured.";
+  if (!token) return t("mod_no_token");
   switch (def.name) {
     case "softban": {
       const u = id(o.user);
       const r = await api("PUT", `/guilds/${guild}/bans/${u}`, { delete_message_seconds: 7 * 86400 }, `softban: ${why}`);
       if (!r.ok) return fail(r, "softban that member");
       await api("DELETE", `/guilds/${guild}/bans/${u}`, undefined, "softban");
-      return `🧽 Softbanned <@${u}> (messages wiped, they can rejoin) — ${why}`;
+      return t("softban", { user: u, reason: why });
     }
     case "nick": {
       const u = id(o.user), nick = String(o.nickname ?? "").trim();
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { nick: nick || null }, "nickname");
-      return r.ok ? (nick ? `✏️ Renamed <@${u}> to **${nick}**` : `✏️ Reset <@${u}>'s nickname`) : fail(r, "change that nickname");
+      return r.ok ? (nick ? t("nick_set", { user: u, nick }) : t("nick_reset", { user: u })) : fail(r, "change that nickname");
     }
     case "addrole":
     case "removerole": {
       const u = id(o.user), role = id(o.role), add = def.name === "addrole";
       const r = await api(add ? "PUT" : "DELETE", `/guilds/${guild}/members/${u}/roles/${role}`, undefined, why);
-      return r.ok ? (add ? `➕ Gave <@&${role}> to <@${u}>` : `➖ Removed <@&${role}> from <@${u}>`) : fail(r, add ? "add that role" : "remove that role");
+      return r.ok ? t(add ? "role_add" : "role_remove", { user: u, role }) : fail(r, add ? "add that role" : "remove that role");
     }
     case "vcmute": case "vcunmute": case "deafen": case "undeafen": {
       const u = id(o.user), field = def.name.includes("mute") ? "mute" : "deaf", on = !def.name.startsWith("vcun") && !def.name.startsWith("un");
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { [field]: on }, why);
-      const label = { vcmute: "🔇 Voice-muted", vcunmute: "🔊 Voice-unmuted", deafen: "🙉 Deafened", undeafen: "👂 Undeafened" }[def.name];
-      return r.ok ? `${label} <@${u}>` : fail(r, `${def.name} that member (they must be in voice)`);
+      return r.ok ? t(def.name as "vcmute" | "vcunmute" | "deafen" | "undeafen", { user: u }) : fail(r, `${def.name} that member (they must be in voice)`);
     }
     case "vcmove": {
       const u = id(o.user), ch = id(o.channel);
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { channel_id: ch }, "vcmove");
-      return r.ok ? `➡️ Moved <@${u}> to <#${ch}>` : fail(r, "move that member (they must be in voice)");
+      return r.ok ? t("vcmove", { user: u, channel: ch }) : fail(r, "move that member (they must be in voice)");
     }
     case "vcdisconnect": {
       const u = id(o.user);
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { channel_id: null }, why);
-      return r.ok ? `📴 Disconnected <@${u}> from voice` : fail(r, "disconnect that member");
+      return r.ok ? t("vcdisconnect", { user: u }) : fail(r, "disconnect that member");
     }
     case "vclimit": {
       const ch = id(o.channel), n = Math.max(0, Math.min(99, Number(o.limit)));
       const r = await api("PATCH", `/channels/${ch}`, { user_limit: n }, "vclimit");
-      return r.ok ? (n ? `👥 <#${ch}> limited to ${n} users` : `👥 Removed the user limit on <#${ch}>`) : fail(r, "change that limit");
+      return r.ok ? (n ? t("vclimit_set", { channel: ch, limit: String(n) }) : t("vclimit_off", { channel: ch })) : fail(r, "change that limit");
     }
     case "ban": {
       const u = id(o.user);
-      await dm(u, `🔨 You were banned from the WardenMC server. Reason: ${why}`);
+      await dm(u, t("ban_dm", { reason: why }));
       const r = await api("PUT", `/guilds/${guild}/bans/${u}`, { delete_message_seconds: Math.min(7, Number(o.delete_days ?? 0)) * 86400 }, why);
-      return r.ok ? `🔨 Banned <@${u}> — ${why}` : fail(r, "ban that member");
+      return r.ok ? t("ban", { user: u, reason: why }) : fail(r, "ban that member");
     }
     case "unban": {
       const u = id(o.user_id);
-      if (!u) return "⚠️ Enter a valid user ID.";
+      if (!u) return t("unban_invalid");
       const r = await api("DELETE", `/guilds/${guild}/bans/${u}`, undefined, why);
-      return r.ok ? `✅ Unbanned <@${u}>` : fail(r, "unban that user");
+      return r.ok ? t("unban", { user: u }) : fail(r, "unban that user");
     }
     case "kick": {
       const u = id(o.user);
-      await dm(u, `👢 You were kicked from the WardenMC server. Reason: ${why}`);
+      await dm(u, t("kick_dm", { reason: why }));
       const r = await api("DELETE", `/guilds/${guild}/members/${u}`, undefined, why);
-      return r.ok ? `👢 Kicked <@${u}> — ${why}` : fail(r, "kick that member");
+      return r.ok ? t("kick", { user: u, reason: why }) : fail(r, "kick that member");
     }
     case "timeout": {
       const u = id(o.user);
       const mins = Math.max(1, Math.min(40320, Number(o.minutes)));
       const until = new Date(Date.now() + mins * 60000).toISOString();
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { communication_disabled_until: until }, why);
-      return r.ok ? `🔇 Timed out <@${u}> for ${mins} min — ${why}` : fail(r, "time out that member");
+      return r.ok ? t("timeout", { user: u, minutes: String(mins), reason: why }) : fail(r, "time out that member");
     }
     case "untimeout": {
       const u = id(o.user);
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { communication_disabled_until: null }, why);
-      return r.ok ? `🔊 Removed timeout for <@${u}>` : fail(r, "remove the timeout");
+      return r.ok ? t("untimeout", { user: u }) : fail(r, "remove the timeout");
     }
     case "warn": {
       const u = id(o.user);
-      const sent = await dm(u, `⚠️ You received a warning on the WardenMC server. Reason: ${why}`);
-      return `⚠️ Warned <@${u}> — ${why}${sent ? "" : " (couldn't DM them; their DMs may be closed)"}`;
+      const sent = await dm(u, t("warn_dm", { reason: why }));
+      return t(sent ? "warn" : "warn_no_dm", { user: u, reason: why });
     }
     case "purge": {
       const ch = body.channel_id ?? body.channel?.id;
@@ -220,17 +221,17 @@ export async function handleModeration(body: any): Promise<string | null> {
       let msgs: any[] = (await lr.json()).filter((m: any) => Date.parse(m.timestamp) > cutoff);
       if (o.user) msgs = msgs.filter((m) => m.author?.id === id(o.user));
       const ids = msgs.slice(0, amount).map((m) => m.id);
-      if (ids.length === 0) return "Nothing to delete (messages older than 14 days can't be bulk-deleted).";
+      if (ids.length === 0) return t("purge_none");
       const r = ids.length === 1
         ? await api("DELETE", `/channels/${ch}/messages/${ids[0]}`, undefined, "purge")
         : await api("POST", `/channels/${ch}/messages/bulk-delete`, { messages: ids }, "purge");
-      return r.ok ? `🧹 Deleted ${ids.length} message${ids.length === 1 ? "" : "s"}.` : fail(r, "delete messages");
+      return r.ok ? (ids.length === 1 ? t("purge_one") : t("purge_many", { count: String(ids.length) })) : fail(r, "delete messages");
     }
     case "slowmode": {
       const ch = body.channel_id ?? body.channel?.id;
       const s = Math.max(0, Math.min(21600, Number(o.seconds)));
       const r = await api("PATCH", `/channels/${ch}`, { rate_limit_per_user: s }, "slowmode");
-      return r.ok ? (s ? `🐢 Slowmode set to ${s}s.` : "Slowmode turned off.") : fail(r, "change slowmode");
+      return r.ok ? (s ? t("slowmode_set", { seconds: String(s) }) : t("slowmode_off")) : fail(r, "change slowmode");
     }
     case "lock":
     case "unlock": {
@@ -241,7 +242,7 @@ export async function handleModeration(body: any): Promise<string | null> {
       let allow = BigInt(ow?.allow ?? "0"), deny = BigInt(ow?.deny ?? "0");
       if (def.name === "lock") { deny |= SEND; allow &= ~SEND; } else { deny &= ~SEND; }
       const r = await api("PUT", `/channels/${ch}/permissions/${guild}`, { type: 0, allow: allow.toString(), deny: deny.toString() }, def.name === "lock" ? why : "unlock");
-      return r.ok ? (def.name === "lock" ? `🔒 Locked <#${ch}> — ${why}` : `🔓 Unlocked <#${ch}>`) : fail(r, `${def.name} that channel`);
+      return r.ok ? t(def.name === "lock" ? "lock" : "unlock", { channel: ch, reason: why }) : fail(r, `${def.name} that channel`);
     }
   }
   return null;

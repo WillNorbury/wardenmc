@@ -8,6 +8,7 @@ import { handleModeration, isFunCommand } from "../_shared/moderation-commands.t
 import { completeStatusInteraction } from "../_shared/discord-status.ts";
 import { canSetupStatus, statusSetupInput } from "../_shared/discord-status-model.ts";
 import { getApplyUrl, setApplyUrl } from "../_shared/discord-apply.ts";
+import { loadReplyTexts, renderReply } from "../_shared/discord-reply-texts.ts";
 import { addCustomCommand, getCustomCommandResponse, listCustomCommands, removeCustomCommand } from "../_shared/discord-custom-commands.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
@@ -66,11 +67,18 @@ Deno.serve(async (req) => {
   if (body.type === InteractionType.APPLICATION_COMMAND) {
     const name = body.data?.name;
 
+    // Website-editable reply texts (site_content -> discord_command_replies).
+    const texts = await loadReplyTexts(createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    ));
+    const t = (key: Parameters<typeof renderReply>[1], vars: Record<string, string> = {}) => renderReply(texts, key, vars);
+
     if (name === "status") {
       const valid = statusSetupInput(body);
       const allowed = canSetupStatus(body.member?.permissions);
       if (!valid || !allowed) return new Response(JSON.stringify({ type: 4, data: {
-        content: !valid ? "⚠️ Use /status setup ip:play.example.com in a server text channel (optional :port)." : "⛔ You need Manage Server permission to set up a status panel.", flags: 64,
+        content: !valid ? t("status_setup_usage") : t("status_setup_permission"), flags: 64,
       } }), { headers: { "Content-Type": "application/json" } });
       // Acknowledge before doing network work: Discord requires a reply within 3 seconds.
       EdgeRuntime.waitUntil(completeStatusInteraction(body));
@@ -78,12 +86,12 @@ Deno.serve(async (req) => {
     }
 
     if (name === "setapply") {
-      const reply = await setApplyUrl(body);
+      const reply = await setApplyUrl(body, texts);
       const ok = reply.startsWith("✅");
       return new Response(JSON.stringify({ type: 4, data: { content: reply, ...(ok ? {} : { flags: 64 }) } }), { headers: { "Content-Type": "application/json" } });
     }
     if (name === "apply") {
-      const reply = await getApplyUrl(body);
+      const reply = await getApplyUrl(body, texts);
       return new Response(JSON.stringify({ type: 4, data: { content: reply, flags: 64 } }), { headers: { "Content-Type": "application/json" } });
     }
 
@@ -116,7 +124,7 @@ Deno.serve(async (req) => {
       { headers: { "Content-Type": "application/json" } },
     );
 
-    const modReply = await handleModeration(body);
+    const modReply = await handleModeration(body, texts);
     if (modReply !== null) {
       // Record moderation actions so they show on the Admin dashboard.
       if (!isFunCommand(body.data?.name) && body.data?.name !== "help") try {
@@ -137,7 +145,7 @@ Deno.serve(async (req) => {
     }
 
     if (cmd && cmd.enabled === false) {
-      return say("⚠️ This command is currently disabled.");
+      return say(t("command_disabled"));
     }
     if (cmd && cmd.kind === "text") {
       const who = body.member?.user?.username ?? body.user?.username ?? "there";
@@ -164,7 +172,7 @@ Deno.serve(async (req) => {
         }),
         { headers: { "Content-Type": "application/json" } },
       );
-      if (!discordId) return reply("Could not determine your Discord account.");
+      if (!discordId) return reply(t("subscribe_no_account"));
 
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
@@ -177,7 +185,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (!link) {
-        return reply("⚠️ Your Discord account isn't linked to a Warden Network account yet. Sign in on the website and link Discord first.");
+        return reply(t("subscribe_not_linked"));
       }
 
       const prefs = { ...((link as any).preferences ?? {}), email_subscribed: subscribed };
@@ -187,10 +195,8 @@ Deno.serve(async (req) => {
         .eq("user_id", link.user_id);
 
 
-      if (error) return reply(`❌ Failed to update: ${error.message}`);
-      return reply(subscribed
-        ? "✅ You're subscribed to email notifications from Warden Network."
-        : "✅ You've been unsubscribed from email notifications.");
+      if (error) return reply(t("subscribe_failed", { error: error.message }));
+      return reply(subscribed ? t("subscribe_done") : t("unsubscribe_done"));
     }
     // Per-server custom reply commands (added with /addcommand).
     const customReply = await getCustomCommandResponse(body);
@@ -199,7 +205,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: { content: "Unknown command", flags: 64 },
+        data: { content: t("unknown_command"), flags: 64 },
       }),
       { headers: { "Content-Type": "application/json" } },
     );

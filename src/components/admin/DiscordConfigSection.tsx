@@ -9,7 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, RefreshCw, Hash, MessageSquare, Terminal } from "lucide-react";
+import { Plus, Trash2, Save, RefreshCw, Hash, MessageSquare, Terminal, MessagesSquare, RotateCcw } from "lucide-react";
+import { DEFAULT_REPLY_TEXTS, MAX_REPLY_TEXT_LEN, REPLY_TEXTS_KEY, REPLY_TEXT_GROUPS, type ReplyTextKey } from "@/lib/discord-reply-texts";
 
 const COMMANDS_KEY = "discord_commands";
 const CHANNELS_KEY = "discord_channels";
@@ -64,13 +65,14 @@ export const DiscordConfigSection = () => {
   const [botToken, setBotToken] = useState("");
   const [botTokenSet, setBotTokenSet] = useState(false);
   const [presenceTexts, setPresenceTexts] = useState("");
+  const [replyTexts, setReplyTexts] = useState<Record<ReplyTextKey, string>>({ ...DEFAULT_REPLY_TEXTS });
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase
         .from("site_content")
         .select("key, value")
-        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY, PRESENCE_KEY]);
+        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY, PRESENCE_KEY, REPLY_TEXTS_KEY]);
       const byKey: Record<string, any> = {};
       (data ?? []).forEach((r: any) => (byKey[r.key] = r.value));
 
@@ -125,6 +127,18 @@ export const DiscordConfigSection = () => {
       const savedPresence = byKey[PRESENCE_KEY]?.texts;
       if (Array.isArray(savedPresence) && savedPresence.length) {
         setPresenceTexts(savedPresence.filter((t: any) => typeof t === "string").join("\n"));
+      }
+
+      const savedReplies = byKey[REPLY_TEXTS_KEY]?.replies;
+      if (savedReplies && typeof savedReplies === "object" && !Array.isArray(savedReplies)) {
+        setReplyTexts((prev) => {
+          const next = { ...prev };
+          (Object.keys(DEFAULT_REPLY_TEXTS) as ReplyTextKey[]).forEach((k) => {
+            const v = (savedReplies as Record<string, unknown>)[k];
+            if (typeof v === "string" && v.trim()) next[k] = v;
+          });
+          return next;
+        });
       }
 
       setLoading(false);
@@ -214,6 +228,24 @@ export const DiscordConfigSection = () => {
     persist(PRESENCE_KEY, { texts: lines }, "Bot status lines");
   };
 
+  const saveReplyTexts = () => {
+    const entries = Object.entries(replyTexts) as [ReplyTextKey, string][];
+    if (entries.some(([, v]) => !v.trim())) {
+      toast.error("Reply texts can't be empty — reset one to its default instead");
+      return;
+    }
+    if (entries.some(([, v]) => v.length > MAX_REPLY_TEXT_LEN)) {
+      toast.error(`Each reply must be ${MAX_REPLY_TEXT_LEN} characters or fewer`);
+      return;
+    }
+    // Only store overrides; anything matching the default falls back automatically.
+    const replies: Record<string, string> = {};
+    entries.forEach(([k, v]) => {
+      if (v !== DEFAULT_REPLY_TEXTS[k]) replies[k] = v;
+    });
+    persist(REPLY_TEXTS_KEY, { replies }, "Reply texts");
+  };
+
   const syncCommands = async () => {
     setSyncing(true);
     const { data, error } = await supabase.functions.invoke("discord-register-commands", { body: {} });
@@ -269,6 +301,9 @@ export const DiscordConfigSection = () => {
         </TabsTrigger>
         <TabsTrigger value="status" className="gap-2">
           <RefreshCw className="h-4 w-4" /> Bot status
+        </TabsTrigger>
+        <TabsTrigger value="replies" className="gap-2">
+          <MessagesSquare className="h-4 w-4" /> Reply texts
         </TabsTrigger>
       </TabsList>
 
@@ -546,6 +581,61 @@ export const DiscordConfigSection = () => {
           <p className="text-xs text-muted-foreground">
             Up to 10 lines, 128 characters each. Saving does not reconnect the bot.
           </p>
+        </Card>
+      </TabsContent>
+
+      {/* ---------------- Reply texts ---------------- */}
+      <TabsContent value="replies" className="space-y-4">
+        <Card className="p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-bold">Slash command reply texts</h2>
+              <p className="text-sm text-muted-foreground">
+                What WardenBot says for each built-in command. Placeholders like{" "}
+                <code>{"{user}"}</code>, <code>{"{reason}"}</code> and <code>{"{url}"}</code> are filled in by the
+                bot — keep them in the text. Reset a reply to use its default again.
+              </p>
+            </div>
+            <Button onClick={saveReplyTexts} disabled={saving === REPLY_TEXTS_KEY}>
+              <Save className="h-4 w-4 mr-2" /> Save
+            </Button>
+          </div>
+
+          {REPLY_TEXT_GROUPS.map((group) => (
+            <div key={group.label} className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{group.label}</h3>
+              {group.keys.map(({ key, label }) => {
+                const edited = replyTexts[key] !== DEFAULT_REPLY_TEXTS[key];
+                const multiline = replyTexts[key].includes("\n") || DEFAULT_REPLY_TEXTS[key].length > 80;
+                return (
+                  <div key={key} className="rounded-lg border border-border p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label>{label}</Label>
+                      <code className="text-xs text-muted-foreground">{key}</code>
+                      {edited && <Badge variant="secondary">Edited</Badge>}
+                      {edited && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="ml-auto"
+                          title="Reset to default"
+                          onClick={() => setReplyTexts((prev) => ({ ...prev, [key]: DEFAULT_REPLY_TEXTS[key] }))}
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <Textarea
+                      rows={multiline ? 3 : 1}
+                      value={replyTexts[key]}
+                      maxLength={MAX_REPLY_TEXT_LEN}
+                      onChange={(e) => setReplyTexts((prev) => ({ ...prev, [key]: e.target.value }))}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </Card>
       </TabsContent>
       </Tabs>
