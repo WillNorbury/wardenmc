@@ -228,6 +228,24 @@ export const DiscordConfigSection = () => {
     persist(PRESENCE_KEY, { texts: lines }, "Bot status lines");
   };
 
+  const saveReplyTexts = () => {
+    const entries = Object.entries(replyTexts) as [ReplyTextKey, string][];
+    if (entries.some(([, v]) => !v.trim())) {
+      toast.error("Reply texts can't be empty — reset one to its default instead");
+      return;
+    }
+    if (entries.some(([, v]) => v.length > MAX_REPLY_TEXT_LEN)) {
+      toast.error(`Each reply must be ${MAX_REPLY_TEXT_LEN} characters or fewer`);
+      return;
+    }
+    // Only store overrides; anything matching the default falls back automatically.
+    const replies: Record<string, string> = {};
+    entries.forEach(([k, v]) => {
+      if (v !== DEFAULT_REPLY_TEXTS[k]) replies[k] = v;
+    });
+    persist(REPLY_TEXTS_KEY, { replies }, "Reply texts");
+  };
+
   const syncCommands = async () => {
     setSyncing(true);
     const { data, error } = await supabase.functions.invoke("discord-register-commands", { body: {} });
