@@ -70,13 +70,14 @@ export const moderationRegistrations = () => MODERATION_COMMANDS.map((c) => ({
 
 const SEND = 1n << 11n;
 
-export async function handleModeration(body: any): Promise<string | null> {
+export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAULT_REPLY_TEXTS }): Promise<string | null> {
+  const t = (key: Parameters<typeof renderReply>[1], vars: Record<string, string> = {}) => renderReply(texts, key, vars);
   const def = MODERATION_COMMANDS.find((c) => c.name === body.data?.name);
   if (!def) return null;
   const guild = body.guild_id;
-  if (!guild) return "⚠️ Use this command in a server.";
+  if (!guild) return t("mod_server_only");
   const perms = BigInt(body.member?.permissions ?? "0");
-  if (def.perm !== 0n && (perms & 8n) === 0n && (perms & def.perm) === 0n) return "⛔ You don't have permission to use this command.";
+  if (def.perm !== 0n && (perms & 8n) === 0n && (perms & def.perm) === 0n) return t("mod_no_permission");
 
   const o: Record<string, any> = Object.fromEntries((body.data.options ?? []).map((x: any) => [x.name, x.value]));
   const mod = body.member?.user?.username ?? "a moderator";
@@ -95,7 +96,7 @@ export async function handleModeration(body: any): Promise<string | null> {
       body: json === undefined ? undefined : JSON.stringify(json),
     });
   const fail = async (r: Response, what: string) =>
-    `❌ Couldn't ${what} (${r.status}). ${r.status === 403 ? "The bot needs the right permission and a higher role than the target." : (await r.text()).slice(0, 200)}`;
+    t("mod_api_fail", { what, status: String(r.status), detail: r.status === 403 ? t("mod_api_fail_403") : (await r.text()).slice(0, 200) });
   const id = (v: unknown) => String(v ?? "").replace(/\D/g, "");
   const dm = async (userId: string, content: string) => {
     const ch = await api("POST", "/users/@me/channels", { recipient_id: userId });
