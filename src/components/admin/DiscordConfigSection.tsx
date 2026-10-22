@@ -583,6 +583,61 @@ export const DiscordConfigSection = () => {
           </p>
         </Card>
       </TabsContent>
+
+      {/* ---------------- Reply texts ---------------- */}
+      <TabsContent value="replies" className="space-y-4">
+        <Card className="p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-bold">Slash command reply texts</h2>
+              <p className="text-sm text-muted-foreground">
+                What WardenBot says for each built-in command. Placeholders like{" "}
+                <code>{"{user}"}</code>, <code>{"{reason}"}</code> and <code>{"{url}"}</code> are filled in by the
+                bot — keep them in the text. Reset a reply to use its default again.
+              </p>
+            </div>
+            <Button onClick={saveReplyTexts} disabled={saving === REPLY_TEXTS_KEY}>
+              <Save className="h-4 w-4 mr-2" /> Save
+            </Button>
+          </div>
+
+          {REPLY_TEXT_GROUPS.map((group) => (
+            <div key={group.label} className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{group.label}</h3>
+              {group.keys.map(({ key, label }) => {
+                const edited = replyTexts[key] !== DEFAULT_REPLY_TEXTS[key];
+                const multiline = replyTexts[key].includes("\n") || DEFAULT_REPLY_TEXTS[key].length > 80;
+                return (
+                  <div key={key} className="rounded-lg border border-border p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label>{label}</Label>
+                      <code className="text-xs text-muted-foreground">{key}</code>
+                      {edited && <Badge variant="secondary">Edited</Badge>}
+                      {edited && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="ml-auto"
+                          title="Reset to default"
+                          onClick={() => setReplyTexts((prev) => ({ ...prev, [key]: DEFAULT_REPLY_TEXTS[key] }))}
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <Textarea
+                      rows={multiline ? 3 : 1}
+                      value={replyTexts[key]}
+                      maxLength={MAX_REPLY_TEXT_LEN}
+                      onChange={(e) => setReplyTexts((prev) => ({ ...prev, [key]: e.target.value }))}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </Card>
+      </TabsContent>
       </Tabs>
     </div>
   );
