@@ -151,12 +151,22 @@ export function pickReplyLine(texts: ReplyTexts, key: ReplyTextKey): string {
   return lines[Math.floor(Math.random() * lines.length)] ?? "";
 }
 
-/** Load saved overrides from site_content and merge them over the defaults. */
-export async function loadReplyTexts(client: any): Promise<ReplyTexts> {
+/**
+ * Load reply texts: defaults <- global site_content overrides <- per-server overrides
+ * (discord_guild_reply_texts) when a guild id is given.
+ */
+export async function loadReplyTexts(client: any, guildId?: string | null): Promise<ReplyTexts> {
   const { data } = await client
     .from("site_content")
     .select("value")
     .eq("key", REPLY_TEXTS_KEY)
     .maybeSingle();
-  return mergeReplyTexts(data?.value);
+  const base = mergeReplyTexts(data?.value);
+  if (!guildId) return base;
+  const { data: row } = await client
+    .from("discord_guild_reply_texts")
+    .select("replies")
+    .eq("guild_id", guildId)
+    .maybeSingle();
+  return mergeGuildReplyTexts(base, row?.replies);
 }
