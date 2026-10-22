@@ -67,11 +67,18 @@ Deno.serve(async (req) => {
   if (body.type === InteractionType.APPLICATION_COMMAND) {
     const name = body.data?.name;
 
+    // Website-editable reply texts (site_content -> discord_command_replies).
+    const texts = await loadReplyTexts(createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    ));
+    const t = (key: Parameters<typeof renderReply>[1], vars: Record<string, string> = {}) => renderReply(texts, key, vars);
+
     if (name === "status") {
       const valid = statusSetupInput(body);
       const allowed = canSetupStatus(body.member?.permissions);
       if (!valid || !allowed) return new Response(JSON.stringify({ type: 4, data: {
-        content: !valid ? "⚠️ Use /status setup ip:play.example.com in a server text channel (optional :port)." : "⛔ You need Manage Server permission to set up a status panel.", flags: 64,
+        content: !valid ? t("status_setup_usage") : t("status_setup_permission"), flags: 64,
       } }), { headers: { "Content-Type": "application/json" } });
       // Acknowledge before doing network work: Discord requires a reply within 3 seconds.
       EdgeRuntime.waitUntil(completeStatusInteraction(body));
