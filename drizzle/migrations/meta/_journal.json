@@ -64,6 +64,13 @@
       "when": 1792378109258,
       "tag": "0008_discord_apply_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792644380255,
+      "tag": "0009_create_discord_custom_commands",
+      "breakpoints": true
     }
   ]
 }
