@@ -86,12 +86,12 @@ Deno.serve(async (req) => {
     }
 
     if (name === "setapply") {
-      const reply = await setApplyUrl(body);
+      const reply = await setApplyUrl(body, texts);
       const ok = reply.startsWith("✅");
       return new Response(JSON.stringify({ type: 4, data: { content: reply, ...(ok ? {} : { flags: 64 }) } }), { headers: { "Content-Type": "application/json" } });
     }
     if (name === "apply") {
-      const reply = await getApplyUrl(body);
+      const reply = await getApplyUrl(body, texts);
       return new Response(JSON.stringify({ type: 4, data: { content: reply, flags: 64 } }), { headers: { "Content-Type": "application/json" } });
     }
 
@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
       { headers: { "Content-Type": "application/json" } },
     );
 
-    const modReply = await handleModeration(body);
+    const modReply = await handleModeration(body, texts);
     if (modReply !== null) {
       // Record moderation actions so they show on the Admin dashboard.
       if (!isFunCommand(body.data?.name) && body.data?.name !== "help") try {
@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
     }
 
     if (cmd && cmd.enabled === false) {
-      return say("⚠️ This command is currently disabled.");
+      return say(t("command_disabled"));
     }
     if (cmd && cmd.kind === "text") {
       const who = body.member?.user?.username ?? body.user?.username ?? "there";
