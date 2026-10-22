@@ -1,5 +1,6 @@
 // Discord moderation slash commands: definitions (for registration) and handler.
 import { getDiscordBotToken } from "./discord-token.ts";
+import { DEFAULT_REPLY_TEXTS, pickReplyLine, renderReply, type ReplyTexts } from "./discord-reply-texts.ts";
 
 const P = { KICK: 1n << 1n, BAN: 1n << 2n, MANAGE_CHANNELS: 1n << 4n, MANAGE_MESSAGES: 1n << 13n, MODERATE: 1n << 40n, NICK: 1n << 27n, ROLES: 1n << 28n, MUTE: 1n << 22n, DEAFEN: 1n << 23n, MOVE: 1n << 24n, NONE: 0n };
 const ROLE = 8;
@@ -44,25 +45,23 @@ export const MODERATION_COMMANDS = [
   { name: "help", description: "See all the commands you can use", perm: P.NONE, category: "help", options: [] },
 ] as { name: string; description: string; perm: bigint; category?: string; options: any[] }[];
 
-const helpReply = () => {
+const helpReply = (t: ReplyTexts) => {
   const fun = MODERATION_COMMANDS.filter((c) => c.perm === 0n && c.name !== "help")
     .map((c) => `\`/${c.name}\` — ${c.description}`);
   return [
-    "🛡️ **WardenBot — commands everyone can use**",
+    renderReply(t, "help_heading"),
     "",
     ...fun,
-    "`/rules` — Show the Warden Network server rules",
-    "`/subscribe` — Get website email updates",
-    "`/unsubscribe` — Stop website email updates",
+    renderReply(t, "help_rules"),
+    renderReply(t, "help_subscribe"),
+    renderReply(t, "help_unsubscribe"),
     "",
-    "_Moderation and voice commands are for staff only._ Questions? DM **will_norbury** or visit https://warden.rip/bot",
+    renderReply(t, "help_footer"),
   ].join("\n");
 };
 
 export const isFunCommand = (name?: string) => MODERATION_COMMANDS.some((c) => c.name === name && c.category === "fun");
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
-const BALL = ["It is certain.", "Without a doubt.", "Yes — definitely.", "Most likely.", "Signs point to yes.", "Ask again later.", "Cannot predict now.", "Don't count on it.", "My sources say no.", "Very doubtful.", "Outlook not so good.", "Creepers say yes. 💥"];
-const JOKES = ["Why did the creeper break up with his girlfriend? Because she was too explosive.", "What do you call a sleepy Enderman? An Ender-yawn.", "Why are Minecraft players bad at keeping secrets? They always spill the beans... and the lava.", "Why did Steve go to therapy? He had too many blocks.", "How does Steve stay fit? He runs around the block.", "What's a skeleton's favourite instrument? The trom-bone."];
 
 export const moderationRegistrations = () => MODERATION_COMMANDS.map((c) => ({
   name: c.name, description: c.description, type: 1, dm_permission: false,
