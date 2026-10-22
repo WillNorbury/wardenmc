@@ -4,7 +4,19 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, Bot as BotIcon, ExternalLink, Globe, Gavel, Mic, PartyPopper, Copy, Check, Loader2, Users } from "lucide-react";
+import {
+  Activity,
+  Bot as BotIcon,
+  ExternalLink,
+  Globe,
+  Gavel,
+  Mic,
+  PartyPopper,
+  Copy,
+  Check,
+  Loader2,
+  Users,
+} from "lucide-react";
 import DiscordMark from "@/components/site/DiscordMark";
 
 type InviteState =
@@ -13,7 +25,11 @@ type InviteState =
   | { status: "error"; message: string };
 
 const FEATURES = [
-  { icon: Gavel, title: "Moderation", text: "Ban, kick, warn, mute and more — with clear commands your staff already know." },
+  {
+    icon: Gavel,
+    title: "Moderation",
+    text: "Ban, kick, warn, mute and more — with clear commands your staff already know.",
+  },
   { icon: Mic, title: "Voice tools", text: "Mute, deafen, move and disconnect members right from a slash command." },
   { icon: PartyPopper, title: "Fun commands", text: "8ball, coinflip, dice rolls, RPS and jokes to keep chat alive." },
   { icon: Users, title: "Server perks", text: "Auto-assigns roles and keeps website ranks in sync." },
@@ -23,6 +39,7 @@ const LINKS = [
   { label: "Website", href: "https://warden.rip" },
   { label: "Main Discord Server", href: "https://discord.warden.rip" },
   { label: "Discord TOS", href: "https://discord.com/tos" },
+  { label: "Bot Dashboard", href: "https://bot.warden.rip" },
 ];
 
 const Bot = () => {
@@ -80,7 +97,12 @@ const Bot = () => {
             {invite.status === "ready" && (
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Button asChild size="lg" className="rounded-full px-8 text-base glow">
-                  <a href={invite.inviteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
+                  <a
+                    href={invite.inviteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center"
+                  >
                     <BotIcon className="mr-2 h-5 w-5" /> Add to Discord
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </a>
@@ -110,9 +132,7 @@ const Bot = () => {
                 <Loader2 className="h-4 w-4 animate-spin" /> Getting the invite link…
               </div>
             )}
-            {invite.status === "error" && (
-              <p className="mt-8 text-sm text-destructive">{invite.message}</p>
-            )}
+            {invite.status === "error" && <p className="mt-8 text-sm text-destructive">{invite.message}</p>}
           </div>
         </section>
 
