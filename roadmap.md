@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Per-server custom reply commands (/addcommand, /removecommand, /commands): 16 model tests pass, functions deployed, 41 commands registered with Discord, DB round-trip verified, changelog emailed to 24 subscribers (wardenmc@warden.rip rejected as before). Real in-Discord /addcommand run not exercised from chat.
 - [x] Redesign /support as the Player Support Centre with four request options, existing private tickets and published FAQs; six support tests pass, desktop/phone public views checked without overflow or runtime errors.
 - [ ] Verify redesigned Support Centre ticket submission signed in — blocked because the requester has no matching account for managed preview sign-in.
 - [ ] Send Player Support Centre changelog email — blocked by missing staff session; published entry e2547ee3-b2a8-4222-9d7f-43466433fa83 is ready in Admin → Changelog.

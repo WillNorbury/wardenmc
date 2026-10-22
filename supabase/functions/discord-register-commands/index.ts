@@ -5,6 +5,7 @@ import { getDiscordBotToken } from "../_shared/discord-token.ts";
 import { moderationRegistrations } from "../_shared/moderation-commands.ts";
 import { statusRegistration } from "../_shared/discord-status-model.ts";
 import { applyRegistration, setApplyRegistration } from "../_shared/discord-apply-model.ts";
+import { addCommandRegistration, listCommandsRegistration, removeCommandRegistration } from "../_shared/discord-custom-commands-model.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,8 +53,8 @@ Deno.serve(async (req) => {
       { name: "unsubscribe", description: "Unsubscribe from email notifications from Warden Network", type: 1 },
     ];
     const modNames = new Set(moderationRegistrations().map((m) => m.name));
-    const builtIn = new Set([...modNames, "status", "setapply", "apply"]);
-    const allCmds = [...cmds.filter((c) => !builtIn.has(c.name)), ...moderationRegistrations(), statusRegistration, setApplyRegistration, applyRegistration];
+    const builtIn = new Set([...modNames, "status", "setapply", "apply", "addcommand", "removecommand", "commands"]);
+    const allCmds = [...cmds.filter((c) => !builtIn.has(c.name)), ...moderationRegistrations(), statusRegistration, setApplyRegistration, applyRegistration, addCommandRegistration, removeCommandRegistration, listCommandsRegistration];
     const r = await fetch(`https://discord.com/api/v10/applications/${appId}/commands`, {
       method: "PUT",
       headers: { Authorization: `Bot ${token}`, "Content-Type": "application/json" },

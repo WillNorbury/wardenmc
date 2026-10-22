@@ -656,6 +656,33 @@ export type Database = {
         }
         Relationships: []
       }
+      discord_custom_commands: {
+        Row: {
+          created_at: string
+          created_by: string
+          guild_id: string
+          id: string
+          name: string
+          response: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          guild_id: string
+          id?: string
+          name: string
+          response: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          guild_id?: string
+          id?: string
+          name?: string
+          response?: string
+        }
+        Relationships: []
+      }
       discord_link_states: {
         Row: {
           created_at: string
