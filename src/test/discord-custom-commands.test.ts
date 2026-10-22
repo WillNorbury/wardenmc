@@ -80,8 +80,7 @@ describe("addCommandInput", () => {
   });
   it("rejects names that clash with built-in commands", () => {
     const result = addCommandInput(addBody("ban", "no"), RESERVED);
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toContain("built-in");
+    expect(result).toEqual({ ok: false, error: expect.stringContaining("built-in") });
     expect(addCommandInput(addBody("status", "no"), RESERVED).ok).toBe(false);
   });
   it("rejects invalid names and responses", () => {
@@ -117,7 +116,7 @@ describe("registrations", () => {
   });
   it("removecommand requires Manage Server; commands is usable by everyone", () => {
     expect(removeCommandRegistration.default_member_permissions).toBe("32");
-    expect(listCommandsRegistration.default_member_permissions).toBeUndefined();
+    expect(listCommandsRegistration).not.toHaveProperty("default_member_permissions");
     expect(listCommandsRegistration.dm_permission).toBe(false);
   });
   it("caps custom commands per server", () => {
