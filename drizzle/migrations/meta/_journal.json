@@ -78,6 +78,13 @@
       "when": 1792645618390,
       "tag": "0010_create_discord_guild_reply_texts",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792645911767,
+      "tag": "0011_create_discord_guild_module_settings",
+      "breakpoints": true
     }
   ]
 }

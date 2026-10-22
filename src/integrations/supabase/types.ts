@@ -683,6 +683,30 @@ export type Database = {
         }
         Relationships: []
       }
+      discord_guild_module_settings: {
+        Row: {
+          guild_id: string
+          module: string
+          settings: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          guild_id: string
+          module: string
+          settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          guild_id?: string
+          module?: string
+          settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       discord_guild_reply_texts: {
         Row: {
           guild_id: string
