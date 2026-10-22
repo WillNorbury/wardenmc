@@ -8,6 +8,7 @@ import { handleModeration, isFunCommand } from "../_shared/moderation-commands.t
 import { completeStatusInteraction } from "../_shared/discord-status.ts";
 import { canSetupStatus, statusSetupInput } from "../_shared/discord-status-model.ts";
 import { getApplyUrl, setApplyUrl } from "../_shared/discord-apply.ts";
+import { addCustomCommand, getCustomCommandResponse, listCustomCommands, removeCustomCommand } from "../_shared/discord-custom-commands.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -83,6 +84,16 @@ Deno.serve(async (req) => {
     }
     if (name === "apply") {
       const reply = await getApplyUrl(body);
+      return new Response(JSON.stringify({ type: 4, data: { content: reply, flags: 64 } }), { headers: { "Content-Type": "application/json" } });
+    }
+
+    if (name === "addcommand" || name === "removecommand") {
+      const reply = name === "addcommand" ? await addCustomCommand(body) : await removeCustomCommand(body);
+      const ok = reply.startsWith("✅");
+      return new Response(JSON.stringify({ type: 4, data: { content: reply, ...(ok ? {} : { flags: 64 }) } }), { headers: { "Content-Type": "application/json" } });
+    }
+    if (name === "commands") {
+      const reply = await listCustomCommands(body);
       return new Response(JSON.stringify({ type: 4, data: { content: reply, flags: 64 } }), { headers: { "Content-Type": "application/json" } });
     }
 
@@ -181,6 +192,10 @@ Deno.serve(async (req) => {
         ? "✅ You're subscribed to email notifications from Warden Network."
         : "✅ You've been unsubscribed from email notifications.");
     }
+    // Per-server custom reply commands (added with /addcommand).
+    const customReply = await getCustomCommandResponse(body);
+    if (customReply) return say(customReply, false);
+
     return new Response(
       JSON.stringify({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
