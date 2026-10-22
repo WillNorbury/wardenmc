@@ -302,6 +302,9 @@ export const DiscordConfigSection = () => {
         <TabsTrigger value="status" className="gap-2">
           <RefreshCw className="h-4 w-4" /> Bot status
         </TabsTrigger>
+        <TabsTrigger value="replies" className="gap-2">
+          <MessagesSquare className="h-4 w-4" /> Reply texts
+        </TabsTrigger>
       </TabsList>
 
       {/* ---------------- Commands ---------------- */}
