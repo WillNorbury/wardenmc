@@ -67,3 +67,50 @@ describe("reply text keys", () => {
     }
   });
 });
+
+describe("per-server reply texts", () => {
+  it("guild overrides win over global overrides and defaults", async () => {
+    const { mergeGuildReplyTexts, loadReplyTexts } = await import("../../supabase/functions/_shared/discord-reply-texts");
+    const base = mergeReplyTexts({ replies: { coinflip_heads: "Global heads" } });
+    const merged = mergeGuildReplyTexts(base, { coinflip_heads: "Guild heads", bogus: "x" });
+    expect(merged.coinflip_heads).toBe("Guild heads");
+    expect((merged as Record<string, string>).bogus).toBeUndefined();
+    expect(merged.coinflip_tails).toBe(DEFAULT_REPLY_TEXTS.coinflip_tails);
+
+    const client = {
+      from: (table: string) => ({
+        select: () => ({
+          eq: (_col: string, _val: string) => ({
+            maybeSingle: async () => ({
+              data: table === "site_content"
+                ? { value: { replies: { coinflip_heads: "Global heads" } } }
+                : { replies: { coinflip_heads: "Guild heads" } },
+            }),
+          }),
+        }),
+      }),
+    };
+    expect((await loadReplyTexts(client, "123456789012345678")).coinflip_heads).toBe("Guild heads");
+    expect((await loadReplyTexts(client)).coinflip_heads).toBe("Global heads");
+  });
+});
+
+describe("dashboard API guards", () => {
+  it("accepts only snowflake-shaped guild ids", async () => {
+    const { isValidGuildId } = await import("../../supabase/functions/_shared/discord-reply-texts");
+    expect(isValidGuildId("123456789012345678")).toBe(true);
+    expect(isValidGuildId("abc")).toBe(false);
+    expect(isValidGuildId("123'; DROP TABLE--")).toBe(false);
+    expect(isValidGuildId(123)).toBe(false);
+  });
+
+  it("grants manage access to owner, Administrator or Manage Server only", async () => {
+    const { canManageGuild } = await import("../../supabase/functions/_shared/discord-reply-texts");
+    expect(canManageGuild({ owner: true, permissions: "0" })).toBe(true);
+    expect(canManageGuild({ owner: false, permissions: "8" })).toBe(true); // Administrator
+    expect(canManageGuild({ owner: false, permissions: "32" })).toBe(true); // Manage Server
+    expect(canManageGuild({ owner: false, permissions: "16" })).toBe(false); // Manage Channels only
+    expect(canManageGuild({ owner: false, permissions: "0" })).toBe(false);
+    expect(canManageGuild(null)).toBe(false);
+  });
+});
