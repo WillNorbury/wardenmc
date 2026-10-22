@@ -1,4 +1,8 @@
 # Roadmap
+- [x] Per-server Welcome/Reaction Roles/AutoMod modules: settings table, discord-modules-api (x-dashboard-secret + Discord-verified Manage Server), native AutoMod sync on save, 14 model tests pass, wrong/missing secret returns 401, DB round-trip verified, changelog published (id f5e2c196-0e1a-4854-bf6c-c72abc2eb449).
+- [ ] Send bot modules changelog email — blocked by missing staff session; notify-changelog needs Send in Admin → Changelog.
+- [ ] Verify discord-modules-api happy path with a real guild — needs a real server ID + manager user ID from the dashboard project.
+- [ ] Welcome/goodbye sending and reaction-role grant/remove need a live gateway connection (bot is REST-only); only AutoMod is enforced today, via Discord native AutoMod.
 - [x] Per-server custom reply commands (/addcommand, /removecommand, /commands): 16 model tests pass, functions deployed, 41 commands registered with Discord, DB round-trip verified, changelog emailed to 24 subscribers (wardenmc@warden.rip rejected as before). Real in-Discord /addcommand run not exercised from chat.
 - [x] Redesign /support as the Player Support Centre with four request options, existing private tickets and published FAQs; six support tests pass, desktop/phone public views checked without overflow or runtime errors.
 - [ ] Verify redesigned Support Centre ticket submission signed in — blocked because the requester has no matching account for managed preview sign-in.
