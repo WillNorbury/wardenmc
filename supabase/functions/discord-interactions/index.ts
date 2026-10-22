@@ -8,6 +8,7 @@ import { handleModeration, isFunCommand } from "../_shared/moderation-commands.t
 import { completeStatusInteraction } from "../_shared/discord-status.ts";
 import { canSetupStatus, statusSetupInput } from "../_shared/discord-status-model.ts";
 import { getApplyUrl, setApplyUrl } from "../_shared/discord-apply.ts";
+import { loadReplyTexts, renderReply } from "../_shared/discord-reply-texts.ts";
 import { addCustomCommand, getCustomCommandResponse, listCustomCommands, removeCustomCommand } from "../_shared/discord-custom-commands.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
