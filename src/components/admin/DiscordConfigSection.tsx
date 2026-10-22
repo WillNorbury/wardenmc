@@ -9,7 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, RefreshCw, Hash, MessageSquare, Terminal } from "lucide-react";
+import { Plus, Trash2, Save, RefreshCw, Hash, MessageSquare, Terminal, MessagesSquare, RotateCcw } from "lucide-react";
+import { DEFAULT_REPLY_TEXTS, MAX_REPLY_TEXT_LEN, REPLY_TEXTS_KEY, REPLY_TEXT_GROUPS, type ReplyTextKey } from "@/lib/discord-reply-texts";
 
 const COMMANDS_KEY = "discord_commands";
 const CHANNELS_KEY = "discord_channels";
@@ -64,13 +65,14 @@ export const DiscordConfigSection = () => {
   const [botToken, setBotToken] = useState("");
   const [botTokenSet, setBotTokenSet] = useState(false);
   const [presenceTexts, setPresenceTexts] = useState("");
+  const [replyTexts, setReplyTexts] = useState<Record<ReplyTextKey, string>>({ ...DEFAULT_REPLY_TEXTS });
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase
         .from("site_content")
         .select("key, value")
-        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY, PRESENCE_KEY]);
+        .in("key", [COMMANDS_KEY, CHANNELS_KEY, TEMPLATES_KEY, PRESENCE_KEY, REPLY_TEXTS_KEY]);
       const byKey: Record<string, any> = {};
       (data ?? []).forEach((r: any) => (byKey[r.key] = r.value));
 
@@ -125,6 +127,18 @@ export const DiscordConfigSection = () => {
       const savedPresence = byKey[PRESENCE_KEY]?.texts;
       if (Array.isArray(savedPresence) && savedPresence.length) {
         setPresenceTexts(savedPresence.filter((t: any) => typeof t === "string").join("\n"));
+      }
+
+      const savedReplies = byKey[REPLY_TEXTS_KEY]?.replies;
+      if (savedReplies && typeof savedReplies === "object" && !Array.isArray(savedReplies)) {
+        setReplyTexts((prev) => {
+          const next = { ...prev };
+          (Object.keys(DEFAULT_REPLY_TEXTS) as ReplyTextKey[]).forEach((k) => {
+            const v = (savedReplies as Record<string, unknown>)[k];
+            if (typeof v === "string" && v.trim()) next[k] = v;
+          });
+          return next;
+        });
       }
 
       setLoading(false);
