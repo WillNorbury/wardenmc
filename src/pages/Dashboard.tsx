@@ -121,7 +121,7 @@ const Dashboard = () => {
         ...((builtIn?.data ?? []) as { role: string }[]).map((row) => row.role),
         ...((custom?.data ?? []) as { role_key: string }[]).map((row) => row.role_key),
       ]);
-      setApps((applications?.data ?? []) as Application[]);
+      setApps((applications ?? []) as Application[]);
       setTickets(ticketCount ?? 0);
       if (streakRow?.data) setStreaks(streakRow.data as unknown as Streaks);
       setLoading(false);
