@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Move page content clear of the fixed top bar (server, partner, profile, plugin-settings pages) so the back link is clickable instead of hitting the logo; verified in a test browser that the link sits below the bar and opens /servers.
+- [x] Publish and email the "Back link no longer hides under the top bar" changelog (entry 3a3dedeb-513b-44f4-9002-846f7f293a52); 25 subscribers queued, none failed.
 - [x] Restore /dashboard as the signed-in member screen (profile, roles, streaks, Minecraft link, applications, uploads, servers); route, sidebar entry and guard tests in place; signed-in render verified in a test browser.
 - [x] Send the "Member dashboard is back" changelog email (entry 7f3c1a92-4b6e-4d18-9a5f-2c8e6d0b4173); 25 of 26 subscribers queued, wardenmc@warden.rip rejected as before.
 - [ ] Confirm /nick with a real signed Discord interaction — awaiting the user's retry in Discord; synthetic tests cannot generate Discord's signature.

@@ -272,7 +272,7 @@ const PluginSettings = () => {
     return (
       <>
         <Navbar />
-        <main className="container max-w-4xl py-16 text-center">
+        <main className="container max-w-4xl pt-28 pb-16 text-center">
           <h1 className="font-display text-2xl font-bold mb-2">Plugin not found</h1>
           <Button asChild variant="outline" className="mt-4">
             <Link to="/plugins">Browse plugins</Link>
@@ -289,7 +289,7 @@ const PluginSettings = () => {
     return (
       <>
         <Navbar />
-        <main className="container max-w-4xl py-16 text-center">
+        <main className="container max-w-4xl pt-28 pb-16 text-center">
           <h1 className="font-display text-2xl font-bold mb-2">Access denied</h1>
           <p className="text-muted-foreground">You don't have permission to edit this plugin.</p>
           <Button asChild variant="outline" className="mt-4">
