@@ -1,6 +1,7 @@
 // Discord moderation slash commands: definitions (for registration) and handler.
 import { getDiscordBotToken } from "./discord-token.ts";
 import { DEFAULT_REPLY_TEXTS, pickReplyLine, renderReply, type ReplyTexts } from "./discord-reply-texts.ts";
+import { nickRefusalKey } from "./discord-nick-model.ts";
 
 const P = { KICK: 1n << 1n, BAN: 1n << 2n, MANAGE_CHANNELS: 1n << 4n, MANAGE_MESSAGES: 1n << 13n, MODERATE: 1n << 40n, NICK: 1n << 27n, ROLES: 1n << 28n, MUTE: 1n << 22n, DEAFEN: 1n << 23n, MOVE: 1n << 24n, NONE: 0n };
 const ROLE = 8;
@@ -154,7 +155,7 @@ export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAU
         // Discord never lets a bot rename the server owner, whatever its role.
         const g = await api("GET", `/guilds/${guild}`);
         const ownerId = g.ok ? (await g.json())?.owner_id : null;
-        return t(ownerId === u ? "nick_owner" : "nick_forbidden", { user: u });
+        return t(nickRefusalKey(u, ownerId), { user: u });
       }
       return fail(r, "change that nickname");
     }
