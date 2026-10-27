@@ -47,6 +47,8 @@ import Status from "./pages/Status.tsx";
 import StatusIncident from "./pages/StatusIncident.tsx";
 import StatusUnsubscribe from "./pages/StatusUnsubscribe.tsx";
 import GameModeDetail from "./pages/GameModeDetail.tsx";
+import Servers from "./pages/Servers.tsx";
+import ServerDetail from "./pages/ServerDetail.tsx";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/site/AppSidebar";
 
@@ -90,6 +92,9 @@ const Shell = () => {
               <Route path="/bot/commands" element={<BotCommands />} />
               <Route path="/community" element={<Community />} />
               <Route path="/bot/status" element={<BotStatus />} />
+              <Route path="/servers" element={<Servers />} />
+              <Route path="/server/:slug" element={<ServerDetail />} />
+              <Route path="/servers/:slug" element={<ServerDetail />} />
               <Route path="/server" element={<Discord />} />
               <Route path="/posts" element={<Posts />} />
               <Route path="/post" element={<PostCompose />} />
