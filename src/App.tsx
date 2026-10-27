@@ -19,6 +19,8 @@ import Users from "./pages/Users.tsx";
 import Discord from "./pages/Discord.tsx";
 import Yapin from "./pages/Yapin.tsx";
 import Bot from "./pages/Bot.tsx";
+import BotCommands from "./pages/BotCommands.tsx";
+import Community from "./pages/Community.tsx";
 import BotStatus from "./pages/BotStatus.tsx";
 import Posts from "./pages/Posts.tsx";
 import PostCompose from "./pages/PostCompose.tsx";
@@ -85,6 +87,8 @@ const Shell = () => {
               <Route path="/yapin" element={<Yapin />} />
               <Route path="/yapper" element={<Yapin />} />
               <Route path="/bot" element={<Bot />} />
+              <Route path="/bot/commands" element={<BotCommands />} />
+              <Route path="/community" element={<Community />} />
               <Route path="/bot/status" element={<BotStatus />} />
               <Route path="/server" element={<Discord />} />
               <Route path="/posts" element={<Posts />} />

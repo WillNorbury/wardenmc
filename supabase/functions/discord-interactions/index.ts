@@ -10,6 +10,7 @@ import { canSetupStatus, statusSetupInput } from "../_shared/discord-status-mode
 import { getApplyUrl, setApplyUrl } from "../_shared/discord-apply.ts";
 import { loadReplyTexts, renderReply } from "../_shared/discord-reply-texts.ts";
 import { addCustomCommand, getCustomCommandResponse, listCustomCommands, removeCustomCommand } from "../_shared/discord-custom-commands.ts";
+import { completeDeferredReply, deferredReply } from "../_shared/discord-deferred.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -65,6 +66,20 @@ Deno.serve(async (req) => {
   }
 
   if (body.type === InteractionType.APPLICATION_COMMAND) {
+    // Discord's 3-second deadline includes database lookups and cold starts.
+    // Keep every command private and defer before the first network request.
+    if (body.data?.name === "status") {
+      EdgeRuntime.waitUntil(completeStatusInteraction(body));
+    } else {
+      EdgeRuntime.waitUntil(completeDeferredReply(body, () => handleApplicationCommand(body)));
+    }
+    return deferredReply();
+  }
+
+  return new Response("ok");
+});
+
+async function handleApplicationCommand(body: any): Promise<Response> {
     const name = body.data?.name;
 
     // Website-editable reply texts (site_content -> discord_command_replies).
@@ -73,17 +88,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     ), body.guild_id);
     const t = (key: Parameters<typeof renderReply>[1], vars: Record<string, string> = {}) => renderReply(texts, key, vars);
-
-    if (name === "status") {
-      const valid = statusSetupInput(body);
-      const allowed = canSetupStatus(body.member?.permissions);
-      if (!valid || !allowed) return new Response(JSON.stringify({ type: 4, data: {
-        content: !valid ? t("status_setup_usage") : t("status_setup_permission"), flags: 64,
-      } }), { headers: { "Content-Type": "application/json" } });
-      // Acknowledge before doing network work: Discord requires a reply within 3 seconds.
-      EdgeRuntime.waitUntil(completeStatusInteraction(body));
-      return new Response(JSON.stringify({ type: 5, data: { flags: 64 } }), { headers: { "Content-Type": "application/json" } });
-    }
 
     if (name === "setapply") {
       const reply = await setApplyUrl(body, texts);
@@ -113,7 +117,7 @@ Deno.serve(async (req) => {
     const { data: cmdRow } = await cfgClient
       .from("site_content").select("value").eq("key", "discord_commands").maybeSingle();
     const configured: any[] = Array.isArray((cmdRow?.value as any)?.commands)
-      ? (cmdRow!.value as any).commands
+      ? (cmdRow?.value as any).commands
       : [];
     const cmd = configured.find((c) => c?.name === name);
     const say = (content: string, ephemeral = true) => new Response(
@@ -209,7 +213,4 @@ Deno.serve(async (req) => {
       }),
       { headers: { "Content-Type": "application/json" } },
     );
-  }
-
-  return new Response("ok");
-});
+}
