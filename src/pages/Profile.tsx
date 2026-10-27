@@ -246,7 +246,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
+      <main className="flex-1 container mx-auto px-4 pt-28 pb-12 max-w-3xl">
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
             <h1 className="text-4xl font-display font-bold text-glow">My Profile</h1>
