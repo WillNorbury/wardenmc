@@ -59,7 +59,7 @@ const PartnerDetail = () => {
         description={partner?.description ?? "Partner Minecraft server."}
       />
       <Navbar />
-      <main className="min-h-[calc(100vh-8rem)] px-4 py-10 bg-background">
+      <main className="min-h-[calc(100vh-8rem)] px-4 pt-28 pb-10 bg-background">
         <div className="max-w-3xl mx-auto">
           <Link
             to="/partners"
