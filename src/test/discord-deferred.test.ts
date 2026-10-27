@@ -1,6 +1,9 @@
-// @vitest-environment node
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { completeDeferredReply, deferredReply } from "../../supabase/functions/_shared/discord-deferred";
+
+// jsdom lacks Deno's AbortSignal.timeout; no network requests occur in these tests.
+beforeAll(() => vi.stubGlobal("AbortSignal", { timeout: () => new AbortController().signal }));
+afterAll(() => vi.unstubAllGlobals());
 
 describe("Discord interaction acknowledgement", () => {
   it("acknowledges privately before a slow command finishes", async () => {
