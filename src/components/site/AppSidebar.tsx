@@ -35,6 +35,7 @@ import {
   Bot,
   Radio,
   Sparkles,
+  Server,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -58,6 +59,7 @@ const mainGroup: NavGroup = {
     { to: "/plugins/developers", label: "Developers", icon: Users },
     { to: "/posts", label: "Posts", icon: MessageSquare },
     { to: "/gamemodes", label: "Game Modes", icon: Gamepad2 },
+    { to: "/servers", label: "Servers", icon: Server },
   ],
 };
 
