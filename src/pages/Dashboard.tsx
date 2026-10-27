@@ -189,13 +189,18 @@ const Dashboard = () => {
             <div className="min-w-0 flex-1">
               <div className="font-display truncate text-xl font-bold">{displayName || user.email}</div>
               <div className="font-mono truncate text-xs text-muted-foreground">{user.email}</div>
-              <div className="mt-2 flex flex-wrap gap-1">
+              <div className="mt-2 flex flex-wrap items-center gap-1">
                 {roles.length === 0 && <span className="text-xs text-muted-foreground">Member</span>}
-                {roles.map((role) => (
+                {roles.slice(0, 6).map((role) => (
                   <Badge key={role} variant="secondary">
                     {roleLabel(role)}
                   </Badge>
                 ))}
+                {roles.length > 6 && (
+                  <Badge variant="outline" title={roles.slice(6).map(roleLabel).join(", ")}>
+                    +{roles.length - 6} more
+                  </Badge>
+                )}
               </div>
             </div>
             <Button asChild variant="outline">
