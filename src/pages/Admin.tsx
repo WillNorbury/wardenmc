@@ -482,7 +482,7 @@ const UsersTab = () => {
       const { data, error } = await supabase.functions.invoke("admin-update-user-email", {
         body: { user_id: p.id },
       });
-      if (error) throw error;
+      if (error) throw new Error(await edgeErrorMessage(error));
       if ((data as any)?.error) throw new Error((data as any).error);
       const em = (data as any)?.email ?? "";
       setOriginalEmail(em);
@@ -515,7 +515,7 @@ const UsersTab = () => {
         const { data, error: emailErr } = await supabase.functions.invoke("admin-update-user-email", {
           body: { user_id: editing.id, email: newEmail },
         });
-        if (emailErr) throw emailErr;
+        if (emailErr) throw new Error(await edgeErrorMessage(emailErr));
         if ((data as any)?.error) throw new Error((data as any).error);
       } catch (e: any) {
         setSavingEdit(false);
