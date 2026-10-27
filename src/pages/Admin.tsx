@@ -78,6 +78,20 @@ import AdminEventsPage from "@/pages/AdminEvents";
 
 import QuizAdminSection from "@/components/admin/QuizAdminSection";
 import { ReportsAdminSection } from "@/components/admin/ReportsAdminSection";
+
+// Edge function errors arrive as a generic "non-2xx status code"; read the
+// response body so admins see the real reason (rate limit, email in use, ...).
+const edgeErrorMessage = async (error: unknown): Promise<string> => {
+  const fallback = error instanceof Error ? error.message : "Request failed";
+  const context = (error as { context?: Response } | null)?.context;
+  if (!context || typeof context.json !== "function") return fallback;
+  try {
+    const body = (await context.json()) as { error?: string; message?: string };
+    return body?.error ?? body?.message ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
 import { PunishmentsAdminSection } from "@/components/admin/PunishmentsAdminSection";
 import { ConsoleAdminSection } from "@/components/admin/ConsoleAdminSection";
 import { SendEmailAdminSection } from "@/components/admin/SendEmailAdminSection";
@@ -482,7 +496,7 @@ const UsersTab = () => {
       const { data, error } = await supabase.functions.invoke("admin-update-user-email", {
         body: { user_id: p.id },
       });
-      if (error) throw error;
+      if (error) throw new Error(await edgeErrorMessage(error));
       if ((data as any)?.error) throw new Error((data as any).error);
       const em = (data as any)?.email ?? "";
       setOriginalEmail(em);
@@ -515,7 +529,7 @@ const UsersTab = () => {
         const { data, error: emailErr } = await supabase.functions.invoke("admin-update-user-email", {
           body: { user_id: editing.id, email: newEmail },
         });
-        if (emailErr) throw emailErr;
+        if (emailErr) throw new Error(await edgeErrorMessage(emailErr));
         if ((data as any)?.error) throw new Error((data as any).error);
       } catch (e: any) {
         setSavingEdit(false);
