@@ -149,7 +149,14 @@ export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAU
     case "nick": {
       const u = id(o.user), nick = String(o.nickname ?? "").trim();
       const r = await api("PATCH", `/guilds/${guild}/members/${u}`, { nick: nick || null }, "nickname");
-      return r.ok ? (nick ? t("nick_set", { user: u, nick }) : t("nick_reset", { user: u })) : fail(r, "change that nickname");
+      if (r.ok) return nick ? t("nick_set", { user: u, nick }) : t("nick_reset", { user: u });
+      if (r.status === 403) {
+        // Discord never lets a bot rename the server owner, whatever its role.
+        const g = await api("GET", `/guilds/${guild}`);
+        const ownerId = g.ok ? (await g.json())?.owner_id : null;
+        return t(ownerId === u ? "nick_owner" : "nick_forbidden", { user: u });
+      }
+      return fail(r, "change that nickname");
     }
     case "addrole":
     case "removerole": {
