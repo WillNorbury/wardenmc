@@ -65,11 +65,13 @@ const communityGroup: NavGroup = {
   id: "community",
   label: "Community",
   items: [
+    { to: "/community", label: "Community hub", icon: Users },
     { to: "/staff", label: "Staff", icon: ShieldCheck },
     { to: "/users", label: "Members", icon: Users },
     { to: "/discord", label: "Discord", icon: DiscordMark },
     { to: "/yapin", label: "Yapin'", icon: Sparkles },
     { to: "/bot", label: "Bot", icon: Bot },
+    { to: "/bot/commands", label: "Bot commands", icon: ScrollText },
     { to: "/live", label: "Live", icon: Radio },
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
