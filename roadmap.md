@@ -1,4 +1,7 @@
 # Roadmap
+- [ ] Fix /nick and sibling moderation command timeouts by acknowledging before network work; test and deploy.
+- [ ] Add /bot/commands and /community, navigation and sitemap; verify both pages.
+- [ ] Publish and notify this update's changelog.
 - [x] Per-server Welcome/Reaction Roles/AutoMod modules: settings table, discord-modules-api (x-dashboard-secret + Discord-verified Manage Server), native AutoMod sync on save, 14 model tests pass, wrong/missing secret returns 401, DB round-trip verified, changelog published (id f5e2c196-0e1a-4854-bf6c-c72abc2eb449).
 - [ ] Send bot modules changelog email — blocked by missing staff session; notify-changelog needs Send in Admin → Changelog.
 - [ ] Verify discord-modules-api happy path with a real guild — needs a real server ID + manager user ID from the dashboard project.
