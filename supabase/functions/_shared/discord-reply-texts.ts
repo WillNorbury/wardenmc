@@ -60,6 +60,8 @@ export const DEFAULT_REPLY_TEXTS = {
   softban: "🧽 Softbanned <@{user}> (messages wiped, they can rejoin) — {reason}",
   nick_set: "✏️ Renamed <@{user}> to **{nick}**",
   nick_reset: "✏️ Reset <@{user}>'s nickname",
+  nick_owner: "❌ Discord doesn't let any bot change the server owner's nickname — change <@{user}>'s nickname yourself in Server Profile.",
+  nick_forbidden: "❌ Couldn't rename <@{user}>. Give WardenBot the **Manage Nicknames** permission and drag its role above <@{user}>'s highest role in Server Settings → Roles.",
   role_add: "➕ Gave <@&{role}> to <@{user}>",
   role_remove: "➖ Removed <@&{role}> from <@{user}>",
   vcmute: "🔇 Voice-muted <@{user}>",
