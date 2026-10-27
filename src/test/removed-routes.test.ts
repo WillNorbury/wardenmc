@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 // Routes that were deliberately deleted from src/App.tsx. Nothing may still
 // navigate or link to them — people would land on the 404 screen.
-const REMOVED_ROUTES = ["/dashboard"];
+const REMOVED_ROUTES = ["/link-account", "/tickets", "/vote", "/news"];
 
 const SEARCH_DIRS = ["src/pages", "src/components", "scripts"];
 

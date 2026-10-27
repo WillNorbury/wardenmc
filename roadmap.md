@@ -1,5 +1,6 @@
 # Roadmap
-- [x] Deploy early private acknowledgement for /nick and sibling commands; 25 regression tests pass.
+- [x] Restore /dashboard as the signed-in member screen (profile, roles, streaks, Minecraft link, applications, uploads, servers); route, sidebar entry and guard tests in place; signed-in render verified in a test browser.
+- [x] Send the "Member dashboard is back" changelog email (entry 7f3c1a92-4b6e-4d18-9a5f-2c8e6d0b4173); 25 of 26 subscribers queued, wardenmc@warden.rip rejected as before.
 - [ ] Confirm /nick with a real signed Discord interaction — awaiting the user's retry in Discord; synthetic tests cannot generate Discord's signature.
 - [x] Add /bot/commands and /community, navigation and sitemap; search, refresh, community links and desktop/phone views verified.
 - [x] Publish this update's changelog (5234a5f9-f11a-450a-b6bb-9a791a473052); 25 subscriber notifications queued, none failed.

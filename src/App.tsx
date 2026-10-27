@@ -27,6 +27,7 @@ import PostCompose from "./pages/PostCompose.tsx";
 import Rules from "./pages/Rules.tsx";
 import Faq from "./pages/Faq.tsx";
 import Profile from "./pages/Profile.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 import UserProfile from "./pages/UserProfile.tsx";
 import Plugins from "./pages/Plugins.tsx";
 import PluginCategories from "./pages/PluginCategories.tsx";
@@ -102,6 +103,7 @@ const Shell = () => {
               <Route path="/faq" element={<Faq />} />
 
               <Route path="/profile" element={<Profile />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/user/:slug" element={<UserProfile />} />
               <Route path="/user/:slug/:tab" element={<UserProfile />} />
 

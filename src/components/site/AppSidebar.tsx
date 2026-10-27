@@ -19,6 +19,7 @@ import spectorLogo from "@/assets/spectorclient-logo.png";
 import {
   Home,
   Gamepad2,
+  LayoutDashboard,
   Puzzle,
   Layers,
   Users,
@@ -93,7 +94,10 @@ const applyGroup: NavGroup = {
 const accountGroup: NavGroup = {
   id: "account",
   label: "Account",
-  items: [{ to: "/profile", label: "Profile", icon: UserIcon }],
+  items: [
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/profile", label: "Profile", icon: UserIcon },
+  ],
 };
 
 export function AppSidebar() {
