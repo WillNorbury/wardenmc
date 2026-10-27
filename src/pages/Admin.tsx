@@ -78,6 +78,20 @@ import AdminEventsPage from "@/pages/AdminEvents";
 
 import QuizAdminSection from "@/components/admin/QuizAdminSection";
 import { ReportsAdminSection } from "@/components/admin/ReportsAdminSection";
+
+// Edge function errors arrive as a generic "non-2xx status code"; read the
+// response body so admins see the real reason (rate limit, email in use, ...).
+const edgeErrorMessage = async (error: unknown): Promise<string> => {
+  const fallback = error instanceof Error ? error.message : "Request failed";
+  const context = (error as { context?: Response } | null)?.context;
+  if (!context || typeof context.json !== "function") return fallback;
+  try {
+    const body = (await context.json()) as { error?: string; message?: string };
+    return body?.error ?? body?.message ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
 import { PunishmentsAdminSection } from "@/components/admin/PunishmentsAdminSection";
 import { ConsoleAdminSection } from "@/components/admin/ConsoleAdminSection";
 import { SendEmailAdminSection } from "@/components/admin/SendEmailAdminSection";
