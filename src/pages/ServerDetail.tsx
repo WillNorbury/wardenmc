@@ -96,7 +96,7 @@ export default function ServerDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 py-16 text-center">
+        <main className="container mx-auto px-4 pt-28 pb-16 text-center">
           <h1 className="font-display text-2xl font-bold mb-2">Server not found</h1>
           <p className="text-muted-foreground mb-6">This listing may have been removed or unpublished.</p>
           <Button asChild variant="outline">
@@ -115,7 +115,7 @@ export default function ServerDetail() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+      <main className="container mx-auto px-4 pt-28 pb-8 max-w-6xl">
         <Link
           to="/servers"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
