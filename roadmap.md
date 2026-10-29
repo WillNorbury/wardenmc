@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add and verify a site-wide custom mouse pointer matching wardenmc.lovable.app, then announce the update.
 - [x] Correct successful /warn action classification and public visibility without treating warn permission/usage failures as successes; 26 tests passed, build OK, interactions deployed. Real Discord retry still needed.
 - [ ] Email warning-log changelog bfc5e210-4f8d-4a69-9898-7984f3f6bd3b — attempted notification returned 401; staff sign-in required.
 - [x] Restore handler-selected Discord reply visibility while retaining immediate private acknowledgements; 51 regression tests passed, build OK, discord-interactions deployed, unsigned requests still rejected.
