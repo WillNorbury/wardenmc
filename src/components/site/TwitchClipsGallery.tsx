@@ -13,16 +13,25 @@ type Clip = {
   creatorName: string;
 };
 
+const PERIODS = [
+  { days: 1, label: "24h" },
+  { days: 7, label: "7 days" },
+  { days: 30, label: "30 days" },
+] as const;
+
 export default function TwitchClipsGallery({ login, parents }: { login: string; parents: string[] }) {
   const [clips, setClips] = useState<Clip[] | null>(null);
   const [active, setActive] = useState<Clip | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [days, setDays] = useState<number>(30);
 
   useEffect(() => {
     let cancelled = false;
+    setClips(null);
+    setError(null);
     (async () => {
       try {
-        const url = `${(import.meta as any).env.VITE_SUPABASE_URL}/functions/v1/twitch-status?mode=clips&login=${encodeURIComponent(login)}&limit=8`;
+        const url = `${(import.meta as any).env.VITE_SUPABASE_URL}/functions/v1/twitch-status?mode=clips&login=${encodeURIComponent(login)}&limit=8&days=${days}`;
         const r = await fetch(url, {
           headers: {
             apikey: (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY,
