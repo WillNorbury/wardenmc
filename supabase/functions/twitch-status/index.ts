@@ -55,10 +55,15 @@ Deno.serve(async (req) => {
       const user = usersRes?.data?.[0];
       if (!user) return json({ clips: [], login: rawLogin }, 200);
       const limit = Math.min(20, Math.max(1, parseInt(url.searchParams.get("limit") ?? "8", 10) || 8));
+      const days = [1, 7, 30].includes(parseInt(url.searchParams.get("days") ?? "", 10))
+        ? parseInt(url.searchParams.get("days")!, 10)
+        : 30;
+      const startedAt = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
       try {
         const clipsRes = await twitchGet("/clips", {
           broadcaster_id: user.id,
           first: String(limit),
+          started_at: startedAt,
         });
         return json({
           login: user.login,

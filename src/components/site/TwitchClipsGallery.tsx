@@ -13,16 +13,25 @@ type Clip = {
   creatorName: string;
 };
 
+const PERIODS = [
+  { days: 1, label: "24h" },
+  { days: 7, label: "7 days" },
+  { days: 30, label: "30 days" },
+] as const;
+
 export default function TwitchClipsGallery({ login, parents }: { login: string; parents: string[] }) {
   const [clips, setClips] = useState<Clip[] | null>(null);
   const [active, setActive] = useState<Clip | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [days, setDays] = useState<number>(30);
 
   useEffect(() => {
     let cancelled = false;
+    setClips(null);
+    setError(null);
     (async () => {
       try {
-        const url = `${(import.meta as any).env.VITE_SUPABASE_URL}/functions/v1/twitch-status?mode=clips&login=${encodeURIComponent(login)}&limit=8`;
+        const url = `${(import.meta as any).env.VITE_SUPABASE_URL}/functions/v1/twitch-status?mode=clips&login=${encodeURIComponent(login)}&limit=8&days=${days}`;
         const r = await fetch(url, {
           headers: {
             apikey: (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY,
@@ -39,27 +48,46 @@ export default function TwitchClipsGallery({ login, parents }: { login: string; 
       }
     })();
     return () => { cancelled = true; };
-  }, [login]);
+  }, [login, days]);
 
   const parentPart = parents.map((p) => `parent=${encodeURIComponent(p)}`).join("&");
 
   return (
     <section className="space-y-4">
-      <div className="flex items-baseline justify-between border-b border-border pb-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-border pb-3">
         <div>
           <span className="text-primary font-mono text-xs tracking-widest uppercase">Recent</span>
           <h2 className="text-2xl md:text-3xl font-bold font-display tracking-tighter italic">
             CLIPS
           </h2>
         </div>
-        <a
-          href={`https://www.twitch.tv/${login}/clips`}
-          target="_blank"
-          rel="noreferrer"
-          className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:text-primary transition"
-        >
-          View all →
-        </a>
+        <div className="flex items-center gap-3">
+          <div className="flex border border-border">
+            {PERIODS.map((p) => (
+              <button
+                key={p.days}
+                type="button"
+                onClick={() => setDays(p.days)}
+                className={
+                  "px-3 py-1.5 text-[10px] font-mono tracking-widest uppercase transition " +
+                  (days === p.days
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <a
+            href={`https://www.twitch.tv/${login}/clips`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:text-primary transition"
+          >
+            View all →
+          </a>
+        </div>
       </div>
 
       {clips === null && !error && (
