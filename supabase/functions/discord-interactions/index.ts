@@ -11,6 +11,7 @@ import { getApplyUrl, setApplyUrl } from "../_shared/discord-apply.ts";
 import { loadReplyTexts, renderReply } from "../_shared/discord-reply-texts.ts";
 import { addCustomCommand, getCustomCommandResponse, listCustomCommands, removeCustomCommand } from "../_shared/discord-custom-commands.ts";
 import { completeDeferredReply, deferredReply } from "../_shared/discord-deferred.ts";
+import { moderationReplyState, type ModerationOutcome } from "../_shared/discord-moderation-outcome.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -128,12 +129,14 @@ async function handleApplicationCommand(body: any): Promise<Response> {
       { headers: { "Content-Type": "application/json" } },
     );
 
-    const modReply = await handleModeration(body, texts);
+    const outcome: ModerationOutcome = {};
+    const modReply = await handleModeration(body, texts, outcome);
     if (modReply !== null) {
+      const state = moderationReplyState(name, modReply, outcome);
       // Record moderation actions so they show on the Admin dashboard.
       if (!isFunCommand(body.data?.name) && body.data?.name !== "help") try {
         const opts = Object.fromEntries((body.data?.options ?? []).map((x: any) => [x.name, x.value]));
-        const failed = /^[⛔⚠❌]/.test(modReply);
+        const failed = state.failed;
         await createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!)
           .from("discord_bot_action_logs").insert({
             action: `/${body.data?.name}`,
@@ -144,8 +147,7 @@ async function handleApplicationCommand(body: any): Promise<Response> {
             response: { reply: modReply.slice(0, 300) },
           });
       } catch (e) { console.warn("mod log failed", e); }
-      const pub = !/^[⛔⚠❌]|^Nothing/.test(modReply) && body.data?.name !== "help";
-      return say(modReply, !pub);
+      return say(modReply, !state.public);
     }
 
     if (cmd && cmd.enabled === false) {

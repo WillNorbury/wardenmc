@@ -2,6 +2,7 @@
 import { getDiscordBotToken } from "./discord-token.ts";
 import { DEFAULT_REPLY_TEXTS, pickReplyLine, renderReply, type ReplyTexts } from "./discord-reply-texts.ts";
 import { nickRefusalKey } from "./discord-nick-model.ts";
+import type { ModerationOutcome } from "./discord-moderation-outcome.ts";
 
 import { MODERATION_COMMANDS } from "./discord-command-catalog.ts";
 export { MODERATION_COMMANDS } from "./discord-command-catalog.ts";
@@ -31,7 +32,7 @@ export const moderationRegistrations = () => MODERATION_COMMANDS.map((c) => ({
 
 const SEND = 1n << 11n;
 
-export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAULT_REPLY_TEXTS }): Promise<string | null> {
+export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAULT_REPLY_TEXTS }, outcome: ModerationOutcome = {}): Promise<string | null> {
   const t = (key: Parameters<typeof renderReply>[1], vars: Record<string, string> = {}) => renderReply(texts, key, vars);
   const def = MODERATION_COMMANDS.find((c) => c.name === body.data?.name);
   if (!def) return null;
@@ -178,6 +179,7 @@ export async function handleModeration(body: any, texts: ReplyTexts = { ...DEFAU
     case "warn": {
       const u = id(o.user);
       const sent = await dm(u, t("warn_dm", { reason: why }));
+      outcome.warningIssued = true;
       return t(sent ? "warn" : "warn_no_dm", { user: u, reason: why });
     }
     case "purge": {
