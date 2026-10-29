@@ -1,5 +1,7 @@
 # Roadmap
-- [ ] Restore handler-selected Discord reply visibility while retaining immediate private acknowledgements; test and deploy the shared completion path.
+- [x] Restore handler-selected Discord reply visibility while retaining immediate private acknowledgements; 51 regression tests passed, build OK, discord-interactions deployed, unsigned requests still rejected.
+- [ ] Confirm restored public and private replies in Discord — requires the user's real signed slash-command interaction; mock transport tests verify routing but not Discord rendering.
+- [ ] Email public-replies changelog d73d8fed-f1f9-4e71-ab03-0465f6a7ff4c — notification attempted, returned 401; requires staff sign-in or Send in Admin → Changelog.
 - [x] Move page content clear of the fixed top bar (server, partner, profile, plugin-settings pages) so the back link is clickable instead of hitting the logo; verified in a test browser that the link sits below the bar and opens /servers.
 - [x] Publish and email the "Back link no longer hides under the top bar" changelog (entry 3a3dedeb-513b-44f4-9002-846f7f293a52); 25 subscribers queued, none failed.
 - [x] Restore /dashboard as the signed-in member screen (profile, roles, streaks, Minecraft link, applications, uploads, servers); route, sidebar entry and guard tests in place; signed-in render verified in a test browser.
