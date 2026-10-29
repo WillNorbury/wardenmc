@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
 
   if (body.type === InteractionType.APPLICATION_COMMAND) {
     // Discord's 3-second deadline includes database lookups and cold starts.
-    // Keep every command private and defer before the first network request.
+    // Defer privately before network work; completion preserves handler visibility.
     if (body.data?.name === "status") {
       EdgeRuntime.waitUntil(completeStatusInteraction(body));
     } else {
