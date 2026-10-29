@@ -1,4 +1,5 @@
 # Project architecture
+- Warning execution passes an explicit outcome to the shared log/visibility classifier, because the warning success symbol is also used for usage errors and cannot determine success alone.
 - The public bot directory and moderation registration consume the browser-safe Discord command catalog, so command names, options and permission metadata stay consistent without exposing server credentials.
 - Signed Discord slash commands acknowledge privately before network work; private results edit the original, while public results resolve the defer then publish a public follow-up and delete the private original only after success, because Discord cannot change an original reply's ephemeral state and errors must stay private.
 - Live announcement drafts are client-only Admin tools with per-account explicit browser saves and escaped HTML exports; never route them through app email sending because stream announcements are marketing.
