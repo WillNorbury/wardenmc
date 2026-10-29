@@ -51,6 +51,9 @@ import StatusUnsubscribe from "./pages/StatusUnsubscribe.tsx";
 import GameModeDetail from "./pages/GameModeDetail.tsx";
 import Servers from "./pages/Servers.tsx";
 import ServerDetail from "./pages/ServerDetail.tsx";
+import Organizations from "./pages/Organizations.tsx";
+import Organization from "./pages/Organization.tsx";
+import OrganizationSettings from "./pages/OrganizationSettings.tsx";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/site/AppSidebar";
 
@@ -105,6 +108,11 @@ const Shell = () => {
 
               <Route path="/profile" element={<Profile />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/organizations" element={<Organizations />} />
+              <Route path="/organization/:slug" element={<Organization />} />
+              <Route path="/organization/:slug/settings" element={<OrganizationSettings />} />
+              <Route path="/org/:slug" element={<Organization />} />
+              <Route path="/org/:slug/settings" element={<OrganizationSettings />} />
               <Route path="/user/:slug" element={<UserProfile />} />
               <Route path="/user/:slug/:tab" element={<UserProfile />} />
 
