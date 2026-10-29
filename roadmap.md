@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Add a site-wide Warden mouse pointer inspired by wardenmc.lovable.app; verified hover, click ripple, navigation, native text editing, touch fallback and reduced motion; build OK. Published changelog 1a2996b7-10d3-4677-bf25-d4a7ff85d0c4.
+- [ ] Confirm mouse-pointer changelog email delivery — notification attempt timed out without a result; delivery remains unverified.
 - [x] Correct successful /warn action classification and public visibility without treating warn permission/usage failures as successes; 26 tests passed, build OK, interactions deployed. Real Discord retry still needed.
 - [ ] Email warning-log changelog bfc5e210-4f8d-4a69-9898-7984f3f6bd3b — attempted notification returned 401; staff sign-in required.
 - [x] Restore handler-selected Discord reply visibility while retaining immediate private acknowledgements; 51 regression tests passed, build OK, discord-interactions deployed, unsigned requests still rejected.

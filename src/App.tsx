@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UpdatePrompt } from "@/components/site/UpdatePrompt";
 import VersionChecker from "@/components/site/VersionChecker";
+import { CustomCursor } from "@/components/site/CustomCursor";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { DeviceVerificationGate } from "@/components/site/DeviceVerificationGate";
@@ -147,6 +148,7 @@ const Shell = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <CustomCursor />
       <Toaster />
       <Sonner />
       <UpdatePrompt />
