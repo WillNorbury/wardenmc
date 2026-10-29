@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Restore handler-selected Discord reply visibility while retaining immediate private acknowledgements; test and deploy the shared completion path.
 - [x] Move page content clear of the fixed top bar (server, partner, profile, plugin-settings pages) so the back link is clickable instead of hitting the logo; verified in a test browser that the link sits below the bar and opens /servers.
 - [x] Publish and email the "Back link no longer hides under the top bar" changelog (entry 3a3dedeb-513b-44f4-9002-846f7f293a52); 25 subscribers queued, none failed.
 - [x] Restore /dashboard as the signed-in member screen (profile, roles, streaks, Minecraft link, applications, uploads, servers); route, sidebar entry and guard tests in place; signed-in render verified in a test browser.
