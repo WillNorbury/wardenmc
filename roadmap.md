@@ -1,5 +1,6 @@
 # Roadmap
 - [x] Correct successful /warn action classification and public visibility without treating warn permission/usage failures as successes; 26 tests passed, build OK, interactions deployed. Real Discord retry still needed.
+- [ ] Email warning-log changelog bfc5e210-4f8d-4a69-9898-7984f3f6bd3b — attempted notification returned 401; staff sign-in required.
 - [x] Restore handler-selected Discord reply visibility while retaining immediate private acknowledgements; 51 regression tests passed, build OK, discord-interactions deployed, unsigned requests still rejected.
 - [ ] Confirm restored public and private replies in Discord — requires the user's real signed slash-command interaction; mock transport tests verify routing but not Discord rendering.
 - [ ] Email public-replies changelog d73d8fed-f1f9-4e71-ab03-0465f6a7ff4c — notification attempted, returned 401; requires staff sign-in or Send in Admin → Changelog.
