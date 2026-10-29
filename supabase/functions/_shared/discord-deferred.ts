@@ -11,19 +11,45 @@ export async function completeDeferredReply(
   let data: Record<string, unknown>;
   try {
     const result = await (await run()).json();
-    data = result.data ?? { content: "❌ This command could not finish. Please try again." };
+    data = result.data ?? { content: "❌ This command could not finish. Please try again.", flags: 64 };
   } catch {
     // Never log the signed interaction token or the raw request.
     console.warn("Discord command execution failed");
-    data = { content: "❌ This command could not finish. Please try again shortly." };
+    data = { content: "❌ This command could not finish. Please try again shortly.", flags: 64 };
   }
-  const { flags: _flags, ...message } = data;
-  const response = await request(`https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...message, allowed_mentions: { parse: [] } }),
-    signal: AbortSignal.timeout(10000),
+  const { flags, ...message } = data;
+  const webhook = `https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}`;
+  const original = `${webhook}/messages/@original`;
+  const payload = { ...message, allowed_mentions: { parse: [] } };
+  const isPrivate = typeof flags === "number" && (flags & 64) !== 0;
+  const send = async (url: string, method: string, body?: Record<string, unknown>) => {
+    try {
+      const response = await request(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+        signal: AbortSignal.timeout(10000),
+      });
+      await response.text();
+      if (!response.ok) console.warn("Discord deferred reply failed", response.status);
+      return response.ok;
+    } catch {
+      console.warn("Discord deferred reply request failed");
+      return false;
+    }
+  };
+
+  // Finish the private defer first. Discord treats a follow-up sent while it is
+  // still loading as an edit, ignoring the follow-up's visibility flags.
+  if (!(await send(original, "PATCH", payload))) return;
+  if (isPrivate) return;
+
+  // Original-message edits cannot change ephemeral state. Publish a separate
+  // follow-up only when the handler explicitly returned a public response.
+  const published = await send(`${webhook}?wait=true`, "POST", {
+    ...payload,
+    ...(typeof flags === "number" ? { flags: flags & ~64 } : {}),
   });
-  await response.text();
-  if (!response.ok) console.warn("Discord deferred reply failed", response.status);
+  // Keep the private result if publishing fails; never delete a reply first.
+  if (published) await send(original, "DELETE");
 }
