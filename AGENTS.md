@@ -1,4 +1,5 @@
 # Project architecture
+- Mount the custom pointer once at app level through a body portal, with theme-token effects and native fallbacks for touch and text editing, so it cannot block clicks or disappear behind dialogs.
 - Warning execution passes an explicit outcome to the shared log/visibility classifier, because the warning success symbol is also used for usage errors and cannot determine success alone.
 - The public bot directory and moderation registration consume the browser-safe Discord command catalog, so command names, options and permission metadata stay consistent without exposing server credentials.
 - Signed Discord slash commands acknowledge privately before network work; private results edit the original, while public results resolve the defer then publish a public follow-up and delete the private original only after success, because Discord cannot change an original reply's ephemeral state and errors must stay private.
