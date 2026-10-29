@@ -19,6 +19,7 @@ export const entries: SitemapEntry[] = [
   { path: "/plugins", changefreq: "daily", priority: "0.9" },
   { path: "/plugins/categories", changefreq: "weekly", priority: "0.7" },
   { path: "/plugins/developers", changefreq: "weekly", priority: "0.7" },
+  { path: "/organizations", changefreq: "weekly", priority: "0.7" },
   { path: "/gamemodes", changefreq: "weekly", priority: "0.8" },
   { path: "/servers", changefreq: "daily", priority: "0.8" },
   { path: "/posts", changefreq: "daily", priority: "0.7" },
