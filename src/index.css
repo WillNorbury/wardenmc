@@ -280,12 +280,13 @@
 }
 
 [data-sidebar="content"] {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--sidebar-border) / 0.5) transparent;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
 }
 [data-sidebar="content"]::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 [data-sidebar="content"]::-webkit-scrollbar-track {
   background: transparent;
