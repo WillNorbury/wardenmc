@@ -21,6 +21,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://warden.rip/organizations</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://warden.rip/gamemodes</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
