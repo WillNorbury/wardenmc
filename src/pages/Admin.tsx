@@ -585,7 +585,7 @@ const UsersTab = () => {
         body: { user_id: p.id },
         headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
       });
-      if (error) throw error;
+      if (error) throw new Error(await edgeErrorMessage(error));
       if ((data as any)?.error) throw new Error((data as any).error);
       toast.success("User deleted");
       load();
