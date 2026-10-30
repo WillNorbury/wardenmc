@@ -43,6 +43,8 @@ import PartnerDetail from "./pages/PartnerDetail.tsx";
 import Changelog from "./pages/Changelog.tsx";
 import Search from "./pages/Search.tsx";
 import Support from "./pages/Support.tsx";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import GameModes from "./pages/GameModes.tsx";
 import Live from "./pages/Live.tsx";
 import Status from "./pages/Status.tsx";
@@ -135,6 +137,8 @@ const Shell = () => {
               <Route path="/changelog" element={<Changelog />} />
               <Route path="/search" element={<Search />} />
               <Route path="/support" element={<Support />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
 
               <Route path="/live" element={<Live />} />
               <Route path="/status" element={<Status />} />
