@@ -4133,16 +4133,6 @@ type ApplicationRow = {
   created_at: string;
 };
 
-type EmailLogRow = {
-  id: string;
-  message_id: string | null;
-  template_name: string | null;
-  recipient_email: string | null;
-  status: string | null;
-  error_message: string | null;
-  created_at: string;
-};
-
 const ApplicationsTab = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<ApplicationRow[]>([]);
