@@ -4133,105 +4133,6 @@ type ApplicationRow = {
   created_at: string;
 };
 
-type EmailLogRow = {
-  id: string;
-  message_id: string | null;
-  template_name: string | null;
-  recipient_email: string | null;
-  status: string | null;
-  error_message: string | null;
-  created_at: string;
-};
-
-const ApplicationEmailLog = () => {
-  const [rows, setRows] = useState<EmailLogRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("email_send_log")
-      .select("id, message_id, template_name, recipient_email, status, error_message, created_at")
-      .like("template_name", "application-%")
-      .order("created_at", { ascending: false })
-      .limit(100);
-    if (error) toast.error(error.message);
-    // Deduplicate by message_id, keep latest status
-    const seen = new Set<string>();
-    const deduped: EmailLogRow[] = [];
-    for (const r of (data as EmailLogRow[]) ?? []) {
-      const key = r.message_id ?? r.id;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      deduped.push(r);
-    }
-    setRows(deduped);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const statusCls = (s: string | null) => {
-    if (s === "sent") return "text-emerald-400 border-emerald-400/40";
-    if (s === "dlq" || s === "failed" || s === "bounced") return "text-destructive border-destructive/40";
-    if (s === "suppressed" || s === "complained") return "text-amber-400 border-amber-400/40";
-    return "text-muted-foreground border-border";
-  };
-
-  return (
-    <Card className="p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4" />
-          <div className="font-display font-bold">Application email delivery log</div>
-        </div>
-        <Button size="sm" variant="ghost" onClick={load} disabled={loading}>
-          {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-        </Button>
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Latest status per email (deduplicated). Shows the most recent 100 application-related sends.
-      </p>
-      {rows.length === 0 ? (
-        <p className="text-xs text-muted-foreground py-2">No application emails yet.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="text-muted-foreground">
-              <tr className="text-left border-b">
-                <th className="py-2 pr-3 font-medium">When</th>
-                <th className="py-2 pr-3 font-medium">Template</th>
-                <th className="py-2 pr-3 font-medium">Recipient</th>
-                <th className="py-2 pr-3 font-medium">Status</th>
-                <th className="py-2 pr-3 font-medium">Error</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-b border-border/50">
-                  <td className="py-2 pr-3 whitespace-nowrap text-muted-foreground">
-                    {new Date(r.created_at).toLocaleString()}
-                  </td>
-                  <td className="py-2 pr-3">{r.template_name}</td>
-                  <td className="py-2 pr-3">{r.recipient_email}</td>
-                  <td className="py-2 pr-3">
-                    <Badge variant="outline" className={statusCls(r.status)}>{r.status ?? "—"}</Badge>
-                  </td>
-                  <td className="py-2 pr-3 text-destructive max-w-xs truncate" title={r.error_message ?? ""}>
-                    {r.error_message ?? ""}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Card>
-  );
-};
-
 const ApplicationsTab = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<ApplicationRow[]>([]);
@@ -4426,8 +4327,6 @@ const ApplicationsTab = () => {
           </div>
         </div>
       </Card>
-
-      <ApplicationEmailLog />
 
       <ApplicationStatusEmailEditor />
 
