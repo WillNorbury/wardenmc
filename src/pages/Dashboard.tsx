@@ -328,7 +328,7 @@ const Dashboard = () => {
                 {apps.map((app) => (
                   <div
                     key={app.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-border/60 p-3"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/60 p-3"
                   >
                     <div className="min-w-0">
                       <div className="font-display font-bold capitalize">{app.type}</div>
@@ -336,9 +336,14 @@ const Dashboard = () => {
                         Submitted {new Date(app.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <Badge variant="outline" className={statusTone(app.status)}>
-                      {app.status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className={statusTone(app.status)}>
+                        {app.status}
+                      </Badge>
+                      <Button asChild size="sm" variant="outline">
+                        <Link to={`/applications/${app.id}`}>View</Link>
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
