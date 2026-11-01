@@ -47,6 +47,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import GameModes from "./pages/GameModes.tsx";
 import Live from "./pages/Live.tsx";
+import Clips from "./pages/Clips";
 import Status from "./pages/Status.tsx";
 import StatusIncident from "./pages/StatusIncident.tsx";
 import StatusUnsubscribe from "./pages/StatusUnsubscribe.tsx";
@@ -141,6 +142,7 @@ const Shell = () => {
               <Route path="/checkout" element={<Checkout />} />
 
               <Route path="/live" element={<Live />} />
+              <Route path="/clips" element={<Clips />} />
               <Route path="/status" element={<Status />} />
               <Route path="/status/unsubscribe" element={<StatusUnsubscribe />} />
               <Route path="/status/:number" element={<StatusIncident />} />

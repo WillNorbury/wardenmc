@@ -38,6 +38,7 @@ import {
   Sparkles,
   Server,
   Building2,
+  Film,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -78,6 +79,7 @@ const communityGroup: NavGroup = {
     { to: "/bot", label: "Bot", icon: Bot },
     { to: "/bot/commands", label: "Bot commands", icon: ScrollText },
     { to: "/live", label: "Live", icon: Radio },
+    { to: "/clips", label: "Clips", icon: Film },
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/changelog", label: "Changelog", icon: FileText },

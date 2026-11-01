@@ -1,4 +1,5 @@
 # Project architecture
+- Community clips use a dedicated private video bucket with public read policies and short-lived playback URLs; metadata ownership policies restrict uploads and deletion to the uploader, keeping media separate from profile images.
 - Mount the custom pointer once at app level through a body portal, with theme-token effects and native fallbacks for touch and text editing, so it cannot block clicks or disappear behind dialogs.
 - Warning execution passes an explicit outcome to the shared log/visibility classifier, because the warning success symbol is also used for usage errors and cannot determine success alone.
 - The public bot directory and moderation registration consume the browser-safe Discord command catalog, so command names, options and permission metadata stay consistent without exposing server credentials.
