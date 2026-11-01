@@ -85,6 +85,13 @@
       "when": 1792645911767,
       "tag": "0011_create_discord_guild_module_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793525509948,
+      "tag": "0012_community_video_clips",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add /clips with authenticated uploads, public gallery, built-in playback, navigation and sitemap; verify and announce.
 - [x] Restore organization directory, profiles, owner settings and navigation; signed-in creation, save, read-back, refresh and legacy alias verified; seven tests passed, build OK. Published changelog b578094b-095e-4bb5-9675-512e93163413.
 - [ ] Confirm organization changelog email delivery — notification timed out; delivery remains unverified.
 - [x] Add a site-wide Warden mouse pointer inspired by wardenmc.lovable.app; verified hover, click ripple, navigation, native text editing, touch fallback and reduced motion; build OK. Published changelog 1a2996b7-10d3-4677-bf25-d4a7ff85d0c4.
