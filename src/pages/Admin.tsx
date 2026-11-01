@@ -4459,8 +4459,8 @@ const ApplicationsTab = () => {
             const isOpen = open === a.id;
             return (
               <Card key={a.id} className="p-4">
-                <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <div className="min-w-0 flex-1">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 flex-1 break-words">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <Badge variant="outline" className="capitalize">
                         {a.type}
@@ -4477,10 +4477,11 @@ const ApplicationsTab = () => {
                       {a.timezone && <>TZ: {a.timezone}</>}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap shrink-0">
                     <Button
                       size="sm"
                       variant="outline"
+                      className="flex-1 sm:flex-none"
                       onClick={() => {
                         setOpen(isOpen ? null : a.id);
                         setNotes(a.reviewer_notes ?? "");
