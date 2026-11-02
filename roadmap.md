@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Restore /punishments with existing punishment records, navigation and sitemap; verify the page and publish an announcement.
+- [ ] Resolve community clip playback security finding — confirm intended viewer access before changing who can watch.
 - [x] Add /clips with authenticated uploads, public gallery, built-in playback, navigation and sitemap; nine tests passed, build OK, public empty page and fixture video playback/shared link verified. Published changelog ab2e5ded-a9f6-4ada-9aef-027c1857d45b.
 - [ ] Verify a real signed-in clip upload and deletion — requester has no matching auth account; sign in to the preview for the end-to-end check.
 - [ ] Email clips changelog — notification returned 401; requires staff sign-in.
