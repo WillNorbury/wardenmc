@@ -82,6 +82,7 @@ const communityGroup: NavGroup = {
     { to: "/clips", label: "Clips", icon: Film },
     { to: "/partners", label: "Partners", icon: Users },
     { to: "/rules", label: "Rules", icon: ScrollText },
+    { to: "/punishments", label: "Punishments", icon: Shield },
     { to: "/changelog", label: "Changelog", icon: FileText },
     { to: "/status", label: "Status", icon: Activity },
     { to: "/faq", label: "FAQ", icon: HelpCircle },
