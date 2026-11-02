@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Remove obsolete Admin sections disconnected from current website pages, preserve working management tools and existing records, test section handling and publish a changelog.
+- [x] Remove obsolete Wiki, Gallery and Quizzes Admin sections and unused files, preserving saved records and current tools; 20 tests passed, build OK; changelog 79647ad7-eaff-4d50-9655-04e730dc0fd0 published.
+- [ ] Verify Admin cleanup signed in and email its changelog — requester has no matching auth account for preview sign-in; notification returned 401.
 - [x] Restore /punishments and /punishments/:player with existing player lookup, navigation and sitemap; live Notch search, tabs and refresh verified, four route tests passed, build OK; changelog 1d0eb2fb-80ce-4cea-b975-d677447839f9 published.
 - [ ] Email punishments changelog — notification returned 401; requires staff sign-in.
 - [x] Restrict community clip playback to listed videos with matching uploader folders, preserving everyone's viewing access as requested; migration applied.
