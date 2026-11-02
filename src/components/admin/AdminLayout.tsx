@@ -43,7 +43,6 @@ import {
   Layers,
   Globe,
   Mail,
-  Brain,
   Flag,
   Send,
   ShieldCheck,
@@ -75,14 +74,11 @@ export type AdminSection =
   | "faqs"
   | "events"
   | "ban-appeals"
-  | "wiki"
-  | "gallery"
   | "contact"
   | "email-test"
   | "send-email"
   | "live-announcement"
   | "email-diagnostics"
-  | "quizzes"
   | "reports"
   | "bot-dashboard"
   | "bot-management"
@@ -116,8 +112,8 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   "dashboard", "users", "roles", "permissions", "news", "content", "status",
   "logs", "tickets", "plugins", "changelog", "applications", "apply",
   "features", "rules", "alerts", "maintenance", "faqs", "events",
-  "ban-appeals", "wiki", "gallery", "contact", "email-test", "send-email", "live-announcement",
-  "email-diagnostics", "quizzes", "reports", "bot-dashboard", "bot-management",
+  "ban-appeals", "contact", "email-test", "send-email", "live-announcement",
+  "email-diagnostics", "reports", "bot-dashboard", "bot-management",
   "bot-config", "punishments", "console", "mysql", "database", "servers-status", "store", "orders",
   "signup-funnel",
   "vote-links", "partners", "tiers", "memberships", "account-removals", "seasons", "tab-animations", "server-panel", "skripts", "game-modes", "site-pages",
@@ -248,14 +244,11 @@ const items: NavItem[] = [
   { kind: "link", id: "account-removals", icon: UserX, label: "Deleted / Banned Accounts" },
   { kind: "link", id: "mysql", icon: Database, label: "LiteBans MySQL" },
   { kind: "link", id: "database", icon: Database, label: "Site database" },
-  { kind: "link", id: "wiki", icon: FileText, label: "Wiki" },
-  { kind: "link", id: "gallery", icon: Package, label: "Gallery" },
   { kind: "link", id: "contact", icon: HelpCircle, label: "Contact" },
   { kind: "link", id: "email-test", icon: Mail, label: "Email Test" },
   { kind: "link", id: "send-email", icon: Send, label: "Send Email" },
   { kind: "link", id: "live-announcement", icon: Mail, label: "Live Email Draft" },
   { kind: "link", id: "email-diagnostics", icon: ShieldCheck, label: "Email Diagnostics" },
-  { kind: "link", id: "quizzes", icon: Brain, label: "Quizzes" },
   { kind: "link", id: "reports", icon: Flag, label: "Reports" },
   { kind: "link", id: "console", icon: Code, label: "Console" },
   { kind: "section", title: "Moderation Tools", icon: ShieldCheck },

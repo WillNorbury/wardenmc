@@ -58,8 +58,6 @@ import {
 } from "@/components/ui/dialog";
 import { AdminLayout, type AdminSection, SECTION_PERMISSIONS, resolveAdminSection, isUnknownAdminTab } from "@/components/admin/AdminLayout";
 import { BanAppealsAdminSection } from "@/components/admin/BanAppealsAdminSection";
-import { WikiAdminSection } from "@/components/admin/WikiAdminSection";
-import { GalleryAdminSection } from "@/components/admin/GalleryAdminSection";
 import { ContactAdminSection } from "@/components/admin/ContactAdminSection";
 import { EmailTestSection } from "@/components/admin/EmailTestSection";
 import { ApplyTypesAdminSection } from "@/components/admin/ApplyTypesAdminSection";
@@ -76,7 +74,6 @@ import { MaintenanceTab } from "@/pages/AdminMaintenance";
 import AdminFaqsPage from "@/pages/AdminFaqs";
 import AdminEventsPage from "@/pages/AdminEvents";
 
-import QuizAdminSection from "@/components/admin/QuizAdminSection";
 import { ReportsAdminSection } from "@/components/admin/ReportsAdminSection";
 
 // Edge function errors arrive as a generic "non-2xx status code"; read the
@@ -165,11 +162,8 @@ const sectionMeta: Record<AdminSection, { title: string; description: string }> 
   "bot-management": { title: "Discord Bot — Management", description: "Configure commands and bot integration." },
   "bot-config": { title: "Discord Bot — Commands & Templates", description: "Configure slash commands, channel routing, and message templates." },
   "ban-appeals": { title: "Ban Appeals", description: "Review and respond to user ban appeals." },
-  wiki: { title: "Wiki", description: "Manage wiki articles." },
-  gallery: { title: "Gallery", description: "Manage gallery images." },
   contact: { title: "Contact", description: "Manage contact methods and inbox." },
   "email-test": { title: "Email Test", description: "Trigger signup or password reset test emails and watch delivery status." },
-  quizzes: { title: "Quizzes", description: "Create, edit, and publish scored quizzes." },
   reports: { title: "Reports", description: "Review reports submitted by users about accounts, plugins, or other content." },
   "send-email": { title: "Send Email", description: "Broadcast emails to all users, admins, or owners only." },
   "live-announcement": { title: "Live Email Draft", description: "" },
@@ -333,11 +327,8 @@ const Admin = () => {
           {section === "faqs" && <AdminFaqsPage />}
           {section === "events" && <AdminEventsPage />}
           {section === "ban-appeals" && <BanAppealsAdminSection />}
-          {section === "wiki" && <WikiAdminSection />}
-          {section === "gallery" && <GalleryAdminSection />}
           {section === "contact" && <ContactAdminSection />}
           {section === "email-test" && <EmailTestSection />}
-          {section === "quizzes" && <QuizAdminSection />}
           {section === "reports" && <ReportsAdminSection />}
           {section === "punishments" && <PunishmentsAdminSection />}
           {section === "send-email" && <SendEmailAdminSection isOwner={isOwner} />}
