@@ -55,15 +55,20 @@ const mainGroup: NavGroup = {
   id: "main",
   label: "Main",
   defaultOpen: true,
+  items: [{ to: "/", label: "Home", icon: Home }],
+};
+
+const browseGroup: NavGroup = {
+  id: "browse",
+  label: "Browse",
   items: [
-    { to: "/", label: "Home", icon: Home },
+    { to: "/servers", label: "Servers", icon: Server },
+    { to: "/gamemodes", label: "Game Modes", icon: Gamepad2 },
     { to: "/plugins", label: "Plugins", icon: Puzzle },
     { to: "/plugins/categories", label: "Categories", icon: Layers },
     { to: "/plugins/developers", label: "Developers", icon: Users },
     { to: "/organizations", label: "Organizations", icon: Building2 },
     { to: "/posts", label: "Posts", icon: MessageSquare },
-    { to: "/gamemodes", label: "Game Modes", icon: Gamepad2 },
-    { to: "/servers", label: "Servers", icon: Server },
   ],
 };
 
@@ -72,28 +77,43 @@ const communityGroup: NavGroup = {
   label: "Community",
   items: [
     { to: "/community", label: "Community hub", icon: Users },
-    { to: "/staff", label: "Staff", icon: ShieldCheck },
     { to: "/users", label: "Members", icon: Users },
+    { to: "/staff", label: "Staff", icon: ShieldCheck },
+    { to: "/partners", label: "Partners", icon: Users },
+  ],
+};
+
+const discordGroup: NavGroup = {
+  id: "discord",
+  label: "Discord",
+  items: [
     { to: "/discord", label: "Discord", icon: DiscordMark },
     { to: "/yapin", label: "Yapin'", icon: Sparkles },
     { to: "/bot", label: "Bot", icon: Bot },
     { to: "/bot/commands", label: "Bot commands", icon: ScrollText },
-    { to: "/live", label: "Live", icon: Radio },
-    { to: "/clips", label: "Clips", icon: Film },
-    { to: "/partners", label: "Partners", icon: Users },
-    { to: "/rules", label: "Rules", icon: ScrollText },
-    { to: "/punishments", label: "Punishments", icon: Shield },
-    { to: "/changelog", label: "Changelog", icon: FileText },
-    { to: "/status", label: "Status", icon: Activity },
-    { to: "/faq", label: "FAQ", icon: HelpCircle },
-    { to: "/support", label: "Support", icon: Headset },
   ],
 };
 
-const applyGroup: NavGroup = {
-  id: "apply",
-  label: "Apply",
-  items: [{ to: "/apply", label: "Apply", icon: FileText }],
+const mediaGroup: NavGroup = {
+  id: "media",
+  label: "Streaming",
+  items: [
+    { to: "/live", label: "Live", icon: Radio },
+    { to: "/clips", label: "Clips", icon: Film },
+  ],
+};
+
+const helpGroup: NavGroup = {
+  id: "help",
+  label: "Help & Info",
+  items: [
+    { to: "/support", label: "Support", icon: Headset },
+    { to: "/faq", label: "FAQ", icon: HelpCircle },
+    { to: "/rules", label: "Rules", icon: ScrollText },
+    { to: "/punishments", label: "Punishments", icon: Shield },
+    { to: "/status", label: "Status", icon: Activity },
+    { to: "/changelog", label: "Changelog", icon: FileText },
+  ],
 };
 
 const accountGroup: NavGroup = {
@@ -103,6 +123,12 @@ const accountGroup: NavGroup = {
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/profile", label: "Profile", icon: UserIcon },
   ],
+};
+
+const applyGroup: NavGroup = {
+  id: "apply",
+  label: "Apply",
+  items: [{ to: "/apply", label: "Apply", icon: FileText }],
 };
 
 export function AppSidebar() {
@@ -174,7 +200,11 @@ export function AppSidebar() {
   const groups: NavGroup[] = [
     linksGroup,
     mainGroup,
+    browseGroup,
     communityGroup,
+    discordGroup,
+    mediaGroup,
+    helpGroup,
     ...(user ? [accountGroup] : []),
     ...(isAdmin
       ? [
