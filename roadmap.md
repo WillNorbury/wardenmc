@@ -1,5 +1,6 @@
 # Roadmap
 - [x] Restore /punishments and /punishments/:player with existing player lookup, navigation and sitemap; live Notch search, tabs and refresh verified, four route tests passed, build OK; changelog 1d0eb2fb-80ce-4cea-b975-d677447839f9 published.
+- [ ] Email punishments changelog — notification returned 401; requires staff sign-in.
 - [ ] Resolve community clip playback security finding — confirm intended viewer access before changing who can watch.
 - [x] Add /clips with authenticated uploads, public gallery, built-in playback, navigation and sitemap; nine tests passed, build OK, public empty page and fixture video playback/shared link verified. Published changelog ab2e5ded-a9f6-4ada-9aef-027c1857d45b.
 - [ ] Verify a real signed-in clip upload and deletion — requester has no matching auth account; sign in to the preview for the end-to-end check.
