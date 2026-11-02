@@ -194,7 +194,11 @@ export function AppSidebar() {
   const groups: NavGroup[] = [
     linksGroup,
     mainGroup,
+    browseGroup,
     communityGroup,
+    discordGroup,
+    mediaGroup,
+    helpGroup,
     ...(user ? [accountGroup] : []),
     ...(isAdmin
       ? [
