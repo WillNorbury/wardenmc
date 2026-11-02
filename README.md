@@ -170,7 +170,7 @@ Owner-only guardrails: LiteBans writes require the owner account with an explici
 | ---- | ------ |
 | Accounts | `profiles`, `profiles_private`, `user_roles`, `custom_roles`, `user_custom_roles`, `trusted_devices`, `login_verifications`, `account_removal_log` |
 | Content | `news`, `site_content`, `site_pages`, `faqs`, `faq_votes`, `faq_vote_counts`, `rule_sections`, `features`, `events`, `seasons`, `changelog_entries`, `posts`, `post_likes`, `issues`, `issue_comments`, `issue_votes` |
-| Plugins & mods | `plugins`, `plugin_versions`, `plugin_downloads`, `plugin_favorites`, `mods`, `mod_reviews`, `mod_likes`, `mod_saves`, `admin_skripts`, `user_skripts`, `skript*` |
+| Plugins & mods | `plugins`, `plugin_versions`, `plugin_downloads`, `plugin_favorites`, `mods`, `mod_reviews`, `mod_likes`, `mod_saves`, `admin_skripts`, `user_skripts` |
 | Servers | `mc_servers`, `mc_public_servers`, `user_servers`, `server_status`, `server_maps`, `server_panel_settings`, `tab_animations`, `discover_items` |
 | Store | `store_categories`, `store_items`, `store_coupons`, `store_wishlists`, `membership_tiers`, `player_tiers`, `vote_links`, `creator_codes`, `user_affiliates` |
 | Community | `organizations`, `organization_members`, `organizations_public`, `partners`, `user_follows`, `user_reports`, `item_reviews`, `reviews`, `player_stats`, `user_streaks`, `notifications`, `community_clips`, `gallery_items` |
@@ -202,10 +202,10 @@ Clip playback requires the storage path to match a listed `community_clips` row 
 | Group | Functions |
 | ----- | --------- |
 | Admin | `admin-create-user`, `admin-delete-user`, `admin-update-user-email`, `admin-send-broadcast`, `admin-test-auth-email`, `litebans-mysql-health`, `litebans-mysql-query`, `mc-console-send` |
-| Auth & email | `auth-email-hook`, `device-verify`, `send-app-email`, `preview-transactional-email`, `handle-email-events`, `handle-email-subscribe`, `unsubscribe-news`, `email-diagnostics`, `allowed_from_addresses` handling |
+| Auth & email | `auth-email-hook`, `device-verify`, `send-app-email`, `preview-transactional-email`, `handle-email-events`, `handle-email-subscribe`, `unsubscribe-news`, `email-diagnostics` |
 | Discord bot | `discord-interactions` (slash commands), `discord-register-commands`, `discord-bot-action`, `discord-bot-invite`, `discord-bot-test`, `discord-presence`, `discord-supporter-role`, `discord-sync-user-roles`, `discord-link-start`, `discord-link-callback`, `discord-invite`, `discord-modules-api`, `discord-reply-texts-api`, `bot-status` |
 | Status & uptime | `uptime-check`, `refresh-server-status`, `server-panel-status`, `twitch-status`, `punishments-lookup` |
-| Notifications | `notify-changelog`, `notify-news`, `notify-post`, `notify-new-mod`, `notify-new-report`, `notify-application-discord`, `notify-changelog`, `changelog-discord-post`, `maintenance-notify`, `mcp` |
+| Notifications | `notify-changelog`, `notify-news`, `notify-post`, `notify-new-mod`, `notify-new-report`, `notify-application-discord`, `changelog-discord-post`, `maintenance-notify`, `mcp` |
 | Site tools | `generate-business-bio`, `plugin-file-url`, `skript-file-url`, `submit-support`, `website-log-event`, `website-webhook-test`, `og-image` |
 
 Shared helpers live in `supabase/functions/_shared/` (Discord command catalog, reply texts, deferred-reply helpers, moderation log classifier, uptime services).
@@ -279,7 +279,7 @@ bun run lint       # eslint
 bun run changelog:check
 ```
 
-`predev`/`prebuild` run `scripts/generate-sitemap.ts`, `scripts/changelog-check.ts` (build fails without a changelog entry) and `scripts/generate-version.ts`.
+`predev`/`prebuild` run `scripts/generate-sitemap.ts`, `scripts/changelog-check.ts` (validates published changelog entries and rewrites `public/release-notes.json` + `public/RELEASE_NOTES.md`; exits non-zero on bad data so `vite build` aborts) and `scripts/generate-version.ts` (stamps `public/version.json`).
 
 ---
 
