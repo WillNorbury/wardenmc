@@ -51,10 +51,16 @@ const linksGroup: NavGroup = {
   items: [{ to: "https://spectorclient.com", label: "SpectorClient", image: spectorLogo, external: true }],
 };
 
+const mainGroup: NavGroup = {
+  id: "main",
+  label: "Main",
+  defaultOpen: true,
+  items: [{ to: "/", label: "Home", icon: Home }],
+};
+
 const browseGroup: NavGroup = {
   id: "browse",
   label: "Browse",
-  defaultOpen: true,
   items: [
     { to: "/servers", label: "Servers", icon: Server },
     { to: "/gamemodes", label: "Game Modes", icon: Gamepad2 },
@@ -71,7 +77,7 @@ const communityGroup: NavGroup = {
   label: "Community",
   items: [
     { to: "/community", label: "Community hub", icon: Users },
-    { to: "/members", label: "Members", icon: Users },
+    { to: "/users", label: "Members", icon: Users },
     { to: "/staff", label: "Staff", icon: ShieldCheck },
     { to: "/partners", label: "Partners", icon: Users },
   ],
