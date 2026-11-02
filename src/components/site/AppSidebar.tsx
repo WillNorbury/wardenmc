@@ -125,6 +125,12 @@ const accountGroup: NavGroup = {
   ],
 };
 
+const applyGroup: NavGroup = {
+  id: "apply",
+  label: "Apply",
+  items: [{ to: "/apply", label: "Apply", icon: FileText }],
+};
+
 export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
