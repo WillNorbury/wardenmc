@@ -227,7 +227,11 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <SidebarContent
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:w-0"
+        style={{ scrollbarWidth: "none" }}
+      >
+
         {groups.map(renderGroup)}
       </SidebarContent>
 
