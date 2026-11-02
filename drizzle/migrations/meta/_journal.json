@@ -92,6 +92,13 @@
       "when": 1793525509948,
       "tag": "0012_community_video_clips",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793585972537,
+      "tag": "0013_restrict_clip_reads_to_listed_videos",
+      "breakpoints": true
     }
   ]
 }

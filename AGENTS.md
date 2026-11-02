@@ -1,6 +1,6 @@
 # Project architecture
 - Public punishment pages use only the existing GET player lookup; bulk records and mutation actions remain admin-only to preserve current access boundaries.
-- Community clips use a dedicated private video bucket with public read policies and short-lived playback URLs; metadata ownership policies restrict uploads and deletion to the uploader, keeping media separate from profile images.
+- Community clips use a private video bucket with short-lived playback URLs; public reads require matching listed metadata and uploader folder, and writes remain uploader-only so unlisted media cannot be accessed.
 - Mount the custom pointer once at app level through a body portal, with theme-token effects and native fallbacks for touch and text editing, so it cannot block clicks or disappear behind dialogs.
 - Warning execution passes an explicit outcome to the shared log/visibility classifier, because the warning success symbol is also used for usage errors and cannot determine success alone.
 - The public bot directory and moderation registration consume the browser-safe Discord command catalog, so command names, options and permission metadata stay consistent without exposing server credentials.
