@@ -63,7 +63,7 @@ const Checkout = () => {
               <ul className="divide-y divide-border text-sm">
                 {cart.items.map((ci) => (
                   <li key={ci.id} className="flex justify-between gap-3 py-2">
-                    <span>{ci.name} × {ci.quantity}{ci.recipient ? ` (gift to ${ci.recipient})` : ""}</span>
+                    <span className="min-w-0 break-words">{ci.name} × {ci.quantity}{ci.recipient ? ` (gift to ${ci.recipient})` : ""}{ci.rankPrefix && <span className="block text-primary">Prefix: {ci.rankPrefix}</span>}</span>
                     <span className="tabular-nums">{formatMoney((Number(ci.price) || 0) * ci.quantity, (ci.currency || "USD").toUpperCase())}</span>
                   </li>
                 ))}

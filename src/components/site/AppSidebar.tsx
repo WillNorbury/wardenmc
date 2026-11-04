@@ -39,6 +39,8 @@ import {
   Server,
   Building2,
   Film,
+  ShoppingBag,
+  ShoppingCart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -131,6 +133,13 @@ const applyGroup: NavGroup = {
   items: [{ to: "/apply", label: "Apply", icon: FileText }],
 };
 
+const storeGroup: NavGroup = {
+  id: "store", label: "Store", items: [
+    { to: "/store", label: "Ranks", icon: ShoppingBag },
+    { to: "/cart", label: "Cart", icon: ShoppingCart },
+  ],
+};
+
 export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
@@ -204,6 +213,7 @@ export function AppSidebar() {
     communityGroup,
     discordGroup,
     mediaGroup,
+    storeGroup,
     helpGroup,
     ...(user ? [accountGroup] : []),
     ...(isAdmin

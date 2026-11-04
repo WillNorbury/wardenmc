@@ -62,7 +62,7 @@ const Cart = () => {
           <Card className="p-10 text-center">
             <Package className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
             <p className="text-muted-foreground">Your cart is empty.</p>
-            <Button asChild variant="outline" className="mt-4"><Link to="/">Back to home</Link></Button>
+            <Button asChild variant="outline" className="mt-4"><Link to="/store">Browse store</Link></Button>
           </Card>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
@@ -74,6 +74,7 @@ const Cart = () => {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium">{ci.name}</div>
+                    {ci.rankPrefix && <div className="break-words text-sm text-primary">Prefix: {ci.rankPrefix}</div>}
                     <div className="text-xs text-muted-foreground">{formatMoney(Number(ci.price) || 0, (ci.currency || "USD").toUpperCase())} each</div>
                     {ci.recipient && <div className="text-xs text-muted-foreground">Gift to {ci.recipient}</div>}
                     <div className="mt-2 inline-flex items-center rounded border border-border">

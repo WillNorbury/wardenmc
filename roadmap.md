@@ -1,4 +1,7 @@
 # Roadmap
+- [x] Restore signed-in /store with VIP ($9.99 USD), custom rank ($19.99 USD), prefix customization and currency estimates; cart/checkout connected, nine tests passed, signed-out desktop/phone gate verified, build OK; changelog de6e5a23-9d7a-43d7-b816-266632275233 published. Private /store intentionally excluded from sitemap.
+- [ ] Verify signed-in store add-to-cart and real order submission — requester has no matching auth account for preview sign-in; tests cover prices, access and prefix order serialization.
+- [ ] Send store changelog email — staff sign-in required.
 - [x] Remove obsolete Wiki, Gallery and Quizzes Admin sections and unused files, preserving saved records and current tools; 20 tests passed, build OK; changelog 79647ad7-eaff-4d50-9655-04e730dc0fd0 published.
 - [ ] Verify Admin cleanup signed in and email its changelog — requester has no matching auth account for preview sign-in; notification returned 401.
 - [x] Restore /punishments and /punishments/:player with existing player lookup, navigation and sitemap; live Notch search, tabs and refresh verified, four route tests passed, build OK; changelog 1d0eb2fb-80ce-4cea-b975-d677447839f9 published.
