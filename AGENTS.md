@@ -1,4 +1,5 @@
 # Project architecture
+- The signed-in store reuses store_items and the existing staff-assisted cart checkout; rank prefixes stay on distinct cart lines and are included in order tickets, while currency conversion is display-only and checkout retains the product's base currency.
 - Retired Admin sections must be removed from the section type, registry, navigation and renderer together; old tab links fall back to the dashboard without deleting saved records.
 - Public punishment pages use only the existing GET player lookup; bulk records and mutation actions remain admin-only to preserve current access boundaries.
 - Community clips use a private video bucket with short-lived playback URLs; public reads require matching listed metadata and uploader folder, and writes remain uploader-only so unlisted media cannot be accessed.
