@@ -10,7 +10,7 @@ export function buildOrderTicket(cart: Cart, note?: string) {
       (Number(ci.price) || 0) * ci.quantity,
       (ci.currency || cart.currency || "USD").toUpperCase(),
     )}${ci.recipient ? `  (gift to: ${ci.recipient})` : ""}`;
-    return ci.giftMessage ? [base, `   ↳ Message: ${ci.giftMessage}`] : [base];
+    return [base, ...(ci.rankPrefix ? [`   Rank prefix: ${ci.rankPrefix}`] : []), ...(ci.giftMessage ? [`   ↳ Message: ${ci.giftMessage}`] : [])];
   });
   const body = ["New store checkout submitted via the website.", "", "Items:", ...lines, "",
     `Subtotal: ${formatMoney(cart.subtotal, cart.currency)}`];

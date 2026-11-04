@@ -13,6 +13,8 @@ export type CartItem = {
   maxQuantity?: number | null;
   recipient?: string | null;
   giftMessage?: string | null;
+  productId?: string;
+  rankPrefix?: string | null;
 };
 
 
