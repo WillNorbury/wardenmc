@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Refresh /clips with custom video controls and a polished watch layout; verify playback and phone layout, publish changelog, and confirm listed-only video security.
+- [x] Refresh /clips with custom controls and a polished watch layout; sample-video play/pause/mute/speed and phone layout verified, five clip tests pass, build OK. Listed-only playback security reconfirmed and finding resolved; changelog ad3a1aed-a72c-4e61-8874-01f71317b0aa published. No real community clips available for playback verification.
+- [ ] Confirm refreshed clip-player changelog email delivery — corrected notification request timed out; delivery unverified.
 - [x] Restore signed-in /store with VIP ($9.99 USD), custom rank ($19.99 USD), prefix customization and currency estimates; cart/checkout connected, nine tests passed, signed-out desktop/phone gate verified, build OK; changelog de6e5a23-9d7a-43d7-b816-266632275233 published. Private /store intentionally excluded from sitemap.
 - [ ] Verify signed-in store add-to-cart and real order submission — requester has no matching auth account for preview sign-in; tests cover prices, access and prefix order serialization.
 - [ ] Send store changelog email — staff sign-in required.
