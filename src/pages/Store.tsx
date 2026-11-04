@@ -48,7 +48,7 @@ function StoreCatalog() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SEO title="Store — Warden Network" description="VIP and custom ranks for Warden Network members." path="/store" noindex />
+      <SEO title="Store — Warden Network" description="VIP and custom ranks for Warden Network members." path="/store" />
       <Navbar />
       <main className="flex-1 pt-28 pb-16">
         <div className="container max-w-5xl">
@@ -56,7 +56,7 @@ function StoreCatalog() {
             <img src={crowns} alt="Diamond and emerald voxel rank crowns" width={1536} height={768} className="absolute inset-0 h-full w-full object-cover" />
             <div className="relative flex min-h-64 flex-col justify-between p-5 sm:min-h-80 sm:p-8">
               <div className="flex items-start justify-between gap-4">
-                <h1 className="font-display text-4xl sm:text-5xl text-primary-foreground bg-background/90 px-3 py-2">WARDEN STORE</h1>
+                <h1 className="font-display text-4xl sm:text-5xl text-foreground bg-background/90 px-3 py-2">WARDEN STORE</h1>
                 <Button asChild variant="secondary" className="shrink-0"><Link to="/cart"><ShoppingCart className="mr-2 h-4 w-4" />Cart ({cart.count})</Link></Button>
               </div>
               <p className="w-fit bg-background/90 px-3 py-2 text-sm text-foreground">VIP & custom ranks</p>
