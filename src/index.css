@@ -4,6 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
+.clip-player:fullscreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+.clip-player:fullscreen .clip-player-screen {
+  flex: 1;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
 @layer base {
   :root {
     /* Glass Aurora: deep navy, mint primary, violet accent */
