@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UpdatePrompt } from "@/components/site/UpdatePrompt";
 import VersionChecker from "@/components/site/VersionChecker";
 import { CustomCursor } from "@/components/site/CustomCursor";
+import { IntroVideoGate } from "@/components/site/IntroVideoGate";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { DeviceVerificationGate } from "@/components/site/DeviceVerificationGate";

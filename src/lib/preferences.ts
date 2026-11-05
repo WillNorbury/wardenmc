@@ -23,6 +23,7 @@ export type UserPreferences = {
   theme?: ThemePref;
   palette?: ThemePalette;
   custom_theme?: CustomTheme;
+  intro_seen?: boolean;
   notify_news?: boolean;
   notify_updates?: boolean;
   notify_tickets?: boolean;
