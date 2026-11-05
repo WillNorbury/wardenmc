@@ -47,11 +47,12 @@ export default function Clips() {
     try {
       const { data, error } = await supabase.from("community_clips").select("*").order("created_at", { ascending: false }).limit(100);
       if (error) throw error;
-      const paths = (data ?? []).map(clip => clip.storage_path);
-      if (!paths.length) { setClips([]); return; }
-      const { data: urls, error: urlError } = await supabase.storage.from(CLIP_BUCKET).createSignedUrls(paths, 3600);
+      const ids = (data ?? []).map(clip => clip.id);
+      if (!ids.length) { setClips([]); return; }
+      const { data: links, error: urlError } = await supabase.functions.invoke("clip-playback-urls", { body: { clip_ids: ids } });
       if (urlError) throw urlError;
-      const resolved = (data ?? []).map(clip => ({ ...clip, url: urls?.find(url => url.path === clip.storage_path)?.signedUrl ?? "" }));
+      const urls: Record<string, string> = links?.urls ?? {};
+      const resolved = (data ?? []).map(clip => ({ ...clip, url: urls[clip.id] ?? "" }));
       setClips(resolved);
     } catch (err) { setError(err instanceof Error ? err.message : "Clips could not be loaded."); }
     finally { setLoading(false); }
