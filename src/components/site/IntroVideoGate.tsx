@@ -57,8 +57,7 @@ export const IntroVideoGate = () => {
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) void dismiss(); }}>
       <DialogContent
-        showCloseButton={false}
-        className="w-[min(92vw,56rem)] max-w-none gap-0 overflow-hidden rounded-2xl border border-border/70 bg-background/95 p-0 shadow-[0_0_80px_-24px_hsl(var(--primary)/0.45)] backdrop-blur-sm"
+        className="intro-dialog w-[min(92vw,56rem)] max-w-none gap-0 overflow-hidden rounded-2xl border border-border/70 bg-background/95 p-0 shadow-[0_0_80px_-24px_hsl(var(--primary)/0.45)] backdrop-blur-sm"
       >
         <div className="relative aspect-video bg-muted">
           <video
@@ -113,15 +112,6 @@ export const IntroVideoGate = () => {
             </Button>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={() => void dismiss()}
-          aria-label="Close the welcome tour"
-          className="absolute right-3 top-3 rounded-full border border-border/60 bg-background/80 p-1.5 text-muted-foreground opacity-80 transition hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <X className="h-4 w-4" />
-        </button>
       </DialogContent>
     </Dialog>
   );

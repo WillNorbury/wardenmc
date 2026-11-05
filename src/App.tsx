@@ -84,6 +84,7 @@ const Shell = () => {
           {!hideSidebar && <AppSidebar />}
           <div className="flex min-h-svh w-full min-w-0 flex-1 flex-col">
             <VersionChecker />
+            <IntroVideoGate />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
