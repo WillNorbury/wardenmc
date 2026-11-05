@@ -13,10 +13,12 @@ export function hasSeenIntro(prefs: unknown): boolean {
 }
 
 /** Returns a full preferences object with the flag set, keeping every other saved preference. */
-export function withIntroSeen(prefs: unknown): Record<string, unknown> {
+export function withIntroSeen(prefs: unknown) {
   const base =
     prefs && typeof prefs === "object" && !Array.isArray(prefs)
-      ? { ...(prefs as Record<string, unknown>) }
+      ? (prefs as Record<string, unknown>)
       : {};
-  return { ...base, [INTRO_SEEN_KEY]: true };
+  // The key is written literally so the saved object keeps the same shape the
+  // other preference writers use.
+  return { ...base, intro_seen: true };
 }
