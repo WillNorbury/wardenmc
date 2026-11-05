@@ -30,10 +30,11 @@ export type UserPreferences = {
   notify_applications?: boolean;
 };
 
-export const DEFAULT_PREFS: Required<Omit<UserPreferences, "intro_seen">> = {
+export const DEFAULT_PREFS: Required<UserPreferences> = {
   theme: "dark",
   palette: "default",
   custom_theme: DEFAULT_CUSTOM_THEME,
+  intro_seen: false,
   notify_news: true,
   notify_updates: true,
   notify_tickets: true,
