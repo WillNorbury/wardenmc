@@ -23,6 +23,7 @@ export type UserPreferences = {
   theme?: ThemePref;
   palette?: ThemePalette;
   custom_theme?: CustomTheme;
+  intro_seen?: boolean;
   notify_news?: boolean;
   notify_updates?: boolean;
   notify_tickets?: boolean;
@@ -33,6 +34,7 @@ export const DEFAULT_PREFS: Required<UserPreferences> = {
   theme: "dark",
   palette: "default",
   custom_theme: DEFAULT_CUSTOM_THEME,
+  intro_seen: false,
   notify_news: true,
   notify_updates: true,
   notify_tickets: true,

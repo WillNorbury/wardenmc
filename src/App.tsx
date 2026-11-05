@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UpdatePrompt } from "@/components/site/UpdatePrompt";
 import VersionChecker from "@/components/site/VersionChecker";
 import { CustomCursor } from "@/components/site/CustomCursor";
+import { IntroVideoGate } from "@/components/site/IntroVideoGate";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { DeviceVerificationGate } from "@/components/site/DeviceVerificationGate";
@@ -83,6 +84,7 @@ const Shell = () => {
           {!hideSidebar && <AppSidebar />}
           <div className="flex min-h-svh w-full min-w-0 flex-1 flex-col">
             <VersionChecker />
+            <IntroVideoGate />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
