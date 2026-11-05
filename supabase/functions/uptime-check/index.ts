@@ -177,7 +177,7 @@ async function sendWebhook(
           latency_ms: Date.now() - start,
         };
       } catch (e) {
-        console.error("webhook failed", url, e);
+        console.error("webhook failed", e instanceof Error ? e.message : "unknown error");
         return {
           url,
           ok: false,
@@ -270,7 +270,7 @@ async function emailAdmins(
               uptimeWindow: payload.uptimeWindow,
             },
           },
-        }).catch((err) => console.error('admin email failed', to, err))
+        }).catch((err) => console.error('admin email failed', err instanceof Error ? err.message : 'unknown error'))
       ),
     );
   } catch (e) {

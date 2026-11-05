@@ -101,10 +101,18 @@ Deno.serve(async (req) => {
 
     const { data: plugin } = await admin
       .from("plugins")
-      .select("id, published, user_id, org_id")
+      .select("id, published, user_id, org_id, jar_path")
       .eq("id", pluginId)
       .maybeSingle();
     if (!plugin) return json({ error: "File not found" }, 404);
+
+    // A version/plugin row's jar_path is caller-controlled, so only sign files
+    // stored in the plugin owner's folder, or the plugin's staff-set main jar.
+    if (path) {
+      const ownerFolder = plugin.user_id ? `${plugin.user_id}/` : null;
+      const ownsPath = !!ownerFolder && path.startsWith(ownerFolder) && !path.includes("..");
+      if (!ownsPath && path !== plugin.jar_path) return json({ error: "File not found" }, 404);
+    }
 
     let allowed = plugin.published === true;
 
