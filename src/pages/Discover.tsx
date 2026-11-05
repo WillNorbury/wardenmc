@@ -187,7 +187,7 @@ export default function Discover() {
   const fresh = [
     { title: "Servers", to: "/servers", items: servers.slice(0, 3).map((s) => serverCard(s, "New server")) },
     { title: "Plugins", to: "/plugins", items: newestPlugins.slice(0, 3).map((p) => pluginCard(p, "New plugin")) },
-    { title: "Posts", to: "/posts", items: posts.slice(0, 3).map((p) => postCard(p, "New post")) },
+    { title: "Posts", to: "/posts", items: posts.slice(0, 3).map((p) => postCard(p, "New post")), hidden: !user },
     { title: "Organizations", to: "/organizations", items: orgs.slice(0, 3).map((o) => <Card key={`o-${o.id}`} to={o.slug ? `/organization/${o.slug}` : "/organizations"} icon={<Building2 className="h-5 w-5" />} image={o.avatar_url} kind="New organization" title={o.name} text={o.description} />) },
   ];
 
@@ -236,7 +236,7 @@ export default function Discover() {
 
       <Section icon={<Compass className="h-6 w-6" />} title="New on WardenMC">
         <div className="space-y-8">
-          {fresh.map((f) => (
+          {fresh.filter((f) => !f.hidden).map((f) => (
             <div key={f.title}>
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-display text-lg font-semibold">{f.title}</h3>
