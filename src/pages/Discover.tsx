@@ -133,7 +133,7 @@ export default function Discover() {
     ]);
     if (pl.status === "fulfilled") setPlugins(pl.value as PluginDirectoryItem[]); else errs.plugins = true;
     if (sv.status === "fulfilled" && !(sv.value as any).error) setServers(((sv.value as any).data ?? []) as ServerRow[]); else errs.servers = true;
-    if (po.status === "fulfilled") setPosts(((po.value as Post[]) ?? []).filter((p) => !p.reply_to)); else errs.posts = true;
+    if (po.status === "fulfilled") setPosts(((po.value as Post[]) ?? []).filter((p) => !p.reply_to)); else if (user) errs.posts = true;
     if (og.status === "fulfilled" && !og.value.error) setOrgs((og.value.data ?? []) as OrgRow[]); else errs.orgs = true;
     if (pa.status === "fulfilled" && !pa.value.error) setPartners((pa.value.data ?? []) as PartnerRow[]); else errs.partners = true;
     setErrors(errs);
