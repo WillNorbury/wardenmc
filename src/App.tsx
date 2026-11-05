@@ -23,6 +23,7 @@ import Yapin from "./pages/Yapin.tsx";
 import Bot from "./pages/Bot.tsx";
 import BotCommands from "./pages/BotCommands.tsx";
 import Community from "./pages/Community.tsx";
+import Discover from "./pages/Discover.tsx";
 import BotStatus from "./pages/BotStatus.tsx";
 import Posts from "./pages/Posts.tsx";
 import PostCompose from "./pages/PostCompose.tsx";
@@ -141,6 +142,7 @@ const Shell = () => {
 
               <Route path="/changelog" element={<Changelog />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/discover" element={<Discover />} />
               <Route path="/support" element={<Support />} />
               <Route path="/punishments" element={<Punishments />} />
               <Route path="/punishments/:player" element={<Punishments />} />

@@ -163,12 +163,12 @@ export default function Discover() {
   const anyError = Object.keys(errors).length > 0;
 
   const trending: ReactNode[] = [
-    ...streams.map((s) => <Card key={`st-${s.login}`} to={`/live?channel=${s.displayName}`} icon={<Radio className="h-5 w-5" />} image={s.profileImage} kind="Live now" title={s.displayName} text={s.title} highlight meta={<span>{s.viewerCount} watching{s.gameName ? ` · ${s.gameName}` : ""}</span>} />),
+    ...streams.map((s) => <Card key={`st-${s.login}`} to={`/live?tab=${s.login === "spectordev" ? "SpectorDev" : "WillNorbury"}`} icon={<Radio className="h-5 w-5" />} image={s.profileImage} kind="Live now" title={s.displayName} text={s.title} highlight meta={<span>{s.viewerCount} watching{s.gameName ? ` · ${s.gameName}` : ""}</span>} />),
     ...topPlugins.slice(0, 3).map((p) => pluginCard(p, "Trending plugin")),
     ...servers.slice(0, 2).map((s) => serverCard(s, "Popular server")),
     ...topPosts.filter((p) => p.likes > 0).slice(0, 2).map((p) => postCard(p, "Popular post")),
     ...[...new Map(topPlugins.map((p) => [p.developer.username, p.developer])).values()].slice(0, 1).map((d) => (
-      <Card key={`d-${d.id}`} to={d.profilePath ?? "/plugins/developers"} icon={<Users className="h-5 w-5" />} image={d.avatar} kind="Featured creator" title={d.name} text={d.bio} />
+      <Card key={`d-${d.id}`} to={d.profilePath ?? "/plugins/developers"} icon={<Users className="h-5 w-5" />} image={d.avatar} kind="Featured creator" title={d.displayName} text={d.bio} />
     )),
   ].slice(0, 9);
 
@@ -224,7 +224,7 @@ export default function Discover() {
           : <Empty text="No featured picks right now." />}
       </Section>
 
-      {(user ? true : false) ? (
+      {user ? (
         <Section icon={<Sparkles className="h-6 w-6" />} title="Recommended for You" action={<p className="text-sm text-muted-foreground">{rec.personalised ? "Based on plugins you've favourited" : "Popular picks — favourite plugins to personalise this"}</p>}>
           {loading ? <Loading /> : rec.items.length ? <Grid>{rec.items.map((p) => pluginCard(p, "For you"))}</Grid> : <Empty text="No recommendations yet." />}
         </Section>
