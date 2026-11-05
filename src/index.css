@@ -609,3 +609,12 @@ font[style] {
   background: none !important;
   box-shadow: none !important;
 }
+
+/* Welcome intro dialog: give the built-in close button a visible chip over the video. */
+.intro-dialog > button {
+  background: hsl(var(--background) / 0.8);
+  border: 1px solid hsl(var(--border) / 0.6);
+  border-radius: 9999px;
+  padding: 0.375rem;
+  backdrop-filter: blur(6px);
+}
