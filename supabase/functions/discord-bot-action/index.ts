@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "status") {
-      const channelId = body.channelId || cfg.statusChannelId;
+      const channelId = cfg.statusChannelId;
       if (!channelId) return json({ ok: false, error: "No status channel configured" });
 
       const { data: ipRow } = await supabase.from("site_content").select("value").eq("key", "server").maybeSingle();
@@ -223,7 +223,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "welcome") {
-      const channelId = body.channelId || cfg.welcomeChannelId || cfg.announceChannelId;
+      const channelId = cfg.welcomeChannelId || cfg.announceChannelId;
       if (!channelId) return json({ ok: false, error: "No welcome channel configured" });
       const template = body.message || cfg.welcomeMessage || "Welcome to Warden Network, {user}!";
       const target = body.username || callerName;
@@ -314,7 +314,7 @@ Deno.serve(async (req) => {
         },
       } as const;
       const m = map[action];
-      const channelId = body.channelId || cfg[m.channelKey] || m.fallbackChannel;
+      const channelId = cfg[m.channelKey] || m.fallbackChannel;
       if (!channelId) return json({ ok: false, error: `No ${action} channel configured` });
 
       // Server IP for info embed
