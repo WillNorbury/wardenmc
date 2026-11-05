@@ -41,6 +41,7 @@ import {
   Film,
   ShoppingBag,
   ShoppingCart,
+  Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
