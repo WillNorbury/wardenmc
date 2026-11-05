@@ -41,6 +41,7 @@ import {
   Film,
   ShoppingBag,
   ShoppingCart,
+  Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -64,6 +65,7 @@ const browseGroup: NavGroup = {
   id: "browse",
   label: "Browse",
   items: [
+    { to: "/discover", label: "Discover", icon: Compass },
     { to: "/servers", label: "Servers", icon: Server },
     { to: "/gamemodes", label: "Game Modes", icon: Gamepad2 },
     { to: "/plugins", label: "Plugins", icon: Puzzle },
