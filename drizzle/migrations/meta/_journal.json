@@ -120,6 +120,13 @@
       "when": 1793942483408,
       "tag": "0016_maintenance_public_read",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793946887740,
+      "tag": "0017_encrypted_app_user_connections",
+      "breakpoints": true
     }
   ]
 }
