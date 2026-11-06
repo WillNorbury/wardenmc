@@ -8,15 +8,14 @@ import { MessageSquare, Radio, Tv, Users } from "lucide-react";
 
 const CHANNELS: { tab: string; login: string; label: string; role: string }[] = [
   { tab: "WillNorbury", login: "will_norbury", label: "WillNorbury", role: "Founder" },
-  { tab: "SpectorDev", login: "spectordev", label: "SpectorDev", role: "Developer" },
+  { tab: "SpectorDev", login: "spectordev", label: "SpectorDev", role: "Founder" },
+  { tab: "KidGamerProTTV", login: "KidGamerProTTV", label: "KidGamerProTTV", role: "Manager" },
 ];
 
 export default function Live() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const active =
-    CHANNELS.find((c) => c.tab.toLowerCase() === (tabParam ?? "").toLowerCase()) ??
-    CHANNELS[0];
+  const active = CHANNELS.find((c) => c.tab.toLowerCase() === (tabParam ?? "").toLowerCase()) ?? CHANNELS[0];
 
   const [parents, setParents] = useState<string[]>([]);
   const [showChat, setShowChat] = useState(true);
@@ -101,8 +100,8 @@ export default function Live() {
               WATCH <span className="text-primary">LIVE</span>
             </h1>
             <p className="text-muted-foreground max-w-xl mt-3">
-              Streams from the Warden Network team, embedded right here — player, chat and
-              clips without leaving the site. Status refreshes every minute.
+              Streams from the Warden Network team, embedded right here — player, chat and clips without leaving the
+              site. Status refreshes every minute.
             </p>
           </div>
         </section>
@@ -119,9 +118,7 @@ export default function Live() {
                   onClick={() => setTab(c.tab)}
                   className={
                     "group relative overflow-hidden border p-5 text-left transition " +
-                    (isActive
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-card hover:border-primary/50")
+                    (isActive ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/50")
                   }
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -132,9 +129,7 @@ export default function Live() {
                       <h2 className="font-display text-2xl font-black tracking-tight truncate">
                         {c.label.toUpperCase()}
                       </h2>
-                      <span className="text-xs text-muted-foreground font-mono">
-                        twitch.tv/{c.login}
-                      </span>
+                      <span className="text-xs text-muted-foreground font-mono">twitch.tv/{c.login}</span>
                     </div>
                     <div
                       className={
@@ -163,9 +158,7 @@ export default function Live() {
           {/* Player + chat */}
           <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
             <div>
-              <span className="text-primary font-mono text-xs tracking-widest uppercase">
-                Now showing
-              </span>
+              <span className="text-primary font-mono text-xs tracking-widest uppercase">Now showing</span>
               <h2 className="text-2xl md:text-3xl font-bold font-display tracking-tighter italic">
                 {active.label.toUpperCase()}
               </h2>
@@ -180,11 +173,7 @@ export default function Live() {
             </button>
           </div>
 
-          <div
-            className={
-              showChat ? "grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]" : "grid gap-4"
-            }
-          >
+          <div className={showChat ? "grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]" : "grid gap-4"}>
             <div
               className="relative w-full overflow-hidden border border-border bg-black"
               style={{ aspectRatio: "16 / 9" }}
@@ -193,7 +182,9 @@ export default function Live() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-muted-foreground px-6">
                   <Tv className="h-8 w-8" />
                   <p className="font-semibold text-foreground">{active.label} is offline</p>
-                  <p className="text-sm">The stream will appear here automatically when they go live. Check out recent clips below.</p>
+                  <p className="text-sm">
+                    The stream will appear here automatically when they go live. Check out recent clips below.
+                  </p>
                 </div>
               ) : isLive && twitchPlayerSrc ? (
                 <iframe
