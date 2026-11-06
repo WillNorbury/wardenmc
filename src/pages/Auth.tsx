@@ -38,6 +38,7 @@ const schema = z.object({
 });
 
 type Mode = "signin" | "signup" | "verify" | "mfa";
+type SocialProvider = "google" | "apple" | "microsoft" | "lovable";
 
 const Auth = () => {
   const nav = useNavigate();
@@ -60,7 +61,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [accountType, setAccountType] = useState<"personal" | "business">("personal");
   const [loading, setLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<"google" | null>(null);
+  const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [otp, setOtp] = useState("");
@@ -250,7 +251,7 @@ const Auth = () => {
     }
   };
 
-  const handleSocialSignIn = async (provider: "google") => {
+  const handleSocialSignIn = async (provider: SocialProvider) => {
     if (socialLoading) return;
     setSocialLoading(provider);
     try {
