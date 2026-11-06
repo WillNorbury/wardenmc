@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Create a blank FamousStreamers.tsx page and enable Apple, Microsoft and Lovable sign-in using existing profiles; verify buttons and provider setup.
 - [x] Apply the uploaded ECLIPSE presentation to /auth, preserving authentication handlers; seven existing tests pass, build OK, desktop/phone form controls verified via a temporary latest-source preview because the running preview served cached Auth code. No live account signup or password-reset email was sent.
 - [ ] Confirm auth-design changelog email delivery — notification returned 401; staff sign-in required. Published entry 8e70872b-ed04-451e-9aeb-6a1280ea819a.
 - [x] Replace maintenance presentation with the uploaded template; existing controls preserved, desktop/mobile and light theme verified without enabling live maintenance. Published changelog bd840bed-ee48-4130-8493-4dac5407baf0.
