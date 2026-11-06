@@ -13,7 +13,7 @@ describe("website Twitch channels", () => {
   });
   it("allows every channel configured on both streaming pages", () => {
     for (const page of ["Live", "FamousStreamers"]) {
-      const source = readFileSync(new URL(`../pages/${page}.tsx`, import.meta.url), "utf8");
+      const source = readFileSync(`src/pages/${page}.tsx`, "utf8");
       const logins = [...source.matchAll(/login:\s*"([^"]+)"/g)].map((match) => match[1]);
       expect(logins.length).toBeGreaterThan(0);
       for (const login of logins) expect(isAllowedTwitchLogin(login), `${page}: ${login}`).toBe(true);
