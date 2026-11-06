@@ -37,6 +37,7 @@ import AvatarFilePicker from "@/components/profile/AvatarFilePicker";
 import { uploadAvatar } from "@/lib/avatarUpload";
 import BusinessProfileCard from "@/components/profile/BusinessProfileCard";
 import CustomThemeEditor from "@/components/profile/CustomThemeEditor";
+import TwitchAccountCard from "@/components/profile/TwitchAccountCard";
 import { normalizeCustomTheme } from "@/lib/theme-colors";
 
 const Profile = () => {
@@ -397,6 +398,8 @@ const Profile = () => {
             </div>
           )}
         </Card>
+
+        <TwitchAccountCard />
 
         <OrganizationsCard userId={user!.id} />
         <AffiliatesCard profileId={user!.id} isOwn viewerId={user!.id} />

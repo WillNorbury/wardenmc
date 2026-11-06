@@ -1,6 +1,8 @@
 # Roadmap
 - [x] Keep Google as the only social sign-in button; retain email/password.
-- [ ] Add member-owned Twitch linking to Profile — needs a Twitch App User Connector client configured and linked first.
+- [x] Add member-owned Twitch linking to Profile — client linked with offline access, authenticated function deployed, encrypted storage created; eight tests and build pass; Google-only screen and safe callback verified, signed-out API rejected with 401.
+- [ ] Verify real Profile Twitch link/reconnect/unlink — no auth account matches the requester for managed preview sign-in; needs member sign-in and Twitch consent. Ensure the Twitch application registers https://connector-gateway.lovable.dev/api/v1/app-users/oauth2/callback.
+- [ ] Email Google/Twitch changelog 11066e5c-c04a-40b6-8ca8-7f8cc82034a7 — notification returned 401; staff sign-in required.
 - [x] Permit Auronplay and Rubius lookups; ten tests pass including both pages' channel lists, deployed; Auronplay status and Rubius clips return 200, browser shows Auronplay offline with no 403. Changelog 3423b16f-c3d2-4f8c-badc-688a4430f028 published.
 - [ ] Send Auronplay/Rubius changelog email — notification returned 401; staff sign-in required.
 - [x] Fix Twitch status and clips rejection for Famous Streamers and the third Live channel; seven allowlist tests pass, deployed, Kai status and Ibai clips return 200, browser confirms Kai player mounts and Ninja offline state with no 403 requests. Actual embedded video playback not verified. Changelog 72e5e38d-1349-4c05-9ba3-323abf35ab84 published.
