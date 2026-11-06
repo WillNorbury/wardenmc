@@ -10,6 +10,8 @@ const CHANNELS: { tab: string; login: string; label: string; role: string }[] = 
   { tab: "kaicenat", login: "kaicenat", label: "kaicenat", role: "Famous" },
   { tab: "ibai", login: "ibai", label: "ibai", role: "Famous" },
   { tab: "ninja", login: "ninja", label: "ninja", role: "Famous" },
+  { tab: "Auronplay", login: "Auronplay", label: "Auronplay", role: "Famous" },
+  { tab: "Rubius", login: "Rubius", label: "Rubius", role: "Famous" },
 ];
 
 export default function Live() {
