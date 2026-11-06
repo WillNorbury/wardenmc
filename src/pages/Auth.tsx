@@ -4,9 +4,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
-import "@lovable.dev/cloud-auth-js/styles.css";
-import appleBlack from "@/assets/apple-sign-in-black.svg";
-import appleWhite from "@/assets/apple-sign-in-white.svg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,7 +35,7 @@ const schema = z.object({
 });
 
 type Mode = "signin" | "signup" | "verify" | "mfa";
-type SocialProvider = "google" | "apple" | "microsoft" | "lovable";
+type SocialProvider = "google";
 
 const Auth = () => {
   const nav = useNavigate();
@@ -429,35 +426,6 @@ const Auth = () => {
                 {socialLoading === "google" && <Loader2 className="h-4 w-4 animate-spin" />}
                 Continue with Google
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="auth-social-button auth-apple-button w-full"
-                disabled={socialLoading !== null}
-                onClick={() => handleSocialSignIn("apple")}
-              >
-                <img src={appleBlack} alt="" className="auth-apple-black" />
-                <img src={appleWhite} alt="" className="auth-apple-white" />
-                Continue with Apple
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="auth-social-button w-full"
-                disabled={socialLoading !== null}
-                onClick={() => handleSocialSignIn("microsoft")}
-              >
-                {socialLoading === "microsoft" && <Loader2 className="h-4 w-4 animate-spin" />}
-                Continue with Microsoft
-              </Button>
-              <button
-                type="button"
-                className="lovable-auth-button lovable-auth-button--full-width auth-social-button"
-                disabled={socialLoading !== null}
-                onClick={() => handleSocialSignIn("lovable")}
-              >
-                Continue with Lovable
-              </button>
             </div>
             <form onSubmit={handle} className="space-y-4">
               <TabsContent value="signup" className="space-y-4 mt-0">
