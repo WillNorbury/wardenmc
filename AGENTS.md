@@ -1,4 +1,5 @@
 # Project architecture
+- MaintenanceScreen is presentation-only; MaintenanceGate retains config and bypass checks.
 - Community clip playback uses ClipPlayer with browser video playback and shared design-system controls; gallery previews stay muted and lightweight so watch controls never appear on every thumbnail.
 - The signed-in store reuses store_items and the existing staff-assisted cart checkout; rank prefixes stay on distinct cart lines and are included in order tickets, while currency conversion is display-only and checkout retains the product's base currency.
 - Retired Admin sections must be removed from the section type, registry, navigation and renderer together; old tab links fall back to the dashboard without deleting saved records.

@@ -1,7 +1,7 @@
 {
   "source": "Maintenance_Site.zip",
   "capabilities": [
-    {"capability":"Static maintenance presentation (dark and light)","source":"HTML/CSS templates","outcome":"Adapt into the existing maintenance gate with site theme tokens, rotating gears and animated activity bar","status":"implemented","next_action":"Verify desktop and mobile rendering"},
+    {"capability":"Static maintenance presentation (dark and light)","source":"HTML/CSS templates","outcome":"Adapted into the existing maintenance gate with site theme tokens, rotating gears and animated activity bar; desktop/mobile and light-theme browser checks passed","status":"verified","next_action":null},
     {"capability":"Sample return time, contact and social links","source":"Template placeholders","outcome":"Replace unverified sample details with existing status and sign-in links; preserve configurable maintenance title and message","status":"accepted","next_action":null},
     {"capability":"Database, records, auth and external providers","source":"Archive inspection","outcome":"None in the static template; existing site controls and access boundaries remain unchanged","status":"not_applicable","next_action":null}
   ]
