@@ -1,10 +1,11 @@
 # Roadmap
+- [x] Keep Google as the only social sign-in button; retain email/password.
+- [ ] Add member-owned Twitch linking to Profile — needs a Twitch App User Connector client configured and linked first.
 - [x] Permit Auronplay and Rubius lookups; ten tests pass including both pages' channel lists, deployed; Auronplay status and Rubius clips return 200, browser shows Auronplay offline with no 403. Changelog 3423b16f-c3d2-4f8c-badc-688a4430f028 published.
 - [ ] Send Auronplay/Rubius changelog email — notification returned 401; staff sign-in required.
 - [x] Fix Twitch status and clips rejection for Famous Streamers and the third Live channel; seven allowlist tests pass, deployed, Kai status and Ibai clips return 200, browser confirms Kai player mounts and Ninja offline state with no 403 requests. Actual embedded video playback not verified. Changelog 72e5e38d-1349-4c05-9ba3-323abf35ab84 published.
 - [ ] Send streamer fix changelog email — notification returned 401; staff sign-in required.
 - [x] Create blank FamousStreamers.tsx at /famous-streamers without sidebar/content; enable Apple, Microsoft and Lovable using existing profiles. Nine tests pass, desktop/phone buttons and blank route verified; all three providers enabled. Changelog e23f0124-ce6c-4954-ab51-0c5964a9d35d published.
-- [ ] Complete real Apple/Microsoft/Lovable authorization — requires the member to authorize their provider account; automated tests verify calls, callback destination and cancellation only.
 - [ ] Send social sign-in changelog email — notification returned 401; requires staff sign-in.
 - [x] Apply the uploaded ECLIPSE presentation to /auth, preserving authentication handlers; seven existing tests pass, build OK, desktop/phone form controls verified via a temporary latest-source preview because the running preview served cached Auth code. No live account signup or password-reset email was sent.
 - [ ] Confirm auth-design changelog email delivery — notification returned 401; staff sign-in required. Published entry 8e70872b-ed04-451e-9aeb-6a1280ea819a.

@@ -14,7 +14,7 @@ vi.mock("sonner", () => ({ toast: { error: toastError } }));
 describe("managed social sign-in", () => {
   beforeEach(() => { signIn.mockReset(); toastError.mockReset(); signIn.mockResolvedValue({ redirected: false }); });
   afterEach(cleanup);
-  for (const [name, provider] of [["Apple", "apple"], ["Microsoft", "microsoft"], ["Lovable", "lovable"]]) {
+  for (const [name, provider] of [["Google", "google"]]) {
     it(`starts ${name} sign-in without email or password`, async () => {
       render(<MemoryRouter initialEntries={["/auth?next=%2Fdashboard"]}><Auth /></MemoryRouter>);
       fireEvent.click(screen.getByRole("button", { name: `Continue with ${name}` }));
@@ -23,14 +23,14 @@ describe("managed social sign-in", () => {
   }
   it("rejects an external return destination", async () => {
     render(<MemoryRouter initialEntries={["/auth?next=https%3A%2F%2Fexample.com"]}><Auth /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: "Continue with Apple" }));
-    await waitFor(() => expect(signIn).toHaveBeenCalledWith("apple", { redirect_uri: `${window.location.origin}/auth?next=%2F` }));
+    fireEvent.click(screen.getByRole("button", { name: "Continue with Google" }));
+    await waitFor(() => expect(signIn).toHaveBeenCalledWith("google", { redirect_uri: `${window.location.origin}/auth?next=%2F` }));
   });
   it("shows provider errors and allows a retry", async () => {
     signIn.mockResolvedValue({ error: new Error("Sign-in cancelled") });
     render(<MemoryRouter><Auth /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: "Continue with Microsoft" }));
+    fireEvent.click(screen.getByRole("button", { name: "Continue with Google" }));
     await waitFor(() => expect(toastError).toHaveBeenCalledWith("Sign-in cancelled"));
-    expect(screen.getByRole("button", { name: "Continue with Microsoft" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Continue with Google" })).toBeEnabled();
   });
 });
