@@ -15,6 +15,7 @@ import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import OAuthConsent from "./pages/OAuthConsent.tsx";
+import TwitchReturn from "./pages/oauth/TwitchReturn";
 import Admin from "./pages/Admin.tsx";
 import Staff from "./pages/Staff.tsx";
 import Users from "./pages/Users.tsx";
@@ -171,6 +172,14 @@ const Shell = () => {
   );
 };
 
+// OAuth completion verifies the session server-side and must not be covered by
+// maintenance, device prompts, or the welcome tour in the consent popup.
+const AppContent = () => {
+  const { pathname } = useLocation();
+  if (pathname === "/oauth/twitch/return") return <TwitchReturn />;
+  return <DeviceVerificationGate><CartProvider><Shell /></CartProvider></DeviceVerificationGate>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -180,11 +189,7 @@ const App = () => (
       <UpdatePrompt />
       <BrowserRouter>
         <AuthProvider>
-          <DeviceVerificationGate>
-            <CartProvider>
-              <Shell />
-            </CartProvider>
-          </DeviceVerificationGate>
+          <AppContent />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

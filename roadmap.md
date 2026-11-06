@@ -1,6 +1,6 @@
 # Roadmap
 - [x] Keep Google as the only social sign-in button; retain email/password.
-- [ ] Add member-owned Twitch linking to Profile — needs a Twitch App User Connector client configured and linked first.
+- [ ] Add and verify member-owned Twitch linking to Profile — client linked with offline access; authenticated functions and encrypted storage implemented, pending checks and member consent.
 - [x] Permit Auronplay and Rubius lookups; ten tests pass including both pages' channel lists, deployed; Auronplay status and Rubius clips return 200, browser shows Auronplay offline with no 403. Changelog 3423b16f-c3d2-4f8c-badc-688a4430f028 published.
 - [ ] Send Auronplay/Rubius changelog email — notification returned 401; staff sign-in required.
 - [x] Fix Twitch status and clips rejection for Famous Streamers and the third Live channel; seven allowlist tests pass, deployed, Kai status and Ibai clips return 200, browser confirms Kai player mounts and Ninja offline state with no 403 requests. Actual embedded video playback not verified. Changelog 72e5e38d-1349-4c05-9ba3-323abf35ab84 published.
