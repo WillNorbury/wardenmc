@@ -55,6 +55,19 @@
 .eclipse-auth-submit { height: 56px; border-radius: 12px; font-size: 1rem; font-weight: 600; }
 .eclipse-auth-tabs { background: hsl(var(--background)); }
 .eclipse-auth-tabs [data-state="active"] { background: hsl(var(--muted)); box-shadow: none; }
+.eclipse-auth { --apple-button-background: 0 0% 100%; --apple-button-foreground: 0 0% 0%; }
+.light .eclipse-auth { --apple-button-background: 0 0% 0%; --apple-button-foreground: 0 0% 100%; }
+.eclipse-auth .auth-social-button { height: 44px; border-radius: 8px; }
+.eclipse-auth .auth-apple-button {
+  position: relative; padding: 0 36px;
+  background: hsl(var(--apple-button-background)); color: hsl(var(--apple-button-foreground));
+  border-color: hsl(var(--apple-button-background));
+  font-family: ui-sans-serif, system-ui, sans-serif; font-size: 18.92px; font-weight: 500;
+}
+.auth-apple-button img { position: absolute; left: 4px; height: 44px; width: auto; }
+.auth-apple-white { display: none; }
+.light .auth-apple-black { display: none; }
+.light .auth-apple-white { display: block; }
 @media (max-width: 480px) { .eclipse-auth-heading { font-size: 1.75rem; } }
 
 /* Uploaded maintenance template, scoped to preserve the rest of the site. */
