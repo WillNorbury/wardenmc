@@ -107,8 +107,8 @@ export default function Live() {
         </section>
 
         <div className="container max-w-[1400px] py-10 flex flex-col gap-10">
-          {/* Channel picker cards */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          {/* Channel picker */}
+          <div className="flex flex-wrap items-center gap-2">
             {CHANNELS.map((c) => {
               const isActive = c.tab === active.tab;
               return (
@@ -116,37 +116,15 @@ export default function Live() {
                   key={c.tab}
                   type="button"
                   onClick={() => setTab(c.tab)}
+                  aria-pressed={isActive}
                   className={
-                    "group relative overflow-hidden border p-5 text-left transition " +
-                    (isActive ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/50")
+                    "inline-flex items-center gap-2 border px-4 py-2 font-mono text-[11px] tracking-widest uppercase transition " +
+                    (isActive
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground")
                   }
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <span className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground">
-                        {c.role}
-                      </span>
-                      <h2 className="font-display text-2xl font-black tracking-tight truncate">
-                        {c.label.toUpperCase()}
-                      </h2>
-                      <span className="text-xs text-muted-foreground font-mono">twitch.tv/{c.login}</span>
-                    </div>
-                    <div
-                      className={
-                        "flex h-11 w-11 shrink-0 items-center justify-center border transition " +
-                        (isActive
-                          ? "border-primary text-primary"
-                          : "border-border text-muted-foreground group-hover:text-primary group-hover:border-primary/50")
-                      }
-                    >
-                      <Tv className="h-5 w-5" />
-                    </div>
-                  </div>
-                  {isActive && (
-                    <span className="absolute right-0 top-0 bg-primary px-2 py-1 text-[9px] font-mono tracking-widest uppercase text-primary-foreground">
-                      Watching
-                    </span>
-                  )}
+                  {c.label}
                 </button>
               );
             })}
