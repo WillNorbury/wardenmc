@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Confirm preview-address fix changelog email 4a36676f-4817-45fe-b39a-050d8bb0b37b — corrected notification request canceled; delivery unverified.
+- [x] Fix Twitch linking editor return-address rejection — exact observed preview origin added; regression fails before/pass after, six tests pass, deployed start request returns 200 with Twitch authorization URL. Real consent still requires the member.
 - [x] Keep Google as the only social sign-in button; retain email/password.
 - [x] Add member-owned Twitch linking to Profile — client linked with offline access, authenticated function deployed, encrypted storage created; eight tests and build pass; Google-only screen and safe callback verified, signed-out API rejected with 401.
 - [ ] Verify real Profile Twitch link/reconnect/unlink — no auth account matches the requester for managed preview sign-in; needs member sign-in and Twitch consent. Ensure the Twitch application registers https://connector-gateway.lovable.dev/api/v1/app-users/oauth2/callback.

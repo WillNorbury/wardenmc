@@ -5,6 +5,11 @@ import { TWITCH_SCOPES } from "../../supabase/functions/_shared/appUserScopes";
 vi.mock("@/integrations/supabase/client", () => ({ supabase: { functions: { invoke: vi.fn() } } }));
 afterEach(() => vi.useRealTimers());
 describe("member Twitch linking", () => {
+  it("accepts this project's editor preview but not other projects or lookalike hosts", () => {
+    expect(isAllowedOrigin("https://c9d110ee-1d92-4be5-b8fd-699d505d0940.lovableproject.com")).toBe(true);
+    expect(isAllowedOrigin("https://other-project.lovableproject.com")).toBe(false);
+    expect(isAllowedOrigin("https://c9d110ee-1d92-4be5-b8fd-699d505d0940.lovableproject.com.attacker.example")).toBe(false);
+  });
   it("accepts the website origin but rejects an external callback", () => {
     expect(isAllowedOrigin("https://warden.rip")).toBe(true);
     expect(isAllowedOrigin("https://warden.rip.attacker.example")).toBe(false);
