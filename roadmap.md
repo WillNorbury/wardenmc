@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Fix Twitch status and clips rejection for Famous Streamers and the third Live channel while retaining the channel allowlist; test and deploy.
 - [x] Create blank FamousStreamers.tsx at /famous-streamers without sidebar/content; enable Apple, Microsoft and Lovable using existing profiles. Nine tests pass, desktop/phone buttons and blank route verified; all three providers enabled. Changelog e23f0124-ce6c-4954-ab51-0c5964a9d35d published.
 - [ ] Complete real Apple/Microsoft/Lovable authorization — requires the member to authorize their provider account; automated tests verify calls, callback destination and cancellation only.
 - [ ] Send social sign-in changelog email — notification returned 401; requires staff sign-in.
