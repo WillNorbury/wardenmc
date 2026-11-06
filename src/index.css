@@ -4,6 +4,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Uploaded maintenance template, scoped to preserve the rest of the site. */
+.maintenance-panel {
+  border-radius: 20px;
+  box-shadow: var(--shadow-elegant);
+  backdrop-filter: blur(10px);
+}
+.maintenance-panel h1 { letter-spacing: 0; overflow-wrap: anywhere; }
+.maintenance-gears { position: relative; width: 104px; height: 80px; }
+.maintenance-gear { position: absolute; width: 58px; height: 58px; }
+.maintenance-gear-forward { top: 0; left: 5px; animation: maintenance-rotate 8s linear infinite; }
+.maintenance-gear-reverse { right: 0; bottom: 0; width: 48px; height: 48px; animation: maintenance-rotate 8s linear infinite reverse; }
+.maintenance-progress-bar { width: 70%; animation: maintenance-progress 2.4s ease-in-out infinite; }
+@keyframes maintenance-rotate { to { transform: rotate(360deg); } }
+@keyframes maintenance-progress { from { transform: translateX(-150%); } to { transform: translateX(150%); } }
+@media (prefers-reduced-motion: reduce) {
+  .maintenance-gear, .maintenance-progress-bar { animation: none; }
+  .maintenance-progress-bar { width: 100%; opacity: 0.5; }
+}
+
 .clip-player:fullscreen {
   display: flex;
   flex-direction: column;

@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Replace maintenance presentation with the uploaded template; existing controls preserved, desktop/mobile and light theme verified without enabling live maintenance. Published changelog bd840bed-ee48-4130-8493-4dac5407baf0.
+- [ ] Confirm maintenance changelog email delivery — notification request was canceled; delivery unverified.
 - [x] Add the uploaded welcome tour for new members: plays once on first visit after signing up, remembered per account in private preferences, skip/close/escape available, hidden on sign-in and Admin screens; five intro tests pass, build OK, signed-in desktop check confirmed playback, skip and no repeat after reload; changelog d8fdbbd7-c7d7-4bde-9a03-0eb0300ffe0e emailed to 33 subscribers, none failed. Supabase asset URLs are unusable in preview (they return the app HTML), so the clip lives in `public/`.
 - [ ] Tell the user the tour file has no audio track, so it cannot play with sound as they chose; ask whether to keep it silent or re-export with music.
 - [x] Refresh /clips with custom controls and a polished watch layout; sample-video play/pause/mute/speed and phone layout verified, five clip tests pass, build OK. Listed-only playback security reconfirmed and finding resolved; changelog ad3a1aed-a72c-4e61-8874-01f71317b0aa published. No real community clips available for playback verification.
