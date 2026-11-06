@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Apply the uploaded ECLIPSE presentation to /auth, preserving authentication handlers; seven existing tests pass, build OK, desktop/phone form controls verified via a temporary latest-source preview because the running preview served cached Auth code. No live account signup or password-reset email was sent.
+- [ ] Confirm auth-design changelog email delivery — notification returned 401; staff sign-in required. Published entry 8e70872b-ed04-451e-9aeb-6a1280ea819a.
 - [x] Replace maintenance presentation with the uploaded template; existing controls preserved, desktop/mobile and light theme verified without enabling live maintenance. Published changelog bd840bed-ee48-4130-8493-4dac5407baf0.
 - [ ] Confirm maintenance changelog email delivery — notification request was canceled; delivery unverified.
 - [x] Add the uploaded welcome tour for new members: plays once on first visit after signing up, remembered per account in private preferences, skip/close/escape available, hidden on sign-in and Admin screens; five intro tests pass, build OK, signed-in desktop check confirmed playback, skip and no repeat after reload; changelog d8fdbbd7-c7d7-4bde-9a03-0eb0300ffe0e emailed to 33 subscribers, none failed. Supabase asset URLs are unusable in preview (they return the app HTML), so the clip lives in `public/`.

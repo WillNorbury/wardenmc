@@ -4,6 +4,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Uploaded ECLIPSE form presentation; isolated from account and site themes. */
+.eclipse-auth {
+  --background: 0 0% 3%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 96%;
+  --muted: 0 0% 11%;
+  --muted-foreground: 0 0% 62%;
+  --primary: 0 0% 96%;
+  --primary-foreground: 0 0% 5%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 96%;
+  --accent: 0 0% 14%;
+  --accent-foreground: 0 0% 96%;
+  --border: 0 0% 16%;
+  --input: 0 0% 18%;
+  --ring: 0 0% 70%;
+  --auth-shadow: 0 24px 80px hsl(0 0% 0% / .3);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  width: 100%;
+}
+.light .eclipse-auth {
+  --background: 0 0% 96%; --foreground: 0 0% 8%;
+  --card: 0 0% 100%; --card-foreground: 0 0% 8%;
+  --muted: 0 0% 94%; --muted-foreground: 0 0% 42%;
+  --primary: 0 0% 9%; --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 94%; --secondary-foreground: 0 0% 8%;
+  --accent: 0 0% 92%; --accent-foreground: 0 0% 8%;
+  --border: 0 0% 86%; --input: 0 0% 82%; --ring: 0 0% 35%;
+  --auth-shadow: 0 24px 80px hsl(0 0% 0% / .08);
+}
+.eclipse-auth-panel {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 20px;
+  box-shadow: var(--auth-shadow);
+}
+.eclipse-auth-heading {
+  font-family: inherit; font-weight: 700; font-size: 2rem;
+  letter-spacing: 0; line-height: 1.2; margin-bottom: .75rem;
+}
+.eclipse-auth-subtitle { color: hsl(var(--muted-foreground)); line-height: 1.5; margin-bottom: 2rem; }
+.eclipse-auth input:not([data-input-otp]) {
+  height: 56px; border-radius: 12px; background: hsl(var(--foreground) / .03);
+  font-size: 1rem; margin-top: .65rem;
+}
+.eclipse-auth input:focus { background: hsl(var(--foreground) / .05); }
+.eclipse-auth-submit { height: 56px; border-radius: 12px; font-size: 1rem; font-weight: 600; }
+.eclipse-auth-tabs { background: hsl(var(--background)); }
+.eclipse-auth-tabs [data-state="active"] { background: hsl(var(--muted)); box-shadow: none; }
+@media (max-width: 480px) { .eclipse-auth-heading { font-size: 1.75rem; } }
+
 /* Uploaded maintenance template, scoped to preserve the rest of the site. */
 .maintenance-panel {
   border-radius: 20px;

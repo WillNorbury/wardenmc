@@ -7,7 +7,6 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useAuth } from "@/lib/auth";
@@ -15,8 +14,7 @@ import { toast } from "sonner";
 import logo from "@/assets/warden-network-icon.png";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/site/SEO";
-import { Mail, Loader2, ShieldCheck, KeyRound, User, Briefcase } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Mail, Loader2, ShieldCheck, KeyRound, User, Briefcase, Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
 import { trackFunnelEvent } from "@/lib/funnel";
 
 const schema = z.object({
@@ -57,6 +55,7 @@ const Auth = () => {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Funnel: record each time a visitor lands on the sign-up form.
   useEffect(() => {
@@ -237,20 +236,37 @@ const Auth = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-grid">
+    <div className="eclipse-auth min-h-screen flex items-center justify-center px-3 py-8 sm:px-6">
       <SEO
         title="Sign in — Warden Network"
         description="Sign in or create your Warden Network account to apply for staff, vote, manage your profile, and access the dashboard."
         path="/auth"
       />
-      <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
-      <Card className="w-full max-w-md p-8 backdrop-blur-xl bg-card/90 border-primary/20 shadow-elegant">
-        <Link to="/" className="flex items-center justify-center gap-2 mb-6">
-          <img src={logo} alt="Warden Network" className="h-12 w-12 object-contain" />
-          <span className="font-bold text-xl">Warden<span className="text-primary"> Network</span></span>
+      <main className="eclipse-auth-panel w-full max-w-[480px] p-6 sm:p-10">
+        <Link to="/" className="flex items-center gap-3 mb-9 w-fit">
+          <img src={logo} alt="" className="h-9 w-9 object-contain" />
+          <span className="font-semibold text-xl">Warden Network</span>
         </Link>
 
-        {mode === "verify" ? (
+        {forgotOpen ? (
+          <div>
+            <KeyRound className="h-7 w-7 mb-5 text-muted-foreground" />
+            <h1 className="eclipse-auth-heading">{forgotSent ? "Check your inbox" : "Forgot password?"}</h1>
+            <p className="eclipse-auth-subtitle" role={forgotSent ? "status" : undefined}>
+              {forgotSent ? "If an account exists for that email, a password reset link has been sent. Check your inbox and spam folder." : "Enter your email and we’ll send you a link to reset your password."}
+            </p>
+            {!forgotSent && <form onSubmit={handleForgotPassword} className="space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="fpw-email">Email</Label>
+                <Input id="fpw-email" type="email" autoComplete="email" placeholder="Enter your email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required autoFocus />
+              </div>
+              <Button type="submit" className="eclipse-auth-submit w-full" disabled={forgotLoading}>
+                {forgotLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />} Send reset link
+              </Button>
+            </form>}
+            <Button variant="ghost" className="w-full mt-5" onClick={() => { setForgotOpen(false); setForgotSent(false); }}><ArrowLeft className="mr-2 h-4 w-4" />Back to sign in</Button>
+          </div>
+        ) : mode === "verify" ? (
           <div className="text-center space-y-6">
             <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
               <Mail className="w-7 h-7 text-primary" />
@@ -327,8 +343,10 @@ const Auth = () => {
             </Button>
           </div>
         ) : (
-          <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
-            <TabsList className="grid grid-cols-2 w-full mb-5">
+          <Tabs value={mode} onValueChange={(v) => { setMode(v as Mode); setShowPassword(false); }}>
+            <h1 className="eclipse-auth-heading">{mode === "signup" ? "Create an account" : "Welcome back"}</h1>
+            <p className="eclipse-auth-subtitle">{mode === "signup" ? "Join the Warden Network community" : "Sign in to continue to your account"}</p>
+            <TabsList className="eclipse-auth-tabs grid grid-cols-2 w-full mb-6">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
@@ -338,55 +356,59 @@ const Auth = () => {
               <TabsContent value="signup" className="space-y-4 mt-0">
                 <div>
                   <Label htmlFor="dn">Display name</Label>
-                  <Input id="dn" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Steve" />
+                  <Input id="dn" autoComplete="nickname" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Enter your display name" />
                 </div>
                 <div>
                   <Label>Account type</Label>
                   <div className="grid grid-cols-2 gap-2 mt-1.5">
-                    <button
+                    <Button variant="outline"
                       type="button"
                       onClick={() => setAccountType("personal")}
                       aria-pressed={accountType === "personal"}
-                      className={`rounded-md border p-3 text-left transition-colors ${accountType === "personal" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
+                      className={`h-auto flex flex-col items-start whitespace-normal rounded-lg border p-3 text-left transition-colors ${accountType === "personal" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
                     >
                       <User className="h-4 w-4 mb-1 text-primary" />
                       <div className="text-sm font-medium">Personal</div>
                       <div className="text-xs text-muted-foreground">For players and community members</div>
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="outline"
                       type="button"
                       onClick={() => setAccountType("business")}
                       aria-pressed={accountType === "business"}
-                      className={`rounded-md border p-3 text-left transition-colors ${accountType === "business" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
+                      className={`h-auto flex flex-col items-start whitespace-normal rounded-lg border p-3 text-left transition-colors ${accountType === "business" ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
                     >
                       <Briefcase className="h-4 w-4 mb-1 text-primary" />
                       <div className="text-sm font-medium">Business</div>
                       <div className="text-xs text-muted-foreground">For brands, servers and creators</div>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </TabsContent>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input id="email" type="email" autoComplete="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
               <div>
                 <div className="flex items-center justify-between">
                   <Label htmlFor="pw">Password</Label>
                   {mode === "signin" && (
-                    <button
+                    <Button variant="link"
                       type="button"
                       onClick={() => { setForgotEmail(email); setForgotSent(false); setForgotOpen(true); }}
-                      className="text-xs text-primary hover:underline"
+                      className="h-auto p-0 text-xs text-muted-foreground"
                     >
                       Forgot password?
-                    </button>
+                    </Button>
                   )}
                 </div>
-                <Input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+                <div className="relative">
+                  <Input id="pw" type={showPassword ? "text" : "password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} placeholder={mode === "signup" ? "Create a password" : "Enter your password"} className="pr-14" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+                  <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground" aria-label={showPassword ? "Hide password" : "Show password"} title={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((shown) => !shown)}>{showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}</Button>
+                </div>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="eclipse-auth-submit w-full" disabled={loading}>
                 {loading ? "Please wait..." : mode === "signup" ? "Create account" : "Sign in"}
+                {loading ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -430,50 +452,12 @@ const Auth = () => {
             </form>
           </Tabs>
         )}
-      </Card>
-
-      <Dialog open={forgotOpen} onOpenChange={(o) => { setForgotOpen(o); if (!o) setForgotSent(false); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <KeyRound className="w-5 h-5 text-primary" /> Reset your password
-            </DialogTitle>
-            <DialogDescription>
-              {forgotSent
-                ? "If an account exists for that email, a reset link has been sent from passwords@warden.rip. Check your inbox (and spam folder)."
-                : "Enter your account email and we'll send you a password reset link."}
-            </DialogDescription>
-          </DialogHeader>
-          {!forgotSent ? (
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <div>
-                <Label htmlFor="fpw-email">Email</Label>
-                <Input
-                  id="fpw-email"
-                  type="email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  required
-                  autoFocus
-                />
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="ghost" onClick={() => setForgotOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={forgotLoading}>
-                  {forgotLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Send reset link
-                </Button>
-              </DialogFooter>
-            </form>
-          ) : (
-            <DialogFooter>
-              <Button onClick={() => setForgotOpen(false)} className="w-full">Done</Button>
-            </DialogFooter>
-          )}
-        </DialogContent>
-      </Dialog>
+        <div className="mt-7 pt-5 border-t border-border flex items-center justify-center gap-5 text-sm text-muted-foreground">
+          <Link to="/" className="hover:text-foreground transition-colors">Back to website</Link>
+          <span aria-hidden="true">·</span>
+          <Link to="/support" className="hover:text-foreground transition-colors">Need help?</Link>
+        </div>
+      </main>
     </div>
   );
 };
