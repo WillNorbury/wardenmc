@@ -17,7 +17,18 @@ import { toast } from "sonner";
 import logo from "@/assets/warden-network-icon.png";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/site/SEO";
-import { Mail, Loader2, ShieldCheck, KeyRound, User, Briefcase, Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  Mail,
+  Loader2,
+  ShieldCheck,
+  KeyRound,
+  User,
+  Briefcase,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import { trackFunnelEvent } from "@/lib/funnel";
 
 const schema = z.object({
@@ -33,7 +44,10 @@ const Auth = () => {
   const [searchParams] = useSearchParams();
   const nextParam = searchParams.get("next") ?? "";
   // Only accept same-origin relative paths (e.g. "/.lovable/oauth/consent?...").
-  const safeNext = useMemo(() => (nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/"), [nextParam]);
+  const safeNext = useMemo(
+    () => (nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/"),
+    [nextParam],
+  );
   const goNext = () => {
     if (safeNext === "/") nav("/");
     else window.location.href = safeNext;
@@ -46,7 +60,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [accountType, setAccountType] = useState<"personal" | "business">("personal");
   const [loading, setLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<"google" | "apple" | "microsoft" | "lovable" | null>(null);
+  const [socialLoading, setSocialLoading] = useState<"google" | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [otp, setOtp] = useState("");
@@ -83,9 +97,10 @@ const Auth = () => {
         }
       }
       goNext();
-
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user, nav, mode]);
 
   useEffect(() => {
@@ -121,7 +136,8 @@ const Auth = () => {
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
-          email, password,
+          email,
+          password,
           options: {
             emailRedirectTo: `${window.location.origin}${safeNext}`,
             data: { display_name: displayName, account_type: accountType },
@@ -139,7 +155,6 @@ const Auth = () => {
           toast.success("Welcome back");
           goNext();
         }
-
       }
     } catch (err: any) {
       toast.error(err.message ?? "Authentication failed");
@@ -163,7 +178,6 @@ const Auth = () => {
       if (error) throw error;
       toast.success("Email verified — welcome!");
       goNext();
-
     } catch (err: any) {
       toast.error(err.message ?? "Invalid or expired code");
     } finally {
@@ -188,7 +202,6 @@ const Auth = () => {
       if (vErr) throw vErr;
       toast.success("Welcome back");
       goNext();
-
     } catch (err: any) {
       toast.error(err.message ?? "Invalid authenticator code");
     } finally {
@@ -237,8 +250,7 @@ const Auth = () => {
     }
   };
 
-
-  const handleSocialSignIn = async (provider: "google" | "apple" | "microsoft" | "lovable") => {
+  const handleSocialSignIn = async (provider: "google") => {
     if (socialLoading) return;
     setSocialLoading(provider);
     try {
@@ -273,18 +285,46 @@ const Auth = () => {
             <KeyRound className="h-7 w-7 mb-5 text-muted-foreground" />
             <h1 className="eclipse-auth-heading">{forgotSent ? "Check your inbox" : "Forgot password?"}</h1>
             <p className="eclipse-auth-subtitle" role={forgotSent ? "status" : undefined}>
-              {forgotSent ? "If an account exists for that email, a password reset link has been sent. Check your inbox and spam folder." : "Enter your email and we’ll send you a link to reset your password."}
+              {forgotSent
+                ? "If an account exists for that email, a password reset link has been sent. Check your inbox and spam folder."
+                : "Enter your email and we’ll send you a link to reset your password."}
             </p>
-            {!forgotSent && <form onSubmit={handleForgotPassword} className="space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="fpw-email">Email</Label>
-                <Input id="fpw-email" type="email" autoComplete="email" placeholder="Enter your email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required autoFocus />
-              </div>
-              <Button type="submit" className="eclipse-auth-submit w-full" disabled={forgotLoading}>
-                {forgotLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />} Send reset link
-              </Button>
-            </form>}
-            <Button variant="ghost" className="w-full mt-5" onClick={() => { setForgotOpen(false); setForgotSent(false); }}><ArrowLeft className="mr-2 h-4 w-4" />Back to sign in</Button>
+            {!forgotSent && (
+              <form onSubmit={handleForgotPassword} className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="fpw-email">Email</Label>
+                  <Input
+                    id="fpw-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="Enter your email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                </div>
+                <Button type="submit" className="eclipse-auth-submit w-full" disabled={forgotLoading}>
+                  {forgotLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Mail className="mr-2 h-4 w-4" />
+                  )}{" "}
+                  Send reset link
+                </Button>
+              </form>
+            )}
+            <Button
+              variant="ghost"
+              className="w-full mt-5"
+              onClick={() => {
+                setForgotOpen(false);
+                setForgotSent(false);
+              }}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to sign in
+            </Button>
           </div>
         ) : mode === "verify" ? (
           <div className="text-center space-y-6">
@@ -332,9 +372,7 @@ const Auth = () => {
             </div>
             <div className="space-y-2">
               <h2 className="text-xl font-semibold">Two-factor authentication</h2>
-              <p className="text-sm text-muted-foreground">
-                Enter the 6-digit code from your authenticator app.
-              </p>
+              <p className="text-sm text-muted-foreground">Enter the 6-digit code from your authenticator app.</p>
             </div>
             <div className="flex justify-center">
               <InputOTP maxLength={6} value={mfaCode} onChange={setMfaCode}>
@@ -363,30 +401,60 @@ const Auth = () => {
             </Button>
           </div>
         ) : (
-          <Tabs value={mode} onValueChange={(v) => { setMode(v as Mode); setShowPassword(false); }}>
+          <Tabs
+            value={mode}
+            onValueChange={(v) => {
+              setMode(v as Mode);
+              setShowPassword(false);
+            }}
+          >
             <h1 className="eclipse-auth-heading">{mode === "signup" ? "Create an account" : "Welcome back"}</h1>
-            <p className="eclipse-auth-subtitle">{mode === "signup" ? "Join the Warden Network community" : "Sign in to continue to your account"}</p>
+            <p className="eclipse-auth-subtitle">
+              {mode === "signup" ? "Join the Warden Network community" : "Sign in to continue to your account"}
+            </p>
             <TabsList className="eclipse-auth-tabs grid grid-cols-2 w-full mb-6">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
 
-
             <div className="space-y-3 mb-6">
-              <Button type="button" variant="outline" className="auth-social-button w-full" disabled={socialLoading !== null} onClick={() => handleSocialSignIn("google")}>
+              <Button
+                type="button"
+                variant="outline"
+                className="auth-social-button w-full"
+                disabled={socialLoading !== null}
+                onClick={() => handleSocialSignIn("google")}
+              >
                 {socialLoading === "google" && <Loader2 className="h-4 w-4 animate-spin" />}
                 Continue with Google
               </Button>
-              <Button type="button" variant="outline" className="auth-social-button auth-apple-button w-full" disabled={socialLoading !== null} onClick={() => handleSocialSignIn("apple")}>
+              <Button
+                type="button"
+                variant="outline"
+                className="auth-social-button auth-apple-button w-full"
+                disabled={socialLoading !== null}
+                onClick={() => handleSocialSignIn("apple")}
+              >
                 <img src={appleBlack} alt="" className="auth-apple-black" />
                 <img src={appleWhite} alt="" className="auth-apple-white" />
                 Continue with Apple
               </Button>
-              <Button type="button" variant="outline" className="auth-social-button w-full" disabled={socialLoading !== null} onClick={() => handleSocialSignIn("microsoft")}>
+              <Button
+                type="button"
+                variant="outline"
+                className="auth-social-button w-full"
+                disabled={socialLoading !== null}
+                onClick={() => handleSocialSignIn("microsoft")}
+              >
                 {socialLoading === "microsoft" && <Loader2 className="h-4 w-4 animate-spin" />}
                 Continue with Microsoft
               </Button>
-              <button type="button" className="lovable-auth-button lovable-auth-button--full-width auth-social-button" disabled={socialLoading !== null} onClick={() => handleSocialSignIn("lovable")}>
+              <button
+                type="button"
+                className="lovable-auth-button lovable-auth-button--full-width auth-social-button"
+                disabled={socialLoading !== null}
+                onClick={() => handleSocialSignIn("lovable")}
+              >
                 Continue with Lovable
               </button>
             </div>
@@ -394,12 +462,19 @@ const Auth = () => {
               <TabsContent value="signup" className="space-y-4 mt-0">
                 <div>
                   <Label htmlFor="dn">Display name</Label>
-                  <Input id="dn" autoComplete="nickname" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Enter your display name" />
+                  <Input
+                    id="dn"
+                    autoComplete="nickname"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Enter your display name"
+                  />
                 </div>
                 <div>
                   <Label>Account type</Label>
                   <div className="grid grid-cols-2 gap-2 mt-1.5">
-                    <Button variant="outline"
+                    <Button
+                      variant="outline"
                       type="button"
                       onClick={() => setAccountType("personal")}
                       aria-pressed={accountType === "personal"}
@@ -409,7 +484,8 @@ const Auth = () => {
                       <div className="text-sm font-medium">Personal</div>
                       <div className="text-xs text-muted-foreground">For players and community members</div>
                     </Button>
-                    <Button variant="outline"
+                    <Button
+                      variant="outline"
                       type="button"
                       onClick={() => setAccountType("business")}
                       aria-pressed={accountType === "business"}
@@ -424,15 +500,28 @@ const Auth = () => {
               </TabsContent>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" autoComplete="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
               <div>
                 <div className="flex items-center justify-between">
                   <Label htmlFor="pw">Password</Label>
                   {mode === "signin" && (
-                    <Button variant="link"
+                    <Button
+                      variant="link"
                       type="button"
-                      onClick={() => { setForgotEmail(email); setForgotSent(false); setForgotOpen(true); }}
+                      onClick={() => {
+                        setForgotEmail(email);
+                        setForgotSent(false);
+                        setForgotOpen(true);
+                      }}
                       className="h-auto p-0 text-xs text-muted-foreground"
                     >
                       Forgot password?
@@ -440,8 +529,28 @@ const Auth = () => {
                   )}
                 </div>
                 <div className="relative">
-                  <Input id="pw" type={showPassword ? "text" : "password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} placeholder={mode === "signup" ? "Create a password" : "Enter your password"} className="pr-14" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
-                  <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground" aria-label={showPassword ? "Hide password" : "Show password"} title={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((shown) => !shown)}>{showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}</Button>
+                  <Input
+                    id="pw"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                    placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
+                    className="pr-14"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    title={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword((shown) => !shown)}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </Button>
                 </div>
               </div>
               <Button type="submit" className="eclipse-auth-submit w-full" disabled={loading}>
@@ -452,9 +561,13 @@ const Auth = () => {
           </Tabs>
         )}
         <div className="mt-7 pt-5 border-t border-border flex items-center justify-center gap-5 text-sm text-muted-foreground">
-          <Link to="/" className="hover:text-foreground transition-colors">Back to website</Link>
+          <Link to="/" className="hover:text-foreground transition-colors">
+            Back to website
+          </Link>
           <span aria-hidden="true">·</span>
-          <Link to="/support" className="hover:text-foreground transition-colors">Need help?</Link>
+          <Link to="/support" className="hover:text-foreground transition-colors">
+            Need help?
+          </Link>
         </div>
       </main>
     </div>
