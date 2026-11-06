@@ -386,9 +386,9 @@ const Auth = () => {
                 {socialLoading === "microsoft" && <Loader2 className="h-4 w-4 animate-spin" />}
                 Continue with Microsoft
               </Button>
-              <Button type="button" variant="outline" className="lovable-auth-button lovable-auth-button--full-width auth-social-button" disabled={socialLoading !== null} onClick={() => handleSocialSignIn("lovable")}>
+              <button type="button" className="lovable-auth-button lovable-auth-button--full-width auth-social-button" disabled={socialLoading !== null} onClick={() => handleSocialSignIn("lovable")}>
                 Continue with Lovable
-              </Button>
+              </button>
             </div>
             <form onSubmit={handle} className="space-y-4">
               <TabsContent value="signup" className="space-y-4 mt-0">
