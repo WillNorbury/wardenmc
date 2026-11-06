@@ -103,6 +103,7 @@ const mediaGroup: NavGroup = {
   label: "Streaming",
   items: [
     { to: "/live", label: "Live", icon: Radio },
+    { to: "/famous-streamers", label: "Famous Streamers", icon: Radio },
     { to: "/clips", label: "Clips", icon: Film },
   ],
 };
@@ -136,7 +137,9 @@ const applyGroup: NavGroup = {
 };
 
 const storeGroup: NavGroup = {
-  id: "store", label: "Store", items: [
+  id: "store",
+  label: "Store",
+  items: [
     { to: "/store", label: "Ranks", icon: ShoppingBag },
     { to: "/cart", label: "Cart", icon: ShoppingCart },
   ],
@@ -243,7 +246,6 @@ export function AppSidebar() {
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:w-0"
         style={{ scrollbarWidth: "none" }}
       >
-
         {groups.map(renderGroup)}
       </SidebarContent>
 
