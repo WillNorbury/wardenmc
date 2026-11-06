@@ -39,6 +39,34 @@ export default function Live() {
     return `https://player.twitch.tv/?${qp.toString()}&${parentPart}`;
   }, [parents, active.login]);
 
+  // null = checking, true/false = known. Twitch's embed plays old clips when offline,
+  // so only mount the player while the channel is actually live.
+  const [isLive, setIsLive] = useState<boolean | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setIsLive(null);
+    const check = async () => {
+      try {
+        const url = new URL(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/twitch-status`);
+        url.searchParams.set("login", active.login);
+        const res = await fetch(url.toString(), {
+          headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string },
+        });
+        const data = await res.json().catch(() => null);
+        if (!cancelled && res.ok) setIsLive(!!data?.isLive);
+        else if (!cancelled) setIsLive((prev) => prev ?? false);
+      } catch {
+        if (!cancelled) setIsLive((prev) => prev ?? false);
+      }
+    };
+    check();
+    const id = setInterval(check, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [active.login]);
+
   const twitchChatSrc = useMemo(() => {
     if (!parents.length) return "";
     const parentPart = parents.map((p) => `parent=${encodeURIComponent(p)}`).join("&");
@@ -161,7 +189,13 @@ export default function Live() {
               className="relative w-full overflow-hidden border border-border bg-black"
               style={{ aspectRatio: "16 / 9" }}
             >
-              {twitchPlayerSrc ? (
+              {isLive === false ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-muted-foreground px-6">
+                  <Tv className="h-8 w-8" />
+                  <p className="font-semibold text-foreground">{active.label} is offline</p>
+                  <p className="text-sm">The stream will appear here automatically when they go live. Check out recent clips below.</p>
+                </div>
+              ) : isLive && twitchPlayerSrc ? (
                 <iframe
                   key={twitchPlayerSrc}
                   src={twitchPlayerSrc}
@@ -172,7 +206,7 @@ export default function Live() {
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                  <Tv className="h-6 w-6 mr-2" /> Loading player…
+                  <Tv className="h-6 w-6 mr-2" /> Checking stream…
                 </div>
               )}
             </div>
