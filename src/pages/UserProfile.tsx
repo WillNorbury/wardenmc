@@ -502,10 +502,24 @@ const UserProfile = () => {
           {/* Avatar + actions */}
           <div className="flex items-end justify-between gap-2 -mt-12 sm:-mt-16">
             <div className="relative shrink-0">
-              <Avatar className={`h-24 w-24 sm:h-32 sm:w-32 rounded-md border-4 border-background bg-background ${twitchLive ? "twitch-live-glow" : ""}`}>
-                <AvatarImage src={avatar} />
-                <AvatarFallback className="text-3xl">{initials}</AvatarFallback>
-              </Avatar>
+              {twitchLive && profile.twitch_login ? (
+                <a
+                  href={`https://twitch.tv/${profile.twitch_login}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Watch live on Twitch"
+                >
+                  <Avatar className="h-24 w-24 sm:h-32 sm:w-32 rounded-md border-4 border-background bg-background twitch-live-glow">
+                    <AvatarImage src={avatar} />
+                    <AvatarFallback className="text-3xl">{initials}</AvatarFallback>
+                  </Avatar>
+                </a>
+              ) : (
+                <Avatar className="h-24 w-24 sm:h-32 sm:w-32 rounded-md border-4 border-background bg-background">
+                  <AvatarImage src={avatar} />
+                  <AvatarFallback className="text-3xl">{initials}</AvatarFallback>
+                </Avatar>
+              )}
               {twitchLive && (
                 <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded bg-[#a855f7] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                   Live
