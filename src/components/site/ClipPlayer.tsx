@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Maximize, Minimize, Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { Loader2, Maximize, Minimize, Pause, Play, RotateCcw, RotateCw, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -57,8 +57,8 @@ export default function ClipPlayer({ src, title }: { src: string; title: string 
   return <div ref={frameRef} className="clip-player overflow-hidden bg-background text-foreground" role="region" aria-label={`${title} video player`} onKeyDown={event => {
     if (event.target !== event.currentTarget) return;
     if (event.key === " " || event.key === "k") { event.preventDefault(); void togglePlayback(); }
-    if (event.key === "ArrowRight") { event.preventDefault(); seek(time + 5); }
-    if (event.key === "ArrowLeft") { event.preventDefault(); seek(time - 5); }
+    if (event.key === "ArrowRight") { event.preventDefault(); seek(time + 10); }
+    if (event.key === "ArrowLeft") { event.preventDefault(); seek(time - 10); }
   }} tabIndex={0}>
     <div className="clip-player-screen relative flex aspect-video items-center justify-center bg-muted">
       <video ref={videoRef} src={src} playsInline preload="metadata" aria-label={title} className="h-full w-full object-contain" onClick={() => void togglePlayback()} onDoubleClick={() => void toggleFullscreen()}
@@ -73,7 +73,9 @@ export default function ClipPlayer({ src, title }: { src: string; title: string 
     <div className="space-y-2 border-t border-border bg-card px-3 pt-4 pb-2 sm:px-5">
       <Slider aria-label="Seek video" value={[time]} max={duration || 1} step={0.1} disabled={!duration || failed} onValueChange={([value]) => seek(value)} className="[&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_span[data-orientation=horizontal]]:h-1" />
       <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+        <Button variant="ghost" size="icon" title="Back 10 seconds" aria-label="Back 10 seconds" disabled={failed || !duration} onClick={() => seek(time - 10)}><span className="relative flex items-center justify-center"><RotateCcw /><span className="absolute text-[8px] font-bold leading-none">10</span></span></Button>
         <Button variant="ghost" size="icon" title={playing ? "Pause" : "Play"} aria-label={playing ? "Pause video" : "Resume video"} disabled={failed} onClick={() => void togglePlayback()}>{playing ? <Pause /> : <Play />}</Button>
+        <Button variant="ghost" size="icon" title="Forward 10 seconds" aria-label="Forward 10 seconds" disabled={failed || !duration} onClick={() => seek(time + 10)}><span className="relative flex items-center justify-center"><RotateCw /><span className="absolute text-[8px] font-bold leading-none">10</span></span></Button>
         <Button variant="ghost" size="icon" title={muted ? "Unmute" : "Mute"} aria-label={muted ? "Unmute" : "Mute"} onClick={() => { const video = videoRef.current; if (video) { video.muted = !video.muted; setMuted(video.muted); } }}>{muted || volume === 0 ? <VolumeX /> : <Volume2 />}</Button>
         <Slider aria-label="Volume" value={[muted ? 0 : volume]} max={1} step={0.05} className="mr-2 hidden max-w-20 sm:flex [&_[role=slider]]:h-3 [&_[role=slider]]:w-3" onValueChange={([value]) => { const video = videoRef.current; if (video) { video.volume = value; video.muted = false; setVolume(value); setMuted(false); } }} />
         <span className="whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground">{timestamp(time)} <span className="px-0.5">/</span> {timestamp(duration)}</span>
