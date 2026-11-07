@@ -703,3 +703,8 @@ font[style] {
   padding: 0.375rem;
   backdrop-filter: blur(6px);
 }
+
+/* Purple glow for members whose linked Twitch channel is live. */
+.twitch-live-glow {
+  box-shadow: 0 0 0 2px #a855f7, 0 0 18px 4px rgba(168, 85, 247, 0.55);
+}

@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchLiveTwitchLogins } from "@/lib/twitch-live";
 import { userProfilePath } from "@/lib/userSlug";
 import { GlassCard, PageHero, Reveal } from "@/components/site/ui-kit";
 import { BadgeCheck, Search, Users as UsersIcon } from "lucide-react";
@@ -19,6 +20,7 @@ type Member = {
   bio: string | null;
   verified: boolean | null;
   created_at: string;
+  twitch_login: string | null;
 };
 
 const PAGE_SIZE = 48;
@@ -27,6 +29,7 @@ const Users = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [liveLogins, setLiveLogins] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_SIZE);
 
@@ -35,12 +38,14 @@ const Users = () => {
     (async () => {
       const { data, count } = await supabase
         .from("profiles")
-        .select("id,display_name,mc_username,avatar_url,bio,verified,created_at", { count: "exact" })
+        .select("id,display_name,mc_username,avatar_url,bio,verified,created_at,twitch_login", { count: "exact" })
         .order("created_at", { ascending: false })
         .limit(500);
-      setMembers((data ?? []) as Member[]);
+      const rows = (data ?? []) as Member[];
+      setMembers(rows);
       setTotal(count ?? 0);
       setLoading(false);
+      fetchLiveTwitchLogins(rows.map((r) => r.twitch_login)).then(setLiveLogins);
     })();
   }, []);
 
@@ -105,6 +110,7 @@ const Users = () => {
                   const skin = m.mc_username
                     ? `https://mc-heads.net/avatar/${m.mc_username}/96`
                     : null;
+                  const isLive = !!m.twitch_login && liveLogins.has(m.twitch_login.toLowerCase());
                   return (
                     <Reveal key={m.id} delay={Math.min(i, 12) * 40}>
                       <GlassCard interactive className="h-full">
@@ -112,10 +118,17 @@ const Users = () => {
                           to={userProfilePath({ id: m.id, display_name: m.display_name, mc_username: m.mc_username })}
                           className="flex items-center gap-4 p-5"
                         >
-                          <Avatar className="h-14 w-14 ring-2 ring-primary/30">
-                            <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
-                            <AvatarFallback>{initials}</AvatarFallback>
-                          </Avatar>
+                          <div className="relative shrink-0">
+                            <Avatar className={`h-14 w-14 ring-2 ${isLive ? "twitch-live-glow ring-transparent" : "ring-primary/30"}`}>
+                              <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
+                              <AvatarFallback>{initials}</AvatarFallback>
+                            </Avatar>
+                            {isLive && (
+                              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded bg-[#a855f7] px-1 text-[9px] font-bold uppercase tracking-wide text-white">
+                                Live
+                              </span>
+                            )}
+                          </div>
                           <div className="min-w-0">
                             <p className="flex items-center gap-1 font-semibold truncate">
                               {name}

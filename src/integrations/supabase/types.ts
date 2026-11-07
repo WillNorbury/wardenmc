@@ -2557,6 +2557,7 @@ export type Database = {
           display_name: string | null
           id: string
           mc_username: string | null
+          twitch_login: string | null
           updated_at: string
           verified: boolean
         }
@@ -2571,6 +2572,7 @@ export type Database = {
           display_name?: string | null
           id: string
           mc_username?: string | null
+          twitch_login?: string | null
           updated_at?: string
           verified?: boolean
         }
@@ -2585,6 +2587,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           mc_username?: string | null
+          twitch_login?: string | null
           updated_at?: string
           verified?: boolean
         }

@@ -1,5 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { isAllowedTwitchLogin } from "./channels.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { isAllowedTwitchLogin, parseLiveLogins } from "./channels.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twitch";
 const DEFAULT_LOGIN = "will_norbury";
@@ -41,6 +42,23 @@ Deno.serve(async (req) => {
     }
 
     const url = new URL(req.url);
+
+    // mode=live: which of the given logins are currently streaming.
+    // Only logins saved on a member profile (via Twitch linking) may be checked.
+    if ((url.searchParams.get("mode") ?? "status") === "live") {
+      const requested = parseLiveLogins(url.searchParams.get("logins"));
+      if (requested.length === 0) return json({ live: [] });
+      const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const { data: rows, error: dbError } = await sb.from("profiles").select("twitch_login").in("twitch_login", requested);
+      if (dbError) throw dbError;
+      const linked = [...new Set((rows ?? []).map((r) => String(r.twitch_login ?? "").toLowerCase()).filter(Boolean))];
+      if (linked.length === 0) return json({ live: [] });
+      const qs = linked.map((l) => `user_login=${encodeURIComponent(l)}`).join("&");
+      const streamsRes = await twitchGet(`/streams?${qs}`, {});
+      const live = (streamsRes?.data ?? []).map((s: any) => String(s.user_login ?? "").toLowerCase());
+      return json({ live: linked.filter((l) => live.includes(l)) });
+    }
+
     const rawLogin = (url.searchParams.get("login") ?? DEFAULT_LOGIN).trim().toLowerCase();
     if (!/^[a-z0-9_]{2,32}$/.test(rawLogin)) {
       return json({ error: "invalid login" }, 400);

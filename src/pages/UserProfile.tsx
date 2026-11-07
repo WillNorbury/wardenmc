@@ -62,6 +62,7 @@ import { PostCard } from "@/components/site/PostCard";
 import { fetchPosts, toggleLike, type Post } from "@/lib/posts";
 import AvatarFilePicker from "@/components/profile/AvatarFilePicker";
 import { uploadAvatar } from "@/lib/avatarUpload";
+import { fetchLiveTwitchLogins } from "@/lib/twitch-live";
 
 type Profile = {
   id: string;
@@ -70,6 +71,7 @@ type Profile = {
   mc_username: string | null;
   bio: string | null;
   created_at: string;
+  twitch_login: string | null;
 };
 
 type Project = {
@@ -150,6 +152,7 @@ const UserProfile = () => {
 
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [ignStats, setIgnStats] = useState<PlayerStats | null>(null);
+  const [twitchLive, setTwitchLive] = useState(false);
 
   const isOwn = !!user && !!profile && user.id === profile.id;
 
@@ -161,7 +164,7 @@ const UserProfile = () => {
       setNotFound(false);
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("id, display_name, avatar_url, mc_username, bio, created_at, verified, account_type, business_website, business_contact, business_category");
+        .select("id, display_name, avatar_url, mc_username, bio, created_at, verified, account_type, business_website, business_contact, business_category, twitch_login");
       const match = (profiles ?? []).find((p) => matchesUserSlug(p, slug))
         ?? (user?.id.toLowerCase().startsWith(slug.trim().toLowerCase())
           ? (profiles ?? []).find((p) => p.id === user.id)
@@ -199,6 +202,12 @@ const UserProfile = () => {
       setIgnStats(null);
       const p = match as Profile;
       setProfile(p);
+      setTwitchLive(false);
+      if (p.twitch_login) {
+        fetchLiveTwitchLogins([p.twitch_login]).then((live) => {
+          if (!cancelled) setTwitchLive(live.has(p.twitch_login!.toLowerCase()));
+        });
+      }
       const canonicalSlug = userProfileSlug(p);
       if (canonicalSlug !== slug.trim().toLowerCase()) {
         navigate(`/user/${canonicalSlug}`, { replace: true });
@@ -492,10 +501,17 @@ const UserProfile = () => {
         <div className="px-4">
           {/* Avatar + actions */}
           <div className="flex items-end justify-between gap-2 -mt-12 sm:-mt-16">
-            <Avatar className="h-24 w-24 sm:h-32 sm:w-32 rounded-md border-4 border-background shrink-0 bg-background">
-              <AvatarImage src={avatar} />
-              <AvatarFallback className="text-3xl">{initials}</AvatarFallback>
-            </Avatar>
+            <div className="relative shrink-0">
+              <Avatar className={`h-24 w-24 sm:h-32 sm:w-32 rounded-md border-4 border-background bg-background ${twitchLive ? "twitch-live-glow" : ""}`}>
+                <AvatarImage src={avatar} />
+                <AvatarFallback className="text-3xl">{initials}</AvatarFallback>
+              </Avatar>
+              {twitchLive && (
+                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded bg-[#a855f7] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                  Live
+                </span>
+              )}
+            </div>
 
           <div className="flex items-center gap-2 shrink-0 pb-1">
             <DropdownMenu>
