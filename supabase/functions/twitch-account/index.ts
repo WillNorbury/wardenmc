@@ -6,6 +6,18 @@ import { TWITCH_SCOPES } from "../_shared/appUserScopes.ts";
 import { isAllowedOrigin, twitchProjection } from "./model.ts";
 const GATEWAY = "https://connector-gateway.lovable.dev";
 const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+const profileAdmin = () => createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+async function saveLinkedLogin(userId: string, connectionAPIKey: string) {
+  try {
+    const res = await callAsAppUser({ gatewayBaseUrl: GATEWAY, connectorId: "twitch", connectionAPIKey, path: "/users", requiredScopes: TWITCH_SCOPES });
+    if (!res.ok) return;
+    const profile = (await res.json()).data?.[0];
+    const login = String(profile?.login ?? "").toLowerCase();
+    if (!/^[a-z0-9_]{2,32}$/.test(login)) return;
+    const { error } = await profileAdmin().from("profiles").update({ twitch_login: login }).eq("id", userId);
+    if (error) console.error("saveLinkedLogin failed:", error.message);
+  } catch (e) { console.error("saveLinkedLogin failed:", e instanceof Error ? e.message : String(e)); }
+}
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   if (req.method !== "POST") return reply({ error: "Method not allowed" }, 405);
@@ -29,6 +41,7 @@ Deno.serve(async req => {
       const { connectionAPIKey, connectorId } = await exchangeAppUserOAuthCode(GATEWAY, body.code);
       if (connectorId !== "twitch") return reply({ error: "Wrong account provider" }, 400);
       await saveConnectionKeyForUser(user.id, connectorId, connectionAPIKey);
+      await saveLinkedLogin(user.id, connectionAPIKey);
       return reply({ ok: true });
     }
     if (body.action !== "profile" && body.action !== "disconnect") return reply({ error: "Invalid action" }, 400);
@@ -38,6 +51,7 @@ Deno.serve(async req => {
       await disconnectAppUser({ gatewayBaseUrl: GATEWAY, connectorId: "twitch", connectionAPIKey: key });
       const { error } = await connectionAdmin().from("app_user_connections").delete().eq("user_id", user.id).eq("connector_id", "twitch");
       if (error) throw error;
+      await profileAdmin().from("profiles").update({ twitch_login: null }).eq("id", user.id);
       return reply({ connected: false });
     }
     const res = await callAsAppUser({ gatewayBaseUrl: GATEWAY, connectorId: "twitch", connectionAPIKey: key, path: "/users", requiredScopes: TWITCH_SCOPES });
