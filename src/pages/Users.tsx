@@ -114,22 +114,38 @@ const Users = () => {
                   return (
                     <Reveal key={m.id} delay={Math.min(i, 12) * 40}>
                       <GlassCard interactive className="h-full">
-                        <Link
-                          to={userProfilePath({ id: m.id, display_name: m.display_name, mc_username: m.mc_username })}
-                          className="flex items-center gap-4 p-5"
-                        >
-                          <div className="relative shrink-0">
-                            <Avatar className={`h-14 w-14 ring-2 ${isLive ? "twitch-live-glow ring-transparent" : "ring-primary/30"}`}>
-                              <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
-                              <AvatarFallback>{initials}</AvatarFallback>
-                            </Avatar>
-                            {isLive && (
+                        <div className="flex items-center gap-4 p-5">
+                          {isLive && m.twitch_login ? (
+                            <a
+                              href={`https://twitch.tv/${m.twitch_login}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="relative shrink-0"
+                              aria-label={`Watch ${name} live on Twitch`}
+                            >
+                              <Avatar className="h-14 w-14 ring-2 twitch-live-glow ring-transparent">
+                                <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
+                                <AvatarFallback>{initials}</AvatarFallback>
+                              </Avatar>
                               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded bg-[#a855f7] px-1 text-[9px] font-bold uppercase tracking-wide text-white">
                                 Live
                               </span>
-                            )}
-                          </div>
-                          <div className="min-w-0">
+                            </a>
+                          ) : (
+                            <Link
+                              to={userProfilePath({ id: m.id, display_name: m.display_name, mc_username: m.mc_username })}
+                              className="relative shrink-0"
+                            >
+                              <Avatar className="h-14 w-14 ring-2 ring-primary/30">
+                                <AvatarImage src={skin ?? m.avatar_url ?? undefined} alt={name} />
+                                <AvatarFallback>{initials}</AvatarFallback>
+                              </Avatar>
+                            </Link>
+                          )}
+                          <Link
+                            to={userProfilePath({ id: m.id, display_name: m.display_name, mc_username: m.mc_username })}
+                            className="min-w-0 flex-1"
+                          >
                             <p className="flex items-center gap-1 font-semibold truncate">
                               {name}
                               {m.verified && <BadgeCheck className="h-4 w-4 shrink-0 text-primary" />}
@@ -137,8 +153,8 @@ const Users = () => {
                             <p className="text-xs text-muted-foreground truncate">
                               Joined {new Date(m.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                             </p>
-                          </div>
-                        </Link>
+                          </Link>
+                        </div>
                       </GlassCard>
                     </Reveal>
                   );
