@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { getDeviceId } from "@/lib/deviceId";
+import { requestDeviceVerification } from "@/lib/device-verification-request";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +14,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-type Status = "idle" | "checking" | "required" | "mfa" | "ok";
+type Status = "idle" | "checking" | "required" | "mfa" | "ok" | "error";
 
 const okKey = (uid: string) => `cmc_dv_ok_${uid}`;
 
@@ -32,24 +33,30 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
 
+  const request = useCallback(async (body: Record<string, unknown>) => {
+    if (!uid) throw new Error("Please sign in again.");
+    return requestDeviceVerification<{ required?: boolean; reason?: "new_device" | "new_network"; email?: string; ok?: boolean; error?: string; remembered?: boolean }>(body, uid, {
+      getSession: () => supabase.auth.getSession(),
+      refreshSession: () => supabase.auth.refreshSession(),
+      invoke: (payload, token) => supabase.functions.invoke("device-verify", {
+        body: payload, headers: { Authorization: `Bearer ${token}` },
+      }),
+    });
+  }, [uid]);
+
   const runCheck = useCallback(
     async (action: "check" | "resend") => {
-      const { data, error } = await supabase.functions.invoke("device-verify", {
-        body: { action, device_id: getDeviceId() },
-      });
+      let result;
+      try {
+        result = await request({ action, device_id: getDeviceId() });
+      } catch {
+        setStatus("error");
+        return;
+      }
+      const { data, error } = result;
       if (error) {
-        const statusCode = (error as any)?.context?.status;
-        if (statusCode === 401) {
-          // Expired sign-in: refresh it once; if that fails, sign out cleanly.
-          const { error: refreshErr } = await supabase.auth.refreshSession();
-          if (refreshErr) await supabase.auth.signOut();
-          else checkedFor.current = null;
-          setStatus("ok");
-          return;
-        }
-        // Fail open so a backend hiccup can never lock members out.
         console.warn("[device-verify]", error);
-        setStatus("ok");
+        setStatus("error");
         return;
       }
       if (data?.required) {
@@ -61,7 +68,7 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
         setStatus("ok");
       }
     },
-    [uid],
+    [uid, request],
   );
 
   useEffect(() => {
@@ -101,7 +108,7 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
         }
       }
       runCheck("check");
-    })();
+    })().catch(() => setStatus("error"));
   }, [uid, loading, runCheck]);
 
   const verifyMfa = async () => {
@@ -110,7 +117,9 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
     const { data: challenge, error: cErr } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
     const { error: vErr } = cErr
       ? { error: cErr }
-      : await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: challenge!.id, code: mfaCode });
+      : challenge
+        ? await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: challenge.id, code: mfaCode })
+        : { error: new Error("Could not start verification") };
     setSubmitting(false);
     if (vErr) {
       toast.error("Incorrect code. Try again.");
@@ -125,9 +134,8 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
   const confirm = async () => {
     if (code.length !== 8) return;
     setSubmitting(true);
-    const { data, error } = await supabase.functions.invoke("device-verify", {
-      body: { action: "confirm", device_id: getDeviceId(), code, remember },
-    });
+    const { data, error } = await request({ action: "confirm", device_id: getDeviceId(), code, remember })
+      .catch(() => ({ data: null, error: new Error("Please sign in again.") }));
     setSubmitting(false);
     if (error || !data?.ok) {
       const err = (data as any)?.error;
@@ -167,6 +175,19 @@ export const DeviceVerificationGate = ({ children }: { children: ReactNode }) =>
       </div>
     );
   }
+
+  if (status === "error") return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader><CardTitle>Sign-in could not be verified</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">Try again, or sign out and sign back in.</p>
+          <Button className="w-full" onClick={() => { setStatus("checking"); void runCheck("check"); }}>Try again</Button>
+          <Button variant="outline" className="w-full" onClick={() => supabase.auth.signOut({ scope: "local" })}>Sign out</Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
   if (status === "mfa") {
     return (
