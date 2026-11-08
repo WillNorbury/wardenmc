@@ -22,10 +22,16 @@ type StaffMember = {
 
 const STAFF_ROLES: AppRole[] = [
   "founder",
-  "owner", "manager", "developer",
-  "sr_admin", "admin",
-  "sr_mod", "mod",
-  "sr_helper", "helper",
+  "owner",
+  "manager",
+  "developer",
+  "sr_admin",
+  "admin",
+  "sr_mod",
+  "mod",
+  "sr_helper",
+  "helper",
+  "trainee",
 ];
 
 const roleRank = (r: AppRole) => {
@@ -40,10 +46,7 @@ const Staff = () => {
   useEffect(() => {
     document.title = "Staff — Warden Network";
     (async () => {
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("user_id,role")
-        .in("role", STAFF_ROLES);
+      const { data: roles } = await supabase.from("user_roles").select("user_id,role").in("role", STAFF_ROLES);
       const ids = Array.from(new Set((roles ?? []).map((r) => r.user_id)));
       if (ids.length === 0) {
         setLoading(false);
@@ -54,10 +57,7 @@ const Staff = () => {
         .select("id,display_name,avatar_url,mc_username")
         .in("id", ids);
       const profMap = new Map((profiles ?? []).map((p) => [p.id, p]));
-      const { data: affiliates } = await supabase
-        .from("user_affiliates")
-        .select("owner_id")
-        .in("owner_id", ids);
+      const { data: affiliates } = await supabase.from("user_affiliates").select("owner_id").in("owner_id", ids);
       const affiliateCounts = new Map<string, number>();
       (affiliates ?? []).forEach((a) => {
         affiliateCounts.set(a.owner_id, (affiliateCounts.get(a.owner_id) ?? 0) + 1);
@@ -79,9 +79,7 @@ const Staff = () => {
           });
         }
       });
-      const list = Array.from(byUser.values()).sort(
-        (a, b) => roleRank(a.role) - roleRank(b.role)
-      );
+      const list = Array.from(byUser.values()).sort((a, b) => roleRank(a.role) - roleRank(b.role));
       setMembers(list);
       setLoading(false);
     })();
@@ -98,7 +96,11 @@ const Staff = () => {
       <Navbar />
       <main className="flex-1">
         <PageHero
-          eyebrow={<><ShieldCheck className="h-3 w-3 mr-1" /> The Team</>}
+          eyebrow={
+            <>
+              <ShieldCheck className="h-3 w-3 mr-1" /> The Team
+            </>
+          }
           title="Meet the"
           highlight="Staff"
           description="The people keeping Warden Network running smoothly — moderation, development, builds and support."
@@ -132,27 +134,33 @@ const Staff = () => {
                 <section key={role}>
                   <Reveal delay={gi * 60}>
                     <div className="flex items-center gap-3 mb-5">
-                      <h2 className="font-display text-lg md:text-xl font-black tracking-tight">
-                        {roleLabel(role)}
-                      </h2>
+                      <h2 className="font-display text-lg md:text-xl font-black tracking-tight">{roleLabel(role)}</h2>
                       <span className="h-px flex-1 bg-gradient-to-r from-primary/40 to-transparent" />
-                      <Badge variant="secondary" className="border-primary/30">{members.length}</Badge>
+                      <Badge variant="secondary" className="border-primary/30">
+                        {members.length}
+                      </Badge>
                     </div>
                   </Reveal>
                   <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {members.map((m, i) => {
                       const name = m.display_name ?? m.mc_username ?? "Unknown";
                       const initials = name.slice(0, 2).toUpperCase();
-                      const skin = m.mc_username
-                        ? `https://mc-heads.net/avatar/${m.mc_username}/96`
-                        : null;
-                      const slug = userProfileSlug({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username });
+                      const skin = m.mc_username ? `https://mc-heads.net/avatar/${m.mc_username}/96` : null;
+                      const slug = userProfileSlug({
+                        id: m.user_id,
+                        display_name: m.display_name,
+                        mc_username: m.mc_username,
+                      });
                       return (
                         <Reveal key={m.user_id} delay={i * 45}>
                           <GlassCard interactive className="h-full">
                             <div className="p-5">
                               <Link
-                                to={userProfilePath({ id: m.user_id, display_name: m.display_name, mc_username: m.mc_username })}
+                                to={userProfilePath({
+                                  id: m.user_id,
+                                  display_name: m.display_name,
+                                  mc_username: m.mc_username,
+                                })}
                                 className="flex items-center gap-4"
                               >
                                 <Avatar className="h-14 w-14 ring-2 ring-primary/30">
@@ -168,7 +176,8 @@ const Staff = () => {
                                 to={`/user/${slug}/affiliates`}
                                 className="mt-3 inline-block text-sm text-muted-foreground hover:underline"
                               >
-                                <strong className="text-foreground">{m.affiliate_count}</strong> Affiliate{m.affiliate_count === 1 ? "" : "s"}
+                                <strong className="text-foreground">{m.affiliate_count}</strong> Affiliate
+                                {m.affiliate_count === 1 ? "" : "s"}
                               </Link>
                             </div>
                           </GlassCard>
