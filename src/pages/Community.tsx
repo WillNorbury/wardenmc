@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Bot, Headset, Radio, Sparkles, Users, Handshake } from "lucide-react";
+import { ArrowUpRight, Bot, Headset, Radio, Sparkles, Users, Handshake, MessageSquare } from "lucide-react";
 import DiscordMark from "@/components/site/DiscordMark";
 import logo from "@/assets/warden-network-logo.png";
 
 const destinations = [
+  { title: "Forums", detail: "Community topics & staff applications", to: "/forums", icon: MessageSquare },
   { title: "Discord", detail: "Community chat", to: "/discord", icon: DiscordMark },
   { title: "Yapin'", detail: "Our Yapin' community", to: "/yapin", icon: Sparkles },
   { title: "WardenBot", detail: "Bot invite & server dashboard", to: "/bot", icon: Bot },
