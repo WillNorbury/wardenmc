@@ -24,6 +24,7 @@ import Yapin from "./pages/Yapin.tsx";
 import Bot from "./pages/Bot.tsx";
 import BotCommands from "./pages/BotCommands.tsx";
 import Community from "./pages/Community.tsx";
+import Forums from "./pages/Forums";
 import Discover from "./pages/Discover.tsx";
 import BotStatus from "./pages/BotStatus.tsx";
 import Posts from "./pages/Posts.tsx";
@@ -107,6 +108,8 @@ const Shell = () => {
               <Route path="/bot" element={<Bot />} />
               <Route path="/bot/commands" element={<BotCommands />} />
               <Route path="/community" element={<Community />} />
+              <Route path="/forums" element={<Forums />} />
+              <Route path="/forums/:slug" element={<Forums />} />
               <Route path="/bot/status" element={<BotStatus />} />
               <Route path="/servers" element={<Servers />} />
               <Route path="/server/:slug" element={<ServerDetail />} />

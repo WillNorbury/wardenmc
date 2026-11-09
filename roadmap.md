@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add /forums with a readable "How to apply for staff" topic credited to Will Norbury, navigation and sitemap; verify and announce.
 - [ ] Confirm preview-address fix changelog email 4a36676f-4817-45fe-b39a-050d8bb0b37b — corrected notification request canceled; delivery unverified.
 - [x] Fix Twitch linking editor return-address rejection — exact observed preview origin added; regression fails before/pass after, six tests pass, deployed start request returns 200 with Twitch authorization URL. Real consent still requires the member.
 - [x] Keep Google as the only social sign-in button; retain email/password.
