@@ -81,6 +81,16 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://warden.rip/forums</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://warden.rip/forums/how-to-apply-for-staff</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://warden.rip/live</loc>
     <changefreq>hourly</changefreq>
     <priority>0.6</priority>
