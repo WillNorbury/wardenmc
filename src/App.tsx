@@ -47,6 +47,7 @@ import PartnerDetail from "./pages/PartnerDetail.tsx";
 import Changelog from "./pages/Changelog.tsx";
 import Search from "./pages/Search.tsx";
 import Support from "./pages/Support.tsx";
+import BanAppeals from "./pages/BanAppeals";
 import Cart from "./pages/Cart";
 import Store from "./pages/Store";
 import Checkout from "./pages/Checkout";
@@ -150,6 +151,8 @@ const Shell = () => {
               <Route path="/search" element={<Search />} />
               <Route path="/discover" element={<Discover />} />
               <Route path="/support" element={<Support />} />
+              <Route path="/ban-appeals" element={<BanAppeals />} />
+              <Route path="/appeal" element={<Navigate to="/ban-appeals" replace />} />
               <Route path="/punishments" element={<Punishments />} />
               <Route path="/punishments/:player" element={<Punishments />} />
               <Route path="/cart" element={<Cart />} />

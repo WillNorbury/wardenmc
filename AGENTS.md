@@ -1,4 +1,7 @@
 # Project architecture
+<!-- LOVABLE:BEGIN -->
+- Ban appeals reuse the existing ban_appeals table and Admin inbox; /appeal redirects to /ban-appeals so existing notifications stay valid.
+<!-- LOVABLE:END -->
 - MaintenanceScreen is presentation-only; MaintenanceGate retains config and bypass checks.
 - Community clip playback uses ClipPlayer with browser video playback and shared design-system controls; gallery previews stay muted and lightweight so watch controls never appear on every thumbnail.
 - The signed-in store reuses store_items and the existing staff-assisted cart checkout; rank prefixes stay on distinct cart lines and are included in order tickets, while currency conversion is display-only and checkout retains the product's base currency.
