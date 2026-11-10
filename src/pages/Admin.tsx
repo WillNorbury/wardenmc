@@ -42,8 +42,6 @@ import {
   Star,
   Search,
   Lock,
-
-
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -56,7 +54,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { AdminLayout, type AdminSection, SECTION_PERMISSIONS, resolveAdminSection, isUnknownAdminTab } from "@/components/admin/AdminLayout";
+import {
+  AdminLayout,
+  type AdminSection,
+  SECTION_PERMISSIONS,
+  resolveAdminSection,
+  isUnknownAdminTab,
+} from "@/components/admin/AdminLayout";
 import { BanAppealsAdminSection } from "@/components/admin/BanAppealsAdminSection";
 import { ContactAdminSection } from "@/components/admin/ContactAdminSection";
 import { EmailTestSection } from "@/components/admin/EmailTestSection";
@@ -122,7 +126,6 @@ import { AdminSkriptsSection } from "@/components/admin/AdminSkriptsSection";
 import { DiscordConfigSection } from "@/components/admin/DiscordConfigSection";
 import { LiveAnnouncementDraftSection } from "@/components/admin/LiveAnnouncementDraftSection";
 
-
 type Profile = { id: string; display_name: string | null; mc_username: string | null; created_at: string };
 type RoleRow = { id: string; user_id: string; role: AppRole };
 type News = {
@@ -136,7 +139,10 @@ type News = {
 };
 
 const sectionMeta: Record<AdminSection, { title: string; description: string }> = {
-  dashboard: { title: "Warden Network Dashboard", description: "Live control center for Warden Network operations and activity." },
+  dashboard: {
+    title: "Warden Network Dashboard",
+    description: "Live control center for Warden Network operations and activity.",
+  },
   users: { title: "Users", description: "Promote or demote admin access." },
   roles: { title: "Roles", description: "Assign and manage roles for members." },
   permissions: { title: "Permissions", description: "Define what each role can do." },
@@ -160,38 +166,77 @@ const sectionMeta: Record<AdminSection, { title: string; description: string }> 
     description: "Status and overview of the Warden Network Discord bot.",
   },
   "bot-management": { title: "Discord Bot — Management", description: "Configure commands and bot integration." },
-  "bot-config": { title: "Discord Bot — Commands & Templates", description: "Configure slash commands, channel routing, and message templates." },
+  "bot-config": {
+    title: "Discord Bot — Commands & Templates",
+    description: "Configure slash commands, channel routing, and message templates.",
+  },
   "ban-appeals": { title: "Ban Appeals", description: "Review and respond to user ban appeals." },
   contact: { title: "Contact", description: "Manage contact methods and inbox." },
-  "email-test": { title: "Email Test", description: "Trigger signup or password reset test emails and watch delivery status." },
-  reports: { title: "Reports", description: "Review reports submitted by users about accounts, plugins, or other content." },
+  "email-test": {
+    title: "Email Test",
+    description: "Trigger signup or password reset test emails and watch delivery status.",
+  },
+  reports: {
+    title: "Reports",
+    description: "Review reports submitted by users about accounts, plugins, or other content.",
+  },
   "send-email": { title: "Send Email", description: "Broadcast emails to all users, admins, or owners only." },
   "live-announcement": { title: "Live Email Draft", description: "" },
-  "email-diagnostics": { title: "Email Diagnostics", description: "Verify the notify.warden.rip sender domain and From-address allowlist." },
-  punishments: { title: "Punishments", description: "Browse bans, mutes, kicks, and warnings from the network database. Unban or unmute players from the web (silent by default)." },
+  "email-diagnostics": {
+    title: "Email Diagnostics",
+    description: "Verify the notify.warden.rip sender domain and From-address allowlist.",
+  },
+  punishments: {
+    title: "Punishments",
+    description:
+      "Browse bans, mutes, kicks, and warnings from the network database. Unban or unmute players from the web (silent by default).",
+  },
   console: { title: "Owner Console", description: "Terminal-style admin console. Type `help` for available commands." },
   mysql: { title: "LiteBans MySQL", description: "Connect and edit the LiteBans database directly. Use with caution." },
-  database: { title: "Site database", description: "Run SQL against the website database. Locked to the site owner account." },
-  "servers-status": { title: "Servers (Public Status)", description: "Edit the per-server cards on /servers-status: players, TPS, uptime, IP, and MOTD." },
+  database: {
+    title: "Site database",
+    description: "Run SQL against the website database. Locked to the site owner account.",
+  },
+  "servers-status": {
+    title: "Servers (Public Status)",
+    description: "Edit the per-server cards on /servers-status: players, TPS, uptime, IP, and MOTD.",
+  },
   store: { title: "Store", description: "Manage the categories and items shown on /store." },
   orders: { title: "Order Inbox", description: "Track every store order and its payment status in one place." },
-  "signup-funnel": { title: "Sign-up Funnel", description: "See how many visitors reach the sign-up form and how many finish." },
+  "signup-funnel": {
+    title: "Sign-up Funnel",
+    description: "See how many visitors reach the sign-up form and how many finish.",
+  },
   "vote-links": { title: "Vote Links", description: "Manage the vote sites shown on /vote." },
   partners: { title: "Partners", description: "Manage the partners shown in the sidebar Partners dropdown." },
-  "account-removals": { title: "Deleted / Banned Accounts", description: "Historical log of removed and suspended accounts." },
+  "account-removals": {
+    title: "Deleted / Banned Accounts",
+    description: "Historical log of removed and suspended accounts.",
+  },
   tiers: { title: "Player Tiers", description: "Add players to the public tier list at /tiers." },
   seasons: { title: "Seasons", description: "Manage seasons, dates, highlights and winners shown on /seasons." },
   "tab-animations": { title: "Tab Animations", description: "Manage animated TAB list lines shown on /tab." },
-  memberships: { title: "Membership Tiers", description: "Create paid membership tiers and perks sold on the store and dashboard." },
-  "server-panel": { title: "Server Panel", description: "Monitor the live server, manage maps, and send player moderation commands." },
+  memberships: {
+    title: "Membership Tiers",
+    description: "Create paid membership tiers and perks sold on the store and dashboard.",
+  },
+  "server-panel": {
+    title: "Server Panel",
+    description: "Monitor the live server, manage maps, and send player moderation commands.",
+  },
   skripts: { title: "Skripts", description: "Upload and download Skript (.sk) files staff can add to the server." },
-  "site-pages": { title: "Site Pages", description: "Create and edit standalone content pages such as /guides, /about, /roadmap and /credits." },
+  "site-pages": {
+    title: "Site Pages",
+    description: "Create and edit standalone content pages such as /guides, /about, /roadmap and /credits.",
+  },
   "mod-skripts": { title: "Community Skripts", description: "Moderate member-uploaded Skripts." },
   "mod-servers": { title: "Community Servers", description: "Moderate member-submitted servers." },
   "mod-mods": { title: "Mods", description: "Publish, feature or remove mods." },
   "mod-reviews": { title: "Reviews", description: "Moderate player reviews." },
-  "game-modes": { title: "Game Modes", description: "Manage the game modes shown on /gamemodes and their detail pages." },
-
+  "game-modes": {
+    title: "Game Modes",
+    description: "Manage the game modes shown on /gamemodes and their detail pages.",
+  },
 };
 
 const Admin = () => {
@@ -247,7 +292,11 @@ const Admin = () => {
   const hasAdminAccess = isOwner || isAdmin || can("admin.access");
 
   if (loading || permsLoading)
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading Warden Network admin...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Loading Warden Network admin...
+      </div>
+    );
   if (!user) return <Navigate to="/auth" replace />;
   if (!hasAdminAccess)
     return (
@@ -278,7 +327,9 @@ const Admin = () => {
       isOwner={isOwner}
       canSee={canSeeSection}
     >
-      {!allowed ? denied : (
+      {!allowed ? (
+        denied
+      ) : (
         <>
           {unknownTab && (
             <div className="mb-6 flex flex-col gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -355,15 +406,15 @@ const Admin = () => {
           {section === "tiers" && <PlayerTiersAdminSection />}
           {section === "memberships" && <MembershipTiersAdminSection />}
           {section === "account-removals" && <AccountRemovalsAdminSection />}
-           {section === "seasons" && <SeasonsAdminSection />}
-           {section === "tab-animations" && <TabAnimationsAdminSection />}
-           {section === "server-panel" && (
-             <div className="space-y-8">
-               <ServerDashboardAdminSection />
-               <ServerPanelAdminSection />
-             </div>
-           )}
-           {section === "skripts" && <AdminSkriptsSection />}
+          {section === "seasons" && <SeasonsAdminSection />}
+          {section === "tab-animations" && <TabAnimationsAdminSection />}
+          {section === "server-panel" && (
+            <div className="space-y-8">
+              <ServerDashboardAdminSection />
+              <ServerPanelAdminSection />
+            </div>
+          )}
+          {section === "skripts" && <AdminSkriptsSection />}
           {section === "game-modes" && <GameModesAdminSection />}
           {section === "site-pages" && <SitePagesAdminSection />}
           {section === "mod-skripts" && <SkriptsModerationSection />}
@@ -376,14 +427,12 @@ const Admin = () => {
   );
 };
 
-
 const ComingSoonAdminSection = ({ label }: { label: string }) => (
   <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
     <Sparkles className="h-10 w-10 text-primary" />
     <h2 className="text-xl font-bold">{label} admin coming soon</h2>
     <p className="text-muted-foreground max-w-md">
-      Management tools for {label.toLowerCase()} aren't built yet. The public
-      discover page is live as a placeholder.
+      Management tools for {label.toLowerCase()} aren't built yet. The public discover page is live as a placeholder.
     </p>
   </div>
 );
@@ -536,7 +585,10 @@ const UsersTab = () => {
 
   const load = async () => {
     const [{ data: p }, { data: r }] = await Promise.all([
-      supabase.from("profiles").select("id, display_name, mc_username, created_at").order("created_at", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("id, display_name, mc_username, created_at")
+        .order("created_at", { ascending: false }),
       supabase.from("user_roles").select("id, user_id, role"),
     ]);
     setProfiles((p ?? []) as Profile[]);
@@ -560,7 +612,6 @@ const UsersTab = () => {
     load();
   };
 
-
   const deleteUser = async (p: Profile) => {
     const ok = await confirm({
       title: "Delete this user?",
@@ -571,7 +622,8 @@ const UsersTab = () => {
     if (!ok) return;
     try {
       const { data: sessionData, error: sessionError } = await supabase.auth.refreshSession();
-      if (sessionError || !sessionData.session?.access_token) throw new Error("Please sign in again before deleting users.");
+      if (sessionError || !sessionData.session?.access_token)
+        throw new Error("Please sign in again before deleting users.");
       const { data, error } = await supabase.functions.invoke("admin-delete-user", {
         body: { user_id: p.id },
         headers: { Authorization: `Bearer ${sessionData.session.access_token}` },
@@ -640,9 +692,7 @@ const UsersTab = () => {
         <Card className="bg-[#1a1410] border-[#2a2018] overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between gap-3 px-5 py-4 flex-wrap">
-            <h2 className="text-lg font-bold text-foreground">
-              Users ({filteredProfiles.length})
-            </h2>
+            <h2 className="text-lg font-bold text-foreground">Users ({filteredProfiles.length})</h2>
             <div className="flex items-center gap-3 flex-wrap">
               <div className="relative">
                 <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -654,7 +704,9 @@ const UsersTab = () => {
                 />
               </div>
               <label className="flex items-center gap-2 text-sm cursor-pointer select-none text-muted-foreground">
-                <span className={`h-3 w-3 rounded-full border ${staffOnly ? 'bg-primary border-primary' : 'border-muted-foreground/40'}`} />
+                <span
+                  className={`h-3 w-3 rounded-full border ${staffOnly ? "bg-primary border-primary" : "border-muted-foreground/40"}`}
+                />
                 Staff only
                 <input
                   type="checkbox"
@@ -681,9 +733,7 @@ const UsersTab = () => {
                     <div className="font-semibold text-foreground truncate">
                       {p.display_name ?? p.mc_username ?? p.id.slice(0, 8)}
                     </div>
-                    <div className="text-xs text-muted-foreground font-mono">
-                      {p.id.slice(0, 8)}
-                    </div>
+                    <div className="text-xs text-muted-foreground font-mono">{p.id.slice(0, 8)}</div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -787,8 +837,12 @@ const UsersTab = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-            <Button onClick={saveEdit} disabled={savingEdit || loadingEmail}>{savingEdit ? "Saving..." : "Save"}</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button onClick={saveEdit} disabled={savingEdit || loadingEmail}>
+              {savingEdit ? "Saving..." : "Save"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -800,9 +854,7 @@ const RolesSection = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [customRoles, setCustomRoles] = useState<CustomRole[]>([]);
-  const [customAssignments, setCustomAssignments] = useState<
-    { user_id: string; role_key: string }[]
-  >([]);
+  const [customAssignments, setCustomAssignments] = useState<{ user_id: string; role_key: string }[]>([]);
   const [search, setSearch] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Set<string>>>({});
   const [savingUid, setSavingUid] = useState<string | null>(null);
@@ -841,10 +893,7 @@ const RolesSection = () => {
         .select("id, display_name, mc_username, created_at")
         .order("created_at", { ascending: false }),
       supabase.from("user_roles").select("id, user_id, role"),
-      supabase
-        .from("custom_roles")
-        .select("key,label,emoji,color,rank")
-        .order("rank", { ascending: true }),
+      supabase.from("custom_roles").select("key,label,emoji,color,rank").order("rank", { ascending: true }),
       supabase.from("user_custom_roles").select("user_id, role_key"),
     ]);
     setProfiles((p ?? []) as Profile[]);
@@ -897,9 +946,7 @@ const RolesSection = () => {
     const removeCustom = toRemove.filter((k) => customKeySet.has(k));
 
     if (addBuiltin.length) {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert(addBuiltin.map((role) => ({ user_id: uid, role })));
+      const { error } = await supabase.from("user_roles").insert(addBuiltin.map((role) => ({ user_id: uid, role })));
       if (error) throw error;
     }
     if (addCustom.length) {
@@ -909,11 +956,7 @@ const RolesSection = () => {
       if (error) throw error;
     }
     if (removeBuiltin.length) {
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", uid)
-        .in("role", removeBuiltin);
+      const { error } = await supabase.from("user_roles").delete().eq("user_id", uid).in("role", removeBuiltin);
       if (error) throw error;
     }
     if (removeCustom.length) {
@@ -937,9 +980,7 @@ const RolesSection = () => {
     setSavingUid(uid);
     try {
       await applyDiffForUser(uid, toAdd, toRemove);
-      toast.success(
-        `Updated ${toAdd.length + toRemove.length} role${toAdd.length + toRemove.length === 1 ? "" : "s"}`,
-      );
+      toast.success(`Updated ${toAdd.length + toRemove.length} role${toAdd.length + toRemove.length === 1 ? "" : "s"}`);
       // Fire-and-forget Discord role sync
       supabase.functions
         .invoke("discord-sync-user-roles", { body: { user_id: uid } })
@@ -961,7 +1002,6 @@ const RolesSection = () => {
       setSavingUid(null);
     }
   };
-
 
   const filtered = useMemo(
     () =>
@@ -1372,7 +1412,14 @@ const toLocalInput = (ms?: number) => {
 
 const ContentTab = () => {
   const [hero, setHero] = useState({ title: "", subtitle: "", badge: "", enabled: true });
-  const [server, setServer] = useState({ ip: "", bedrockIp: "", bedrockPort: "", discord: "", version: "", tagline: "" });
+  const [server, setServer] = useState({
+    ip: "",
+    bedrockIp: "",
+    bedrockPort: "",
+    discord: "",
+    version: "",
+    tagline: "",
+  });
   const [alerts, setAlerts] = useState({
     onlineEnabled: true,
     onlineMessage: "🟢 Server is back online — jump in!",
@@ -1460,11 +1507,19 @@ const ContentTab = () => {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label>Bedrock IP</Label>
-            <Input value={server.bedrockIp} onChange={(e) => setServer({ ...server, bedrockIp: e.target.value })} placeholder="Soon" />
+            <Input
+              value={server.bedrockIp}
+              onChange={(e) => setServer({ ...server, bedrockIp: e.target.value })}
+              placeholder="Soon"
+            />
           </div>
           <div>
             <Label>Bedrock Port</Label>
-            <Input value={server.bedrockPort} onChange={(e) => setServer({ ...server, bedrockPort: e.target.value })} placeholder="Soon" />
+            <Input
+              value={server.bedrockPort}
+              onChange={(e) => setServer({ ...server, bedrockPort: e.target.value })}
+              placeholder="Soon"
+            />
           </div>
         </div>
         <div>
@@ -1613,16 +1668,16 @@ const StatusTab = () => {
   const [page, setPage] = useState<{
     title: string;
     subtitle: string;
-     footnote: string;
-     website_webhook_url: string;
-     services: { key: string; name: string; desc: string; url: string }[];
-   }>({
-     title: "Warden Network Status",
-     subtitle: "Live uptime — automated checks every 5 minutes.",
-     footnote: "",
-     website_webhook_url: "",
-     services: [],
-   });
+    footnote: string;
+    website_webhook_url: string;
+    services: { key: string; name: string; desc: string; url: string }[];
+  }>({
+    title: "Warden Network Status",
+    subtitle: "Live uptime — automated checks every 5 minutes.",
+    footnote: "",
+    website_webhook_url: "",
+    services: [],
+  });
   const [savingPage, setSavingPage] = useState(false);
   const [deliveries, setDeliveries] = useState<any[]>([]);
   const [loadingDeliveries, setLoadingDeliveries] = useState(false);
@@ -1639,7 +1694,9 @@ const StatusTab = () => {
     setLoadingDeliveries(false);
   };
 
-  useEffect(() => { loadDeliveries(); }, []);
+  useEffect(() => {
+    loadDeliveries();
+  }, []);
 
   const sendTest = async (kind: "up" | "down") => {
     setTesting(kind);
@@ -1679,19 +1736,32 @@ const StatusTab = () => {
       .maybeSingle()
       .then(({ data }) => {
         const v = (data?.value as any) ?? {};
-         setPage((p) => ({
-           title: v.title ?? p.title,
-           subtitle: v.subtitle ?? p.subtitle,
-           footnote: v.footnote ?? "",
-           website_webhook_url: v.website_webhook_url ?? "",
-          services: Array.isArray(v.services) && v.services.length ? v.services : [
-            { key: "website", name: "Website", desc: "Main site & dashboard", url: "" },
-            { key: "minecraft", name: "Minecraft Server", desc: "warden.rip", url: "" },
-            { key: "api", name: "API & Database", desc: "Backend services", url: "" },
-            { key: "panel", name: "Panel", desc: "dash.nightly.host", url: "" },
-            { key: "discord", name: "Discord Server", desc: "https://discord.warden.rip", url: "https://discord.warden.rip" },
-            { key: "bot", name: "WardenBot", desc: "Discord bot · warden.rip/bot", url: "https://warden.rip/bot" },
-          ],
+        setPage((p) => ({
+          title: v.title ?? p.title,
+          subtitle: v.subtitle ?? p.subtitle,
+          footnote: v.footnote ?? "",
+          website_webhook_url: v.website_webhook_url ?? "",
+          services:
+            Array.isArray(v.services) && v.services.length
+              ? v.services
+              : [
+                  { key: "website", name: "Website", desc: "Main site & dashboard", url: "" },
+                  { key: "minecraft", name: "Minecraft Server", desc: "warden.rip", url: "" },
+                  { key: "api", name: "API & Database", desc: "Backend services", url: "" },
+                  { key: "panel", name: "Panel", desc: "dash.nightly.host", url: "" },
+                  {
+                    key: "discord",
+                    name: "Discord Server",
+                    desc: "https://discord.warden.rip",
+                    url: "https://discord.warden.rip",
+                  },
+                  {
+                    key: "bot",
+                    name: "WardenBot",
+                    desc: "Discord bot · warden.rip/bot",
+                    url: "https://warden.rip/bot",
+                  },
+                ],
         }));
       });
   }, []);
@@ -1706,7 +1776,10 @@ const StatusTab = () => {
     setSavingPage(true);
     const cleanedServices = page.services
       .map((svc) => ({
-        key: svc.key.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "-"),
+        key: svc.key
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9_-]/g, "-"),
         name: svc.name.trim(),
         desc: svc.desc.trim(),
         url: svc.url.trim(),
@@ -1758,65 +1831,84 @@ const StatusTab = () => {
             onChange={(e) => setPage({ ...page, footnote: e.target.value })}
             placeholder="Optional message shown below the services list."
           />
-         </div>
-         <div>
-           <Label>Website status webhook URL</Label>
-           <Input
-             value={page.website_webhook_url}
-             onChange={(e) => setPage({ ...page, website_webhook_url: e.target.value })}
-             placeholder="https://discord.com/api/webhooks/..."
-           />
-           <p className="text-[11px] text-muted-foreground mt-1">
-             Receives down/up alerts specifically for the Website service, in addition to the global Alert webhooks.
-           </p>
-           <div className="flex flex-wrap gap-2 mt-3">
-             <Button size="sm" variant="outline" onClick={() => sendTest("down")} disabled={testing !== null || !page.website_webhook_url}>
-               {testing === "down" ? "Sending…" : "Test website webhook (down)"}
-             </Button>
-             <Button size="sm" variant="outline" onClick={() => sendTest("up")} disabled={testing !== null || !page.website_webhook_url}>
-               {testing === "up" ? "Sending…" : "Test website webhook (up)"}
-             </Button>
-           </div>
-         </div>
+        </div>
+        <div>
+          <Label>Website status webhook URL</Label>
+          <Input
+            value={page.website_webhook_url}
+            onChange={(e) => setPage({ ...page, website_webhook_url: e.target.value })}
+            placeholder="https://discord.com/api/webhooks/..."
+          />
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Receives down/up alerts specifically for the Website service, in addition to the global Alert webhooks.
+          </p>
+          <div className="flex flex-wrap gap-2 mt-3">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => sendTest("down")}
+              disabled={testing !== null || !page.website_webhook_url}
+            >
+              {testing === "down" ? "Sending…" : "Test website webhook (down)"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => sendTest("up")}
+              disabled={testing !== null || !page.website_webhook_url}
+            >
+              {testing === "up" ? "Sending…" : "Test website webhook (up)"}
+            </Button>
+          </div>
+        </div>
 
-         <div className="space-y-2">
-           <div className="flex items-center justify-between">
-             <Label>Recent website webhook deliveries</Label>
-             <Button size="sm" variant="ghost" onClick={loadDeliveries} disabled={loadingDeliveries}>
-               <RefreshCw className={`h-3.5 w-3.5 mr-1 ${loadingDeliveries ? "animate-spin" : ""}`} /> Refresh
-             </Button>
-           </div>
-           <div className="rounded-md border border-border overflow-hidden">
-             <table className="w-full text-xs">
-               <thead className="bg-secondary/40 text-muted-foreground">
-                 <tr>
-                   <th className="text-left px-3 py-2 font-medium">Time</th>
-                   <th className="text-left px-3 py-2 font-medium">Kind</th>
-                   <th className="text-left px-3 py-2 font-medium">HTTP</th>
-                   <th className="text-left px-3 py-2 font-medium">Latency</th>
-                   <th className="text-left px-3 py-2 font-medium">Error</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 {deliveries.length === 0 && (
-                   <tr><td colSpan={5} className="px-3 py-4 text-center text-muted-foreground">
-                     {loadingDeliveries ? "Loading…" : "No deliveries logged yet."}
-                   </td></tr>
-                 )}
-                 {deliveries.map((d) => (
-                   <tr key={d.id} className="border-t border-border">
-                     <td className="px-3 py-2 whitespace-nowrap">{new Date(d.attempted_at).toLocaleString()}</td>
-                     <td className="px-3 py-2"><Badge variant="secondary" className="capitalize">{d.kind?.replace("_", " ")}</Badge></td>
-                     <td className={`px-3 py-2 font-mono ${d.ok ? "text-primary" : "text-destructive"}`}>{d.status_code ?? "—"}</td>
-                     <td className="px-3 py-2 font-mono">{d.latency_ms != null ? `${d.latency_ms}ms` : "—"}</td>
-                     <td className="px-3 py-2 text-destructive max-w-[280px] truncate" title={d.error ?? ""}>{d.error ?? "—"}</td>
-                   </tr>
-                 ))}
-               </tbody>
-             </table>
-           </div>
-         </div>
-
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label>Recent website webhook deliveries</Label>
+            <Button size="sm" variant="ghost" onClick={loadDeliveries} disabled={loadingDeliveries}>
+              <RefreshCw className={`h-3.5 w-3.5 mr-1 ${loadingDeliveries ? "animate-spin" : ""}`} /> Refresh
+            </Button>
+          </div>
+          <div className="rounded-md border border-border overflow-hidden">
+            <table className="w-full text-xs">
+              <thead className="bg-secondary/40 text-muted-foreground">
+                <tr>
+                  <th className="text-left px-3 py-2 font-medium">Time</th>
+                  <th className="text-left px-3 py-2 font-medium">Kind</th>
+                  <th className="text-left px-3 py-2 font-medium">HTTP</th>
+                  <th className="text-left px-3 py-2 font-medium">Latency</th>
+                  <th className="text-left px-3 py-2 font-medium">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deliveries.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-3 py-4 text-center text-muted-foreground">
+                      {loadingDeliveries ? "Loading…" : "No deliveries logged yet."}
+                    </td>
+                  </tr>
+                )}
+                {deliveries.map((d) => (
+                  <tr key={d.id} className="border-t border-border">
+                    <td className="px-3 py-2 whitespace-nowrap">{new Date(d.attempted_at).toLocaleString()}</td>
+                    <td className="px-3 py-2">
+                      <Badge variant="secondary" className="capitalize">
+                        {d.kind?.replace("_", " ")}
+                      </Badge>
+                    </td>
+                    <td className={`px-3 py-2 font-mono ${d.ok ? "text-primary" : "text-destructive"}`}>
+                      {d.status_code ?? "—"}
+                    </td>
+                    <td className="px-3 py-2 font-mono">{d.latency_ms != null ? `${d.latency_ms}ms` : "—"}</td>
+                    <td className="px-3 py-2 text-destructive max-w-[280px] truncate" title={d.error ?? ""}>
+                      {d.error ?? "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -1829,7 +1921,10 @@ const StatusTab = () => {
             <p className="text-xs text-muted-foreground">No services yet. Add one to display it on /status.</p>
           )}
           {page.services.map((svc, i) => (
-            <div key={i} className="grid grid-cols-12 gap-2 items-start p-3 rounded-md border border-border bg-secondary/30">
+            <div
+              key={i}
+              className="grid grid-cols-12 gap-2 items-start p-3 rounded-md border border-border bg-secondary/30"
+            >
               <div className="col-span-6 sm:col-span-2">
                 <Label className="text-[10px] uppercase tracking-widest text-muted-foreground">Key</Label>
                 <Input
@@ -1907,7 +2002,6 @@ const StatusTab = () => {
   );
 };
 
-
 const LogsTab = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [scope, setScope] = useState<"mine" | "all">("mine");
@@ -1977,13 +2071,18 @@ const DiscordRoleMapCard = ({ guildId }: { guildId?: string }) => {
 
   useEffect(() => {
     supabase
-      .from("site_content").select("value").eq("key", "discord_role_map").maybeSingle()
+      .from("site_content")
+      .select("value")
+      .eq("key", "discord_role_map")
+      .maybeSingle()
       .then(({ data }) => {
         const m = (data?.value as any)?.map;
         if (m && typeof m === "object") setMap(m);
       });
     supabase
-      .from("custom_roles").select("key,label,emoji").order("rank", { ascending: true })
+      .from("custom_roles")
+      .select("key,label,emoji")
+      .order("rank", { ascending: true })
       .then(({ data }) => setCustomRoles((data ?? []) as any));
   }, []);
 
@@ -1999,8 +2098,7 @@ const DiscordRoleMapCard = ({ guildId }: { guildId?: string }) => {
     setSaving(true);
     const clean: Record<string, string> = {};
     for (const [k, v] of Object.entries(map)) if (v && v.trim()) clean[k] = v.trim();
-    const { error } = await supabase
-      .from("site_content").upsert({ key: "discord_role_map", value: { map: clean } });
+    const { error } = await supabase.from("site_content").upsert({ key: "discord_role_map", value: { map: clean } });
     setSaving(false);
     if (error) toast.error(error.message);
     else toast.success("Role mapping saved");
@@ -2043,7 +2141,9 @@ const DiscordRoleMapCard = ({ guildId }: { guildId?: string }) => {
         ))}
       </div>
       <div className="flex gap-2 mt-4">
-        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save mapping"}</Button>
+        <Button onClick={save} disabled={saving}>
+          {saving ? "Saving…" : "Save mapping"}
+        </Button>
       </div>
       <div className="mt-6 pt-4 border-t border-border">
         <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Test sync</div>
@@ -2062,8 +2162,6 @@ const DiscordRoleMapCard = ({ guildId }: { guildId?: string }) => {
     </Card>
   );
 };
-
-
 
 const BotDashboardSection = () => {
   const [cfg, setCfg] = useState<any>({
@@ -2096,7 +2194,9 @@ const BotDashboardSection = () => {
     fields?: EmbedField[];
   };
   const [embedOverrides, setEmbedOverrides] = useState<Record<"info" | "rules" | "roles", EmbedOverride>>({
-    info: {}, rules: {}, roles: {},
+    info: {},
+    rules: {},
+    roles: {},
   });
   const [editingEmbed, setEditingEmbed] = useState<"info" | "rules" | "roles" | null>(null);
   const [embedForm, setEmbedForm] = useState<EmbedOverride>({});
@@ -2143,7 +2243,9 @@ const BotDashboardSection = () => {
                 : [],
         }));
       }
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
   };
 
   const updateField = (idx: number, patch: Partial<EmbedField>) => {
@@ -2162,9 +2264,7 @@ const BotDashboardSection = () => {
     if (!editingEmbed) return;
     setSavingEmbed(true);
     const next = { ...embedOverrides, [editingEmbed]: embedForm };
-    const { error } = await supabase
-      .from("site_content")
-      .upsert({ key: "discord_embeds", value: next });
+    const { error } = await supabase.from("site_content").upsert({ key: "discord_embeds", value: next });
     setSavingEmbed(false);
     if (error) {
       toast.error(error.message);
@@ -2199,7 +2299,10 @@ const BotDashboardSection = () => {
     const payload = error
       ? { ok: false, message: error.message }
       : data?.ok
-        ? { ok: true, message: `Scanned ${data.scanned} members — ${data.matched} advertising, ${data.granted} given the role, ${data.removed} removed.` }
+        ? {
+            ok: true,
+            message: `Scanned ${data.scanned} members — ${data.matched} advertising, ${data.granted} given the role, ${data.removed} removed.`,
+          }
         : { ok: false, message: data?.error ?? "Sync failed" };
     setActionResults((r) => ({ ...r, "supporter-sync": payload }));
     if (payload.ok) toast.success(payload.message);
@@ -2333,9 +2436,7 @@ const BotDashboardSection = () => {
             {result.ok && result.guildError && <div className="text-amber-400">Warning: {result.guildError}</div>}
             {result.ok && result.inviteUrl && (
               <div className="pt-1 space-y-1">
-                <div className="text-muted-foreground">
-                  Invite link — works in any server, no guild ID needed:
-                </div>
+                <div className="text-muted-foreground">Invite link — works in any server, no guild ID needed:</div>
                 <div className="flex items-center gap-2">
                   <code className="flex-1 truncate rounded bg-background/60 px-2 py-1 text-xs">{result.inviteUrl}</code>
                   <Button
@@ -2349,7 +2450,9 @@ const BotDashboardSection = () => {
                     Copy
                   </Button>
                   <Button size="sm" asChild>
-                    <a href={result.inviteUrl} target="_blank" rel="noopener noreferrer">Open</a>
+                    <a href={result.inviteUrl} target="_blank" rel="noopener noreferrer">
+                      Open
+                    </a>
                   </Button>
                 </div>
               </div>
@@ -2363,11 +2466,13 @@ const BotDashboardSection = () => {
           <div>
             <h2 className="font-bold">Supporter role</h2>
             <p className="text-sm text-muted-foreground">
-              Gives the supporter role to members whose Discord status shows discord.warden.rip or the invite link,
-              and removes it when they stop. Runs automatically every hour.
+              Gives the supporter role to members whose Discord status shows discord.warden.rip or the invite link, and
+              removes it when they stop. Runs automatically every hour.
             </p>
             {actionResults["supporter-sync"] && (
-              <div className={`mt-2 text-xs ${actionResults["supporter-sync"].ok ? "text-emerald-400" : "text-destructive"}`}>
+              <div
+                className={`mt-2 text-xs ${actionResults["supporter-sync"].ok ? "text-emerald-400" : "text-destructive"}`}
+              >
                 {actionResults["supporter-sync"].ok ? "✓ " : "✗ "}
                 {actionResults["supporter-sync"].message}
               </div>
@@ -2422,7 +2527,12 @@ const BotDashboardSection = () => {
                     </Button>
                   )}
                   {previewKey && (
-                    <Button size="sm" variant="outline" onClick={() => previewAction(previewKey)} disabled={!!busy || !t.channel}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => previewAction(previewKey)}
+                      disabled={!!busy || !t.channel}
+                    >
                       {busy === `${previewKey}-preview` ? "Loading..." : "Preview"}
                     </Button>
                   )}
@@ -2441,8 +2551,8 @@ const BotDashboardSection = () => {
       <Card className="p-6 space-y-3">
         <h2 className="font-bold">About the Discord Bot</h2>
         <p className="text-sm text-muted-foreground">
-          Configure your bot in the Management section. When enabled, it can sync with your Warden Network server to deliver
-          announcements, role assignments, and live server status to your Discord guild.
+          Configure your bot in the Management section. When enabled, it can sync with your Warden Network server to
+          deliver announcements, role assignments, and live server status to your Discord guild.
         </p>
         {cfg.inviteUrl && (
           <a href={cfg.inviteUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">
@@ -2459,7 +2569,8 @@ const BotDashboardSection = () => {
             </DialogTitle>
             <DialogDescription>
               Edit the title, description, fields, and footer. Values are prefilled from the current embed.
-              {editingEmbed === "rules" && " Rule items are normally managed in the Rules section; edits here override them."}
+              {editingEmbed === "rules" &&
+                " Rule items are normally managed in the Rules section; edits here override them."}
               {editingEmbed === "roles" && " The role list is generated automatically; edits here override it."}
             </DialogDescription>
           </DialogHeader>
@@ -2546,7 +2657,8 @@ const BotDashboardSection = () => {
         <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {previewAction_ === "info" ? "Server Info" : previewAction_ === "rules" ? "Server Rules" : "Roles"} Embed Preview
+              {previewAction_ === "info" ? "Server Info" : previewAction_ === "rules" ? "Server Rules" : "Roles"} Embed
+              Preview
             </DialogTitle>
             <DialogDescription>
               This is how the message will look in channel{" "}
@@ -2555,20 +2667,14 @@ const BotDashboardSection = () => {
           </DialogHeader>
           {previewData && (
             <div className="space-y-3">
-              {previewData._content && (
-                <div className="text-sm font-medium text-primary">{previewData._content}</div>
-              )}
+              {previewData._content && <div className="text-sm font-medium text-primary">{previewData._content}</div>}
               <div
                 className="rounded-lg border-l-4 p-4 bg-card/60 space-y-2"
                 style={{ borderLeftColor: `#${(previewData.color ?? 0x5865f2).toString(16).padStart(6, "0")}` }}
               >
-                {previewData.title && (
-                  <div className="font-semibold text-base">{previewData.title}</div>
-                )}
+                {previewData.title && <div className="font-semibold text-base">{previewData.title}</div>}
                 {previewData.description && (
-                  <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {previewData.description}
-                  </div>
+                  <div className="text-sm text-muted-foreground whitespace-pre-wrap">{previewData.description}</div>
                 )}
                 {Array.isArray(previewData.fields) && previewData.fields.length > 0 && (
                   <div className="grid gap-2 pt-1">
@@ -2616,7 +2722,6 @@ const BotDashboardSection = () => {
   );
 };
 
-
 const BotActionLogsPanel = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -2639,11 +2744,16 @@ const BotActionLogsPanel = () => {
   }, [filter]);
 
   const clearLogs = async () => {
-    if (!(await confirm({ title: "Clear logs?", description: "Delete all Discord bot action logs? This cannot be undone.", confirmText: "Clear", destructive: true }))) return;
-    const { error } = await supabase
-      .from("discord_bot_action_logs")
-      .delete()
-      .gte("created_at", "1970-01-01");
+    if (
+      !(await confirm({
+        title: "Clear logs?",
+        description: "Delete all Discord bot action logs? This cannot be undone.",
+        confirmText: "Clear",
+        destructive: true,
+      }))
+    )
+      return;
+    const { error } = await supabase.from("discord_bot_action_logs").delete().gte("created_at", "1970-01-01");
     if (error) toast.error(error.message);
     else {
       toast.success("Logs cleared");
@@ -2669,7 +2779,9 @@ const BotActionLogsPanel = () => {
             className="text-sm bg-background border border-border rounded-md px-2 py-1.5"
           >
             {actions.map((a) => (
-              <option key={a} value={a}>{a}</option>
+              <option key={a} value={a}>
+                {a}
+              </option>
             ))}
           </select>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
@@ -2706,9 +2818,7 @@ const BotActionLogsPanel = () => {
                     {l.duration_ms != null && (
                       <span className="text-xs text-muted-foreground">· {l.duration_ms}ms</span>
                     )}
-                    {l.error && (
-                      <span className="text-xs text-destructive truncate">— {l.error}</span>
-                    )}
+                    {l.error && <span className="text-xs text-destructive truncate">— {l.error}</span>}
                   </div>
                   <span className="text-xs text-muted-foreground shrink-0">
                     {new Date(l.created_at).toLocaleString()}
@@ -2719,13 +2829,13 @@ const BotActionLogsPanel = () => {
                     <div>
                       <p className="font-semibold mb-1">Request</p>
                       <pre className="bg-background border border-border rounded p-2 overflow-x-auto">
-{JSON.stringify(l.request, null, 2)}
+                        {JSON.stringify(l.request, null, 2)}
                       </pre>
                     </div>
                     <div>
                       <p className="font-semibold mb-1">Response</p>
                       <pre className="bg-background border border-border rounded p-2 overflow-x-auto">
-{JSON.stringify(l.response, null, 2)}
+                        {JSON.stringify(l.response, null, 2)}
                       </pre>
                     </div>
                   </div>
@@ -2791,11 +2901,21 @@ const BotManagementSection = () => {
           <Label>Mark as online</Label>
         </div>
         <div>
-          <Label>Guild ID <span className="text-muted-foreground font-normal">(optional — only for role sync and the supporter role on your own server)</span></Label>
+          <Label>
+            Guild ID{" "}
+            <span className="text-muted-foreground font-normal">
+              (optional — only for role sync and the supporter role on your own server)
+            </span>
+          </Label>
           <Input value={cfg.guildId} onChange={(e) => setCfg({ ...cfg, guildId: e.target.value })} />
         </div>
         <div>
-          <Label>Bot invite URL <span className="text-muted-foreground font-normal">(run a connection test to generate one that works in any server)</span></Label>
+          <Label>
+            Bot invite URL{" "}
+            <span className="text-muted-foreground font-normal">
+              (run a connection test to generate one that works in any server)
+            </span>
+          </Label>
           <Input value={cfg.inviteUrl} onChange={(e) => setCfg({ ...cfg, inviteUrl: e.target.value })} />
         </div>
       </Card>
@@ -2829,7 +2949,8 @@ const BotManagementSection = () => {
             placeholder="Channel where the roles overview embed is posted"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Defaults to <code>#✭「🍸」・server-roles</code> (1498961753457954847). Used by the “Send Discord roles” action.
+            Defaults to <code>#✭「🍸」・server-roles</code> (1498961753457954847). Used by the “Send Discord roles”
+            action.
           </p>
         </div>
         <div>
@@ -2840,7 +2961,8 @@ const BotManagementSection = () => {
             placeholder="Channel where the info embed (IP, ports, links) is posted"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Used by the “Send server info” action. Posts (or updates) a polished embed with the IP, Bedrock port, and quick links, plus an <code>@everyone</code> ping.
+            Used by the “Send server info” action. Posts (or updates) a polished embed with the IP, Bedrock port, and
+            quick links, plus an <code>@everyone</code> ping.
           </p>
         </div>
         <div>
@@ -2850,9 +2972,7 @@ const BotManagementSection = () => {
             onChange={(e) => setCfg({ ...cfg, rulesChannelId: e.target.value })}
             placeholder="Channel where the rules embed is posted"
           />
-          <p className="text-xs text-muted-foreground mt-1">
-            Used by the “Send server rules” action.
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">Used by the “Send server rules” action.</p>
         </div>
         <div>
           <Label>Welcome message</Label>
@@ -2962,16 +3082,13 @@ const TicketsAdminSection = () => {
       .then(({ data }) => setMessages((data ?? []) as AdminMsg[]));
     // Mark as viewed
     const nowIso = new Date().toISOString();
-    setTickets((prev) =>
-      prev.map((t) => (t.id === selectedId ? { ...t, admin_last_viewed_at: nowIso } : t)),
-    );
+    setTickets((prev) => prev.map((t) => (t.id === selectedId ? { ...t, admin_last_viewed_at: nowIso } : t)));
     supabase
       .from("support_tickets")
       .update({ admin_last_viewed_at: nowIso })
       .eq("id", selectedId)
       .then(() => {});
   }, [selectedId]);
-
 
   const filtered = filter === "all" ? tickets : tickets.filter((t) => t.status === filter);
   const selected = tickets.find((t) => t.id === selectedId) ?? null;
@@ -3020,9 +3137,7 @@ const TicketsAdminSection = () => {
       setSending(false);
       return toast.error(error.message);
     }
-    setMessages((prev) =>
-      prev.map((m) => (m.id === tempId ? (inserted as AdminMsg) : m)),
-    );
+    setMessages((prev) => prev.map((m) => (m.id === tempId ? (inserted as AdminMsg) : m)));
     setSending(false);
 
     if (selected.status === "open") updateStatus(selected.id, "waiting_user");
@@ -3058,7 +3173,15 @@ const TicketsAdminSection = () => {
   };
 
   const deleteTicket = async (id: string) => {
-    if (!(await confirm({ title: "Delete ticket?", description: "This ticket and all its messages will be permanently deleted.", confirmText: "Delete", destructive: true }))) return;
+    if (
+      !(await confirm({
+        title: "Delete ticket?",
+        description: "This ticket and all its messages will be permanently deleted.",
+        confirmText: "Delete",
+        destructive: true,
+      }))
+    )
+      return;
     const { error } = await supabase.from("support_tickets").delete().eq("id", id);
     if (error) return toast.error(error.message);
     if (selectedId === id) setSelectedId(null);
@@ -3365,7 +3488,15 @@ const PluginsTab = () => {
 
   const removeJar = async () => {
     if (!form.jar_path) return;
-    if (!(await confirm({ title: "Remove JAR?", description: "The uploaded JAR file will be removed.", confirmText: "Remove", destructive: true }))) return;
+    if (
+      !(await confirm({
+        title: "Remove JAR?",
+        description: "The uploaded JAR file will be removed.",
+        confirmText: "Remove",
+        destructive: true,
+      }))
+    )
+      return;
     await supabase.storage.from("plugin-jars").remove([form.jar_path]);
     setForm((f) => ({ ...f, jar_path: "", jar_filename: "", jar_size: 0, download_url: "" }));
     toast.success("JAR removed");
@@ -3484,7 +3615,7 @@ const PluginsTab = () => {
     const { data: auth } = await supabase.auth.getUser();
     const insertPayload = {
       ...payload,
-      user_id: ownerUserId !== undefined ? ownerUserId : auth.user?.id ?? null,
+      user_id: ownerUserId !== undefined ? ownerUserId : (auth.user?.id ?? null),
     };
     const { error } = editingId
       ? await (supabase.from("plugins") as any).update(payload).eq("id", editingId)
@@ -3497,7 +3628,15 @@ const PluginsTab = () => {
   };
 
   const remove = async (id: string) => {
-    if (!(await confirm({ title: "Delete plugin?", description: "This plugin will be permanently deleted.", confirmText: "Delete", destructive: true }))) return;
+    if (
+      !(await confirm({
+        title: "Delete plugin?",
+        description: "This plugin will be permanently deleted.",
+        confirmText: "Delete",
+        destructive: true,
+      }))
+    )
+      return;
     const target = plugins.find((p) => p.id === id);
     if (target?.jar_path) {
       await supabase.storage.from("plugin-jars").remove([target.jar_path]);
@@ -3824,11 +3963,14 @@ const ChangelogTab = () => {
       toast.error("Publish the entry before sending to subscribers");
       return;
     }
-    if (!(await confirm({
-      title: "Send changelog email?",
-      description: `This will email "${entry.title}" to every subscribed user on the site. Continue?`,
-      confirmText: "Send",
-    }))) return;
+    if (
+      !(await confirm({
+        title: "Send changelog email?",
+        description: `This will email "${entry.title}" to every subscribed user on the site. Continue?`,
+        confirmText: "Send",
+      }))
+    )
+      return;
     setBroadcastingId(entry.id);
     const { data, error } = await supabase.functions.invoke("notify-changelog", {
       body: { entryId: entry.id },
@@ -3892,7 +4034,12 @@ const ChangelogTab = () => {
       published: editing.published,
     };
     const { data: saved, error } = editing.id
-      ? await supabase.from("changelog_entries").update(payload).eq("id", editing.id).select("id, published").maybeSingle()
+      ? await supabase
+          .from("changelog_entries")
+          .update(payload)
+          .eq("id", editing.id)
+          .select("id, published")
+          .maybeSingle()
       : await supabase.from("changelog_entries").insert(payload).select("id, published").maybeSingle();
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -3900,12 +4047,10 @@ const ChangelogTab = () => {
 
     // Notify all subscribed users when a new published entry is created
     if (!editing.id && saved?.id && saved?.published) {
-      supabase.functions
-        .invoke("notify-changelog", { body: { entryId: saved.id } })
-        .then(({ data, error: ne }) => {
-          if (ne) toast.error(`Email notify failed: ${ne.message}`);
-          else if (data?.ok) toast.success(`Notified ${data.queued ?? 0} subscriber${data.queued === 1 ? "" : "s"}`);
-        });
+      supabase.functions.invoke("notify-changelog", { body: { entryId: saved.id } }).then(({ data, error: ne }) => {
+        if (ne) toast.error(`Email notify failed: ${ne.message}`);
+        else if (data?.ok) toast.success(`Notified ${data.queued ?? 0} subscriber${data.queued === 1 ? "" : "s"}`);
+      });
     }
 
     setEditing(null);
@@ -3913,7 +4058,15 @@ const ChangelogTab = () => {
   };
 
   const remove = async (id: string) => {
-    if (!(await confirm({ title: "Delete entry?", description: "This changelog entry will be permanently deleted.", confirmText: "Delete", destructive: true }))) return;
+    if (
+      !(await confirm({
+        title: "Delete entry?",
+        description: "This changelog entry will be permanently deleted.",
+        confirmText: "Delete",
+        destructive: true,
+      }))
+    )
+      return;
     const { error } = await supabase.from("changelog_entries").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
@@ -4006,16 +4159,20 @@ const ChangelogTab = () => {
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <Badge variant="outline" className="capitalize">{e.category}</Badge>
+                    <Badge variant="outline" className="capitalize">
+                      {e.category}
+                    </Badge>
                     {e.version && (
-                      <Badge variant="secondary" className="font-mono">v{e.version}</Badge>
+                      <Badge variant="secondary" className="font-mono">
+                        v{e.version}
+                      </Badge>
                     )}
                     {!e.published && (
-                      <Badge variant="outline" className="text-muted-foreground">Draft</Badge>
+                      <Badge variant="outline" className="text-muted-foreground">
+                        Draft
+                      </Badge>
                     )}
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(e.entry_date).toLocaleDateString()}
-                    </span>
+                    <span className="text-xs text-muted-foreground">{new Date(e.entry_date).toLocaleDateString()}</span>
                   </div>
                   <div className="font-display font-bold">{e.title}</div>
                   <p className="text-sm text-muted-foreground line-clamp-2 whitespace-pre-wrap">{e.content}</p>
@@ -4192,7 +4349,7 @@ const ApplicationsTab = () => {
     const { data, error } = await supabase
       .from("applications")
       .select(
-        "id, user_id, type, status, mc_username, discord, age, timezone, experience, why, portfolio_url, extra, reviewed_by, reviewed_at, created_at, updated_at"
+        "id, user_id, type, status, mc_username, discord, age, timezone, experience, why, portfolio_url, extra, reviewed_by, reviewed_at, created_at, updated_at",
       )
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
@@ -4207,7 +4364,6 @@ const ApplicationsTab = () => {
     setItems(rows);
     setLoading(false);
   };
-
 
   useEffect(() => {
     load();
@@ -4234,7 +4390,7 @@ const ApplicationsTab = () => {
 
     if (status === "approved" && app?.user_id) {
       const ROLE_MAP: Record<string, string> = {
-        staff: "helper",
+        staff: "trainee",
         creator: "media",
         admin: "admin",
         developer: "developer",
@@ -4249,29 +4405,40 @@ const ApplicationsTab = () => {
           toast.error(`Role assign failed: ${roleErr.message}`);
         } else {
           toast.success(`Granted ${role} role`);
-          supabase.functions.invoke("discord-sync-user-roles", {
-            body: { user_id: app.user_id },
-          }).catch(() => {});
+          supabase.functions
+            .invoke("discord-sync-user-roles", {
+              body: { user_id: app.user_id },
+            })
+            .catch(() => {});
         }
       }
     }
 
-    supabase.functions.invoke("send-application-status-email", {
-      body: {
-        applicationId: id,
-        status,
-        reviewerNotes: notes || null,
-        dashboardUrl: window.location.origin,
-      },
-    }).catch(() => {});
+    supabase.functions
+      .invoke("send-application-status-email", {
+        body: {
+          applicationId: id,
+          status,
+          reviewerNotes: notes || null,
+          dashboardUrl: window.location.origin,
+        },
+      })
+      .catch(() => {});
     setOpen(null);
     setNotes("");
     load();
   };
 
-
   const remove = async (id: string) => {
-    if (!(await confirm({ title: "Delete application?", description: "This application will be permanently deleted.", confirmText: "Delete", destructive: true }))) return;
+    if (
+      !(await confirm({
+        title: "Delete application?",
+        description: "This application will be permanently deleted.",
+        confirmText: "Delete",
+        destructive: true,
+      }))
+    )
+      return;
     const { error } = await supabase.from("applications").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
@@ -4295,7 +4462,8 @@ const ApplicationsTab = () => {
           <div className="font-display font-bold">Test application email hooks</div>
         </div>
         <p className="text-xs text-muted-foreground">
-          Sends a sample of each application email template to the address below. Uses the live email queue — check your inbox (and spam) to confirm delivery.
+          Sends a sample of each application email template to the address below. Uses the live email queue — check your
+          inbox (and spam) to confirm delivery.
         </p>
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
@@ -4320,10 +4488,6 @@ const ApplicationsTab = () => {
       </Card>
 
       <ApplicationStatusEmailEditor />
-
-
-
-
 
       <div className="flex flex-wrap gap-2">
         {(["all", "pending", "reviewed", "approved", "rejected"] as const).map((f) => (
@@ -4495,19 +4659,27 @@ const AlertsTab = () => {
     };
     let template: unknown;
     if (jsonStr.trim()) {
-      try { template = JSON.parse(jsonStr); } catch { toast.error(`${kind} payload JSON is invalid`); return; }
+      try {
+        template = JSON.parse(jsonStr);
+      } catch {
+        toast.error(`${kind} payload JSON is invalid`);
+        return;
+      }
     } else {
       // Default fallback matching edge function
       template = {
         username: "Uptime Monitor",
-        embeds: [{
-          title: kind === "down" ? `🔴 {{service_name}} is DOWN` : `🟢 {{service_name}} recovered`,
-          description: kind === "down"
-            ? `Service has failed multiple consecutive checks.\n**Uptime (24h):** {{uptime_window}}\n**Error:** {{error}}`
-            : `Service is responding successfully again.\n**Uptime (24h):** {{uptime_window}}\n**Incident lasted:** {{incident_duration}}`,
-          color: kind === "down" ? 0xef4444 : 0x22c55e,
-          timestamp: "{{timestamp}}",
-        }],
+        embeds: [
+          {
+            title: kind === "down" ? `🔴 {{service_name}} is DOWN` : `🟢 {{service_name}} recovered`,
+            description:
+              kind === "down"
+                ? `Service has failed multiple consecutive checks.\n**Uptime (24h):** {{uptime_window}}\n**Error:** {{error}}`
+                : `Service is responding successfully again.\n**Uptime (24h):** {{uptime_window}}\n**Incident lasted:** {{incident_duration}}`,
+            color: kind === "down" ? 0xef4444 : 0x22c55e,
+            timestamp: "{{timestamp}}",
+          },
+        ],
       };
     }
     const payload = interpolateTemplate(template, vars);
@@ -4517,7 +4689,10 @@ const AlertsTab = () => {
   };
 
   const sendTestWebhook = async () => {
-    const urls = webhookInput.split(/\n+/).map((s) => s.trim()).filter((s) => /^https?:\/\//i.test(s));
+    const urls = webhookInput
+      .split(/\n+/)
+      .map((s) => s.trim())
+      .filter((s) => /^https?:\/\//i.test(s));
     if (urls.length === 0) {
       toast.error("No valid webhook URLs configured");
       return;
@@ -4532,10 +4707,12 @@ const AlertsTab = () => {
             body: previewPayload,
           });
           return { url, ok: res.ok, status: res.status };
-        })
+        }),
       );
       const successes = results.filter((r) => r.status === "fulfilled" && r.value.ok).length;
-      const failures = results.filter((r) => r.status === "rejected" || (r.status === "fulfilled" && !r.value.ok)).length;
+      const failures = results.filter(
+        (r) => r.status === "rejected" || (r.status === "fulfilled" && !r.value.ok),
+      ).length;
       if (failures === 0) {
         toast.success(`Test ${previewKind} sent to all ${successes} webhook(s)`);
       } else {
@@ -4581,8 +4758,8 @@ const AlertsTab = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (cardRef.current) {
-        const buttons = cardRef.current.querySelectorAll('button');
-        const hasPreview = Array.from(buttons).some((b) => b.textContent?.includes('Preview'));
+        const buttons = cardRef.current.querySelectorAll("button");
+        const hasPreview = Array.from(buttons).some((b) => b.textContent?.includes("Preview"));
         setPreviewButtonsDetected(hasPreview);
       }
     }, 2000);
@@ -4593,23 +4770,37 @@ const AlertsTab = () => {
     let downTemplate: object | null = null;
     let upTemplate: object | null = null;
     if (downJson.trim()) {
-      try { downTemplate = JSON.parse(downJson); } catch { toast.error("Down payload JSON is invalid"); return; }
+      try {
+        downTemplate = JSON.parse(downJson);
+      } catch {
+        toast.error("Down payload JSON is invalid");
+        return;
+      }
     }
     if (upJson.trim()) {
-      try { upTemplate = JSON.parse(upJson); } catch { toast.error("Up payload JSON is invalid"); return; }
+      try {
+        upTemplate = JSON.parse(upJson);
+      } catch {
+        toast.error("Up payload JSON is invalid");
+        return;
+      }
     }
     setSaving(true);
-    const urls = webhookInput.split(/\n+/).map((s) => s.trim()).filter((s) => /^https?:\/\//i.test(s));
-    const emails = emailInput.split(/\n+/).map((s) => s.trim()).filter((s) => /^[^\s@]+@[^\s@\.]+\.[^\s@]+$/i.test(s));
-    const { error } = await supabase
-      .from("alert_settings")
-      .upsert({
-        id: 1,
-        webhook_urls: urls,
-        email_recipients: emails,
-        down_payload_template: downTemplate,
-        up_payload_template: upTemplate,
-      } as any);
+    const urls = webhookInput
+      .split(/\n+/)
+      .map((s) => s.trim())
+      .filter((s) => /^https?:\/\//i.test(s));
+    const emails = emailInput
+      .split(/\n+/)
+      .map((s) => s.trim())
+      .filter((s) => /^[^\s@]+@[^\s@\.]+\.[^\s@]+$/i.test(s));
+    const { error } = await supabase.from("alert_settings").upsert({
+      id: 1,
+      webhook_urls: urls,
+      email_recipients: emails,
+      down_payload_template: downTemplate,
+      up_payload_template: upTemplate,
+    } as any);
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -4653,15 +4844,16 @@ const AlertsTab = () => {
           <Code className="h-4 w-4" /> Custom Payload Templates
         </h2>
         <p className="text-sm text-muted-foreground">
-          Override the default Discord embed payload. Use <code className="text-xs bg-secondary px-1 rounded">{"{{variable}}"}</code> placeholders.
-          Available variables: <code className="text-xs bg-secondary px-1 rounded">service_name</code>,{" "}
+          Override the default Discord embed payload. Use{" "}
+          <code className="text-xs bg-secondary px-1 rounded">{"{{variable}}"}</code> placeholders. Available variables:{" "}
+          <code className="text-xs bg-secondary px-1 rounded">service_name</code>,{" "}
           <code className="text-xs bg-secondary px-1 rounded">service_key</code>,{" "}
           <code className="text-xs bg-secondary px-1 rounded">status</code>,{" "}
           <code className="text-xs bg-secondary px-1 rounded">uptime_window</code>,{" "}
           <code className="text-xs bg-secondary px-1 rounded">incident_duration</code>,{" "}
           <code className="text-xs bg-secondary px-1 rounded">error</code>,{" "}
-          <code className="text-xs bg-secondary px-1 rounded">timestamp</code>.
-          Leave empty to use the default Discord embed format.
+          <code className="text-xs bg-secondary px-1 rounded">timestamp</code>. Leave empty to use the default Discord
+          embed format.
         </p>
         {!previewButtonsDetected && (
           <div className="rounded-lg border border-dashed border-destructive/40 p-4 bg-destructive/10 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -4701,15 +4893,21 @@ const AlertsTab = () => {
               value={downJson}
               onChange={(e) => setDownJson(e.target.value)}
               rows={12}
-              placeholder={JSON.stringify({
-                username: "Uptime Monitor",
-                embeds: [{
-                  title: "🔴 {{service_name}} is DOWN",
-                  description: "Uptime (24h): {{uptime_window}}\nDuration: {{incident_duration}}\nError: {{error}}",
-                  color: 0xef4444,
-                  timestamp: "{{timestamp}}",
-                }],
-              }, null, 2)}
+              placeholder={JSON.stringify(
+                {
+                  username: "Uptime Monitor",
+                  embeds: [
+                    {
+                      title: "🔴 {{service_name}} is DOWN",
+                      description: "Uptime (24h): {{uptime_window}}\nDuration: {{incident_duration}}\nError: {{error}}",
+                      color: 0xef4444,
+                      timestamp: "{{timestamp}}",
+                    },
+                  ],
+                },
+                null,
+                2,
+              )}
               className="font-mono text-xs"
             />
           </div>
@@ -4726,15 +4924,21 @@ const AlertsTab = () => {
               value={upJson}
               onChange={(e) => setUpJson(e.target.value)}
               rows={12}
-              placeholder={JSON.stringify({
-                username: "Uptime Monitor",
-                embeds: [{
-                  title: "🟢 {{service_name}} recovered",
-                  description: "Uptime (24h): {{uptime_window}}\nIncident lasted: {{incident_duration}}",
-                  color: 0x22c55e,
-                  timestamp: "{{timestamp}}",
-                }],
-              }, null, 2)}
+              placeholder={JSON.stringify(
+                {
+                  username: "Uptime Monitor",
+                  embeds: [
+                    {
+                      title: "🟢 {{service_name}} recovered",
+                      description: "Uptime (24h): {{uptime_window}}\nIncident lasted: {{incident_duration}}",
+                      color: 0x22c55e,
+                      timestamp: "{{timestamp}}",
+                    },
+                  ],
+                },
+                null,
+                2,
+              )}
               className="font-mono text-xs"
             />
           </div>
@@ -4755,15 +4959,15 @@ const AlertsTab = () => {
               <Eye className="h-4 w-4" />
               {previewKind === "down" ? "Down Alert Preview" : "Up Alert Preview"}
             </DialogTitle>
-            <DialogDescription>
-              Exact payload that will be sent to all configured webhooks.
-            </DialogDescription>
+            <DialogDescription>Exact payload that will be sent to all configured webhooks.</DialogDescription>
           </DialogHeader>
           <pre className="bg-secondary/40 rounded-lg p-4 text-xs font-mono overflow-x-auto whitespace-pre-wrap">
             {previewPayload}
           </pre>
           <DialogFooter className="flex items-center gap-3">
-            <Button variant="outline" onClick={() => setPreviewOpen(false)}>Close</Button>
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>
+              Close
+            </Button>
             <Button onClick={sendTestWebhook} disabled={sendingTest}>
               <Play className="h-3.5 w-3.5 mr-1" />
               {sendingTest ? "Sending..." : "Send Test to All Webhooks"}
