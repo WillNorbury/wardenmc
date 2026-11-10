@@ -114,6 +114,7 @@ const helpGroup: NavGroup = {
   label: "Help & Info",
   items: [
     { to: "/support", label: "Support", icon: Headset },
+    { to: "/ban-appeals", label: "Ban Appeals", icon: Shield },
     { to: "/faq", label: "FAQ", icon: HelpCircle },
     { to: "/rules", label: "Rules", icon: ScrollText },
     { to: "/punishments", label: "Punishments", icon: Shield },

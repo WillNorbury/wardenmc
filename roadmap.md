@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Restore /ban-appeals with existing private appeal storage, staff inbox, legacy /appeal alias, navigation and sitemap; real anonymous submission and saved pending record verified, test appeal removed, desktop/phone checked, four route tests pass, build OK. Changelog bd7b5791-68e2-4f22-9bef-90e93569f9e2 published.
+- [ ] Verify signed-in appeal history and email restored-page changelog — no matching requester account for preview session; notification returned 401, requires staff sign-in.
 - [x] Add /forums with a readable "How to apply for staff" topic credited to Will Norbury, sidebar/community links and sitemap; browser opening and refresh verified, four route tests pass, build OK. Changelog 127b4623-ebdf-482b-9617-296ceae2a2fa published.
 - [ ] Email Forums changelog — notification returned 401; staff sign-in required.
 - [ ] Confirm preview-address fix changelog email 4a36676f-4817-45fe-b39a-050d8bb0b37b — corrected notification request canceled; delivery unverified.
