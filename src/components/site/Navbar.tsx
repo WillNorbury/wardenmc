@@ -6,7 +6,8 @@ import { useAuth } from "@/lib/auth";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import logo from "@/assets/warden-network-icon.png";
 import DiscordMark from "./DiscordMark";
-import { LogIn, LogOut, Shield, User as UserIcon, type LucideIcon } from "lucide-react";
+import { LogIn, LogOut, Repeat, Shield, User as UserIcon, type LucideIcon } from "lucide-react";
+import { rememberAccount } from "@/lib/saved-accounts";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -96,6 +97,21 @@ const Navbar = () => {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={async () => {
+                    if (user?.email) {
+                      rememberAccount({
+                        email: user.email,
+                        displayName: (user.user_metadata?.display_name as string | undefined) ?? undefined,
+                        avatarUrl: (user.user_metadata?.avatar_url as string | undefined) ?? undefined,
+                      });
+                    }
+                    await signOut();
+                    nav("/auth?switch=1");
+                  }}
+                >
+                  <Repeat className="mr-2 h-4 w-4" /> Switch account
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={async () => {
                     await signOut();

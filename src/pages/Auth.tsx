@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { listSavedAccounts, rememberAccount, removeSavedAccount, type SavedAccount } from "@/lib/saved-accounts";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -25,6 +27,7 @@ import {
   EyeOff,
   ArrowLeft,
   ArrowRight,
+  X,
 } from "lucide-react";
 import { trackFunnelEvent } from "@/lib/funnel";
 
@@ -71,6 +74,7 @@ const Auth = () => {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [savedAccounts, setSavedAccounts] = useState<SavedAccount[]>(() => listSavedAccounts());
 
   // Funnel: record each time a visitor lands on the sign-up form.
   useEffect(() => {
@@ -80,6 +84,14 @@ const Auth = () => {
   useEffect(() => {
     if (!user) return;
     if (mode === "mfa") return;
+    // Remember this account on the device so it appears in the switch list.
+    if (user.email) {
+      rememberAccount({
+        email: user.email,
+        displayName: (user.user_metadata?.display_name as string | undefined) ?? undefined,
+        avatarUrl: (user.user_metadata?.avatar_url as string | undefined) ?? undefined,
+      });
+    }
     let cancelled = false;
     (async () => {
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -148,6 +160,7 @@ const Auth = () => {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        rememberAccount({ email });
         const needsMfa = await checkMfaAfterSignIn();
         if (!needsMfa) {
           toast.success("Welcome back");
@@ -415,6 +428,58 @@ const Auth = () => {
               <TabsTrigger value="signup">Create account</TabsTrigger>
             </TabsList>
 
+            {mode === "signin" && savedAccounts.length > 0 && (
+              <div className="mb-6 space-y-2">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Switch account
+                </p>
+                {savedAccounts.map((account) => (
+                  <div
+                    key={account.email}
+                    className="flex items-center gap-2 rounded-lg border border-border p-2"
+                  >
+                    <button
+                      type="button"
+                      className="flex min-w-0 flex-1 items-center gap-3 rounded-md p-1 text-left transition-colors hover:bg-muted/60"
+                      onClick={() => {
+                        setEmail(account.email);
+                        setPassword("");
+                      }}
+                    >
+                      <Avatar className="h-8 w-8 shrink-0">
+                        {account.avatarUrl && <AvatarImage src={account.avatarUrl} alt="" />}
+                        <AvatarFallback>
+                          {(account.displayName ?? account.email).charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-medium">
+                          {account.displayName ?? account.email}
+                        </span>
+                        {account.displayName && (
+                          <span className="block truncate text-xs text-muted-foreground">
+                            {account.email}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 text-muted-foreground"
+                      aria-label={`Remove ${account.email} from this device`}
+                      onClick={() => {
+                        removeSavedAccount(account.email);
+                        setSavedAccounts(listSavedAccounts());
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="space-y-3 mb-6">
               <Button
                 type="button"
