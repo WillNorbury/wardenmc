@@ -25,8 +25,7 @@ const inductees = [
     link: "https://discord.warden.rip",
     category: "Discord Server",
     description: "Join our Discord server for more details!",
-    icon: null,
-    discord: true,
+    icon: DiscordMark,
   },
 ];
 
