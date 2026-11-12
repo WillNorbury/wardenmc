@@ -54,6 +54,8 @@ import Checkout from "./pages/Checkout";
 import GameModes from "./pages/GameModes.tsx";
 import Live from "./pages/Live.tsx";
 import FamousStreamers from "./pages/FamousStreamers.tsx";
+import HallOfFame from "./pages/HallOfFame";
+import CreatorHub from "./pages/CreatorHub";
 import Clips from "./pages/Clips";
 import Punishments from "./pages/Punishments";
 import Status from "./pages/Status.tsx";
@@ -81,7 +83,7 @@ const AdminTabRedirect = () => {
 const Shell = () => {
   const { pathname } = useLocation();
   // The Admin console has its own navigation sidebar — hide the site sidebar there.
-  const isBlankPage = pathname === "/famous-streamers";
+  const isBlankPage = ["/famous-streamers", "/hall-of-fame", "/creator-hub"].includes(pathname);
   const hideSidebar = pathname.startsWith("/admin") || isBlankPage;
   return (
     <MaintenanceGate>
@@ -162,6 +164,8 @@ const Shell = () => {
 
               <Route path="/live" element={<Live />} />
               <Route path="/famous-streamers" element={<FamousStreamers />} />
+              <Route path="/hall-of-fame" element={<HallOfFame />} />
+              <Route path="/creator-hub" element={<CreatorHub />} />
               <Route path="/clips" element={<Clips />} />
               <Route path="/status" element={<Status />} />
               <Route path="/status/unsubscribe" element={<StatusUnsubscribe />} />
