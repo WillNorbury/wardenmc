@@ -25,7 +25,8 @@ const inductees = [
     link: "https://discord.warden.rip",
     category: "Discord Server",
     description: "Join our Discord server for more details!",
-    icon: DiscordMark,
+    icon: null,
+    discord: true,
   },
 ];
 
@@ -59,10 +60,10 @@ export default function HallOfFame() {
           {inductees.map((inductee) => {
             const Icon = inductee.icon;
 
-            const cardContent = (
+            const content = (
               <>
                 <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-600">
-                  <Icon className="h-8 w-8" />
+                  {inductee.discord ? <DiscordMark /> : Icon ? <Icon className="h-8 w-8" /> : null}
                 </div>
 
                 <p className="text-sm font-medium text-primary">{inductee.category}</p>
@@ -74,25 +75,21 @@ export default function HallOfFame() {
             );
 
             const className =
-              "relative block overflow-hidden rounded-xl border border-border bg-card p-6 text-center transition-colors";
+              "relative block overflow-hidden rounded-xl border border-border bg-card p-6 text-center transition-colors hover:border-primary/50";
 
-            if (inductee.link) {
-              return (
-                <a
-                  key={inductee.category}
-                  href={inductee.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${className} hover:border-primary/50`}
-                >
-                  {cardContent}
-                </a>
-              );
-            }
-
-            return (
+            return inductee.link ? (
+              <a
+                key={inductee.category}
+                href={inductee.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={className}
+              >
+                {content}
+              </a>
+            ) : (
               <article key={inductee.category} className={className}>
-                {cardContent}
+                {content}
               </article>
             );
           })}
