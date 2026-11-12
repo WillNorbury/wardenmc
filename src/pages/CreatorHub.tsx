@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Code2, Video, Users, Sparkles } from "lucide-react";
+import DiscordMark from "@/components/site/DiscordMark";
 
 const creatorTypes = [
   {

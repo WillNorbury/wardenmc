@@ -1,4 +1,5 @@
 import { Crown, Medal, Trophy, Star } from "lucide-react";
+import DiscordMark from "@/components/site/DiscordMark";
 
 const inductees = [
   {
@@ -18,6 +19,13 @@ const inductees = [
     category: "Community Award",
     description: "Honouring members who go above and beyond for their community.",
     icon: Medal,
+  },
+  {
+    name: "Our Discord",
+    link: "https://discord.warden.rip",
+    category: "Discord Server",
+    description: "Join our Discord server for more details!",
+    icon: DiscordMark,
   },
 ];
 
