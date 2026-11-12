@@ -36,7 +36,7 @@ export default function CreatorHub() {
           </p>
 
           <Link
-            to="/auth"
+            to="/profile"
             className="mt-8 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Join the Community
