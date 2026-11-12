@@ -1,6 +1,6 @@
 // Remembers accounts the visitor has signed in with on this device so the
-// sign-in page can offer one-tap account switching. Only the email, display
-// name and avatar are stored — never passwords or tokens.
+// sign-in page and account menu can show remembered identities. Session tokens
+// are handled separately by account-sessions; passwords are never stored.
 
 export interface SavedAccount {
   email: string;

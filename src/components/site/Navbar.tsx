@@ -6,14 +6,20 @@ import { useAuth } from "@/lib/auth";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import logo from "@/assets/warden-network-icon.png";
 import DiscordMark from "./DiscordMark";
-import { LogIn, LogOut, Repeat, Shield, User as UserIcon, type LucideIcon } from "lucide-react";
-import { rememberAccount } from "@/lib/saved-accounts";
+import { Check, Loader2, LogIn, LogOut, Plus, Repeat, Shield, User as UserIcon, type LucideIcon } from "lucide-react";
+import { listSavedAccounts, type SavedAccount } from "@/lib/saved-accounts";
+import { ADD_ACCOUNT_KEY, hasAccountSession, restoreAccountSession, saveAccountSession } from "@/lib/account-sessions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 
 export const NAV_LINKS: { to: string; label: string; icon?: LucideIcon }[] = [
@@ -28,10 +34,35 @@ export const NAV_LINKS: { to: string; label: string; icon?: LucideIcon }[] = [
 ];
 
 const Navbar = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, session, isAdmin, signOut } = useAuth();
   const nav = useNavigate();
   const { state, isMobile } = useSidebar();
   const [scrolled, setScrolled] = useState(false);
+  const [accounts, setAccounts] = useState<SavedAccount[]>([]);
+  const [switching, setSwitching] = useState(false);
+
+  const addAccount = (email?: string) => {
+    if (!session) return;
+    try {
+      saveAccountSession(session);
+      sessionStorage.setItem(ADD_ACCOUNT_KEY, session.user.id);
+      nav(`/auth?add=1${email ? `&email=${encodeURIComponent(email)}` : ""}`);
+    } catch { toast.error("Allow browser storage to add another account."); }
+  };
+
+  const switchAccount = async (email: string) => {
+    if (switching || email === user?.email?.toLowerCase()) return;
+    if (!hasAccountSession(email)) { addAccount(email); return; }
+    setSwitching(true);
+    try {
+      if (session) saveAccountSession(session);
+      await restoreAccountSession(email);
+      window.location.assign("/dashboard");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not switch account.");
+      addAccount(email);
+    } finally { setSwitching(false); }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -81,10 +112,10 @@ const Navbar = () => {
 
         <div className="ml-auto flex items-center gap-2">
           {user ? (
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={(open) => { if (open) setAccounts(listSavedAccounts()); }}>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="rounded-full">
-                  <UserIcon className="mr-1.5 h-4 w-4" /> Account
+                  {switching ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <UserIcon className="mr-1.5 h-4 w-4" />} Account
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -97,21 +128,27 @@ const Navbar = () => {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={async () => {
-                    if (user?.email) {
-                      rememberAccount({
-                        email: user.email,
-                        displayName: (user.user_metadata?.display_name as string | undefined) ?? undefined,
-                        avatarUrl: (user.user_metadata?.avatar_url as string | undefined) ?? undefined,
-                      });
-                    }
-                    await signOut();
-                    nav("/auth?switch=1");
-                  }}
-                >
-                  <Repeat className="mr-2 h-4 w-4" /> Switch account
-                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger><Repeat className="mr-2 h-4 w-4" /> Switch account</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-64 max-w-[calc(100vw-2rem)]">
+                    {accounts.map(account => (
+                      <DropdownMenuItem key={account.email} disabled={switching} className="gap-3 py-3" onSelect={() => void switchAccount(account.email)}>
+                        <Avatar className="h-8 w-8 shrink-0">
+                          <AvatarImage src={account.avatarUrl} alt="" />
+                          <AvatarFallback>{(account.displayName ?? account.email).charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-medium">{account.displayName ?? account.email}</span>
+                          <span className="block truncate text-xs text-muted-foreground">{account.displayName ? account.email : hasAccountSession(account.email) ? "Signed in" : "Sign-in required"}</span>
+                        </span>
+                        {account.email === user.email?.toLowerCase() && <Check className="h-4 w-4 shrink-0 text-primary" aria-label="Current account" />}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => addAccount()}><Plus className="mr-2 h-4 w-4" /> Add account</DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem onSelect={() => addAccount()}><Plus className="mr-2 h-4 w-4" /> Add account</DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={async () => {
                     await signOut();

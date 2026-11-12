@@ -3,6 +3,8 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { DEFAULT_PREFS, normalizePalette, normalizeTheme, saveAppearance, type UserPreferences } from "@/lib/preferences";
 import { normalizeCustomTheme } from "@/lib/theme-colors";
+import { forgetAccountSession, saveAccountSession } from "@/lib/account-sessions";
+import { useQueryClient } from "@tanstack/react-query";
 
 type AuthCtx = {
   session: Session | null;
@@ -17,11 +19,14 @@ const Ctx = createContext<AuthCtx>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let currentUid: string | undefined;
+    let currentEmail: string | undefined;
     // For OAuth sign-ins (e.g. Google), backfill the profile's display name
     // and photo from the provider when they aren't set yet.
     const syncProviderProfile = async (u: User | undefined) => {
@@ -52,10 +57,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       if (error) console.error("[auth] admin check failed:", error);
       console.log("[auth] admin check", { uid, ctx, isAdmin: data });
-      setIsAdmin(!!data);
+      if (currentUid === uid) setIsAdmin(!!data);
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((e, s) => {
+      if (e === "SIGNED_OUT" && currentEmail) forgetAccountSession(currentEmail);
+      if (currentUid !== s?.user.id) {
+        setIsAdmin(false);
+        queryClient.clear();
+        saveAppearance(DEFAULT_PREFS.theme, DEFAULT_PREFS.palette);
+      }
+      currentUid = s?.user.id;
+      currentEmail = s?.user.email;
+      if (s) { try { saveAccountSession(s); } catch { /* Normal sign-in works without account storage. */ } }
       setSession(s);
       setTimeout(() => {
         checkRole(s?.user?.id, `auth-event:${e}`);
@@ -64,6 +78,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      currentUid = session?.user.id;
+      currentEmail = session?.user.email;
+      if (session) { try { saveAccountSession(session); } catch { /* Normal sign-in works without account storage. */ } }
       setSession(session);
       await checkRole(session?.user?.id, "init");
       await syncProviderProfile(session?.user);
@@ -71,7 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     if (loading) return;
@@ -97,7 +114,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user: session?.user ?? null,
         isAdmin,
         loading,
-        signOut: async () => { await supabase.auth.signOut(); },
+        signOut: async () => {
+          if (session?.user.email) forgetAccountSession(session.user.email);
+          const { error } = await supabase.auth.signOut({ scope: "local" });
+          if (error) throw error;
+        },
       }}
     >
       {children}

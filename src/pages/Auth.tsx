@@ -30,6 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { trackFunnelEvent } from "@/lib/funnel";
+import { ADD_ACCOUNT_KEY, forgetAccountSession, hasAccountSession, restoreAccountSession } from "@/lib/account-sessions";
 
 const schema = z.object({
   email: z.string().email("Invalid email").max(255),
@@ -43,6 +44,8 @@ type SocialProvider = "google";
 const Auth = () => {
   const nav = useNavigate();
   const [searchParams] = useSearchParams();
+  const addingAccount = searchParams.get("add") === "1";
+  const previousAccountId = sessionStorage.getItem(ADD_ACCOUNT_KEY);
   const nextParam = searchParams.get("next") ?? "";
   // Only accept same-origin relative paths (e.g. "/.lovable/oauth/consent?...").
   const safeNext = useMemo(
@@ -50,13 +53,18 @@ const Auth = () => {
     [nextParam],
   );
   const goNext = () => {
+    if (addingAccount) {
+      sessionStorage.removeItem(ADD_ACCOUNT_KEY);
+      window.location.assign("/dashboard");
+      return;
+    }
     if (safeNext === "/") nav("/");
     else window.location.href = safeNext;
   };
   const { user } = useAuth();
 
   const [mode, setMode] = useState<Mode>("signin");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [accountType, setAccountType] = useState<"personal" | "business">("personal");
@@ -83,6 +91,7 @@ const Auth = () => {
 
   useEffect(() => {
     if (!user) return;
+    if (addingAccount && user.id === previousAccountId) return;
     if (mode === "mfa") return;
     // Remember this account on the device so it appears in the switch list.
     if (user.email) {
@@ -111,7 +120,7 @@ const Auth = () => {
     return () => {
       cancelled = true;
     };
-  }, [user, nav, mode]);
+  }, [user, nav, mode, addingAccount, previousAccountId]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -266,7 +275,7 @@ const Auth = () => {
     setSocialLoading(provider);
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: `${window.location.origin}/auth?next=${encodeURIComponent(safeNext)}`,
+        redirect_uri: `${window.location.origin}/auth?${addingAccount ? "add=1&" : ""}next=${encodeURIComponent(safeNext)}`,
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
@@ -419,7 +428,7 @@ const Auth = () => {
               setShowPassword(false);
             }}
           >
-            <h1 className="eclipse-auth-heading">{mode === "signup" ? "Create an account" : "Welcome back"}</h1>
+            <h1 className="eclipse-auth-heading">{mode === "signup" ? "Create an account" : addingAccount ? "Add account" : "Welcome back"}</h1>
             <p className="eclipse-auth-subtitle">
               {mode === "signup" ? "Join the Warden Network community" : "Sign in to continue to your account"}
             </p>
@@ -438,10 +447,22 @@ const Auth = () => {
                     key={account.email}
                     className="flex items-center gap-2 rounded-lg border border-border p-2"
                   >
-                    <button
+                    <Button
                       type="button"
-                      className="flex min-w-0 flex-1 items-center gap-3 rounded-md p-1 text-left transition-colors hover:bg-muted/60"
-                      onClick={() => {
+                      variant="ghost"
+                      disabled={loading}
+                      className="flex h-auto min-w-0 flex-1 justify-start items-center gap-3 rounded-md p-1 text-left"
+                      onClick={async () => {
+                        if (hasAccountSession(account.email)) {
+                          setLoading(true);
+                          try {
+                            await restoreAccountSession(account.email);
+                            window.location.assign("/dashboard");
+                            return;
+                          } catch (error) {
+                            toast.error(error instanceof Error ? error.message : "Please sign in again.");
+                          } finally { setLoading(false); }
+                        }
                         setEmail(account.email);
                         setPassword("");
                       }}
@@ -462,7 +483,7 @@ const Auth = () => {
                           </span>
                         )}
                       </span>
-                    </button>
+                    </Button>
                     <Button
                       type="button"
                       variant="ghost"
@@ -470,6 +491,7 @@ const Auth = () => {
                       className="h-8 w-8 shrink-0 text-muted-foreground"
                       aria-label={`Remove ${account.email} from this device`}
                       onClick={() => {
+                        forgetAccountSession(account.email);
                         removeSavedAccount(account.email);
                         setSavedAccounts(listSavedAccounts());
                       }}
@@ -595,6 +617,9 @@ const Auth = () => {
           </Tabs>
         )}
         <div className="mt-7 pt-5 border-t border-border flex items-center justify-center gap-5 text-sm text-muted-foreground">
+          {addingAccount && previousAccountId && user?.id === previousAccountId && (
+            <Button variant="ghost" onClick={() => { sessionStorage.removeItem(ADD_ACCOUNT_KEY); window.location.assign("/dashboard"); }}>Cancel</Button>
+          )}
           <Link to="/" className="hover:text-foreground transition-colors">
             Back to website
           </Link>

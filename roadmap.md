@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Replace sign-out-based switching with saved signed-in sessions, account-menu selection, Add account, identity validation and account remount/reload isolation; 14 tests pass, Add account desktop/phone verified, build OK, changelog 7a0c87db-f029-466d-b6be-d7722021b3d4 published.
+- [ ] Verify switching between two real signed-in accounts — requester has no matching account for managed preview sign-in; needs preview sign-in. Changelog email returned 401 and needs staff sign-in.
 - [x] Restore /ban-appeals with existing private appeal storage, staff inbox, legacy /appeal alias, navigation and sitemap; real anonymous submission and saved pending record verified, test appeal removed, desktop/phone checked, four route tests pass, build OK. Changelog bd7b5791-68e2-4f22-9bef-90e93569f9e2 published.
 - [ ] Verify signed-in appeal history and email restored-page changelog — no matching requester account for preview session; notification returned 401, requires staff sign-in.
 - [x] Add /forums with a readable "How to apply for staff" topic credited to Will Norbury, sidebar/community links and sitemap; browser opening and refresh verified, four route tests pass, build OK. Changelog 127b4623-ebdf-482b-9617-296ceae2a2fa published.

@@ -7,7 +7,7 @@ import { UpdatePrompt } from "@/components/site/UpdatePrompt";
 import VersionChecker from "@/components/site/VersionChecker";
 import { CustomCursor } from "@/components/site/CustomCursor";
 import { IntroVideoGate } from "@/components/site/IntroVideoGate";
-import { AuthProvider } from "@/lib/auth";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { DeviceVerificationGate } from "@/components/site/DeviceVerificationGate";
 import { MaintenanceGate } from "./components/site/MaintenanceGate.tsx";
@@ -183,8 +183,9 @@ const Shell = () => {
 // maintenance, device prompts, or the welcome tour in the consent popup.
 const AppContent = () => {
   const { pathname } = useLocation();
+  const { user } = useAuth();
   if (pathname === "/oauth/twitch/return") return <TwitchReturn />;
-  return <DeviceVerificationGate><CartProvider><Shell /></CartProvider></DeviceVerificationGate>;
+  return <DeviceVerificationGate key={user?.id ?? "signed-out"}><CartProvider><Shell /></CartProvider></DeviceVerificationGate>;
 };
 
 const App = () => (
