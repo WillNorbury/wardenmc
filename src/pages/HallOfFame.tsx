@@ -1,7 +1,17 @@
+import type React from "react";
 import { Crown, Medal, Trophy, Star } from "lucide-react";
 import DiscordMark from "@/components/site/DiscordMark";
 
-const inductees = [
+type Inductee = {
+  name: string;
+  category: string;
+  description: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  discord?: boolean;
+  link?: string;
+};
+
+const inductees: Inductee[] = [
   {
     name: "Featured Creator",
     category: "Creator of the Year",
