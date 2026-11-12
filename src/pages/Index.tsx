@@ -32,14 +32,21 @@ const TILES = [
   { to: "/staff", icon: Shield, title: "Staff", text: "Meet the team behind WardenMC." },
   { to: "/rules", icon: BookOpen, title: "Rules", text: "How we keep things fair." },
   { to: "/faq", icon: HelpCircle, title: "FAQ", text: "Quick answers to common questions." },
-  { to: "/discord", icon: DiscordMark, title: "Discord", text: "Join the conversation.", big: true },
+  { to: "/discord", icon: DiscordMark, title: "Discord", text: "Join the conversation." },
+  { to: "/yapin", icon: MessageCircle, title: "Yapin", text: "Join the Yapin conversation." },
 ];
 
 type Plugin = { id: string; name: string; slug: string | null; short_id: string; description: string | null };
 type Post = { id: string; content: string; created_at: string };
 type Entry = { id: string; title: string; category: string; entry_date: string };
 type Partner = { id: string; label: string; url: string; description: string | null };
-type Member = { id: string; display_name: string | null; mc_username: string | null; avatar_url: string | null; created_at: string };
+type Member = {
+  id: string;
+  display_name: string | null;
+  mc_username: string | null;
+  avatar_url: string | null;
+  created_at: string;
+};
 
 const SectionHeading = ({ eyebrow, title, to }: { eyebrow: string; title: string; to: string }) => (
   <div className="mb-6 flex items-end justify-between gap-4">
@@ -72,11 +79,30 @@ const Index = () => {
     let cancelled = false;
     (async () => {
       const [pl, po, ch, pa, mem, plCount, memCount, poCount, dlSum] = await Promise.all([
-        supabase.from("plugins").select("id,name,slug,short_id,description").eq("published", true).order("created_at", { ascending: false }).limit(6),
+        supabase
+          .from("plugins")
+          .select("id,name,slug,short_id,description")
+          .eq("published", true)
+          .order("created_at", { ascending: false })
+          .limit(6),
         supabase.from("posts").select("id,content,created_at").order("created_at", { ascending: false }).limit(5),
-        supabase.from("changelog_entries").select("id,title,category,entry_date").eq("published", true).order("entry_date", { ascending: false }).limit(4),
-        supabase.from("partners").select("id,label,url,description").eq("is_active", true).order("sort_order", { ascending: true }).limit(6),
-        supabase.from("profiles").select("id,display_name,mc_username,avatar_url,created_at").order("created_at", { ascending: false }).limit(8),
+        supabase
+          .from("changelog_entries")
+          .select("id,title,category,entry_date")
+          .eq("published", true)
+          .order("entry_date", { ascending: false })
+          .limit(4),
+        supabase
+          .from("partners")
+          .select("id,label,url,description")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .limit(6),
+        supabase
+          .from("profiles")
+          .select("id,display_name,mc_username,avatar_url,created_at")
+          .order("created_at", { ascending: false })
+          .limit(8),
         supabase.from("plugins").select("id", { count: "exact", head: true }).eq("published", true),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("posts").select("id", { count: "exact", head: true }),
@@ -201,9 +227,7 @@ const Index = () => {
                     <Package className="h-5 w-5 shrink-0 text-primary" />
                     <h3 className="truncate font-display text-2xl tracking-wide">{p.name}</h3>
                   </div>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
-                    {p.description || "A community plugin."}
-                  </p>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{p.description || "A community plugin."}</p>
                   <p className="mt-3 flex items-center gap-1 text-xs text-primary opacity-0 transition-opacity group-hover:opacity-100">
                     View plugin <ArrowRight className="h-3.5 w-3.5" />
                   </p>
@@ -232,7 +256,11 @@ const Index = () => {
                     <Link key={p.id} to="/posts" className="block px-5 py-4 transition-colors hover:bg-primary/5">
                       <p className="line-clamp-2">{p.content}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {new Date(p.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        {new Date(p.created_at).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
                       </p>
                     </Link>
                   ))}
@@ -261,10 +289,16 @@ const Index = () => {
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{e.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(e.entry_date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                          {new Date(e.entry_date).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
                         </p>
                       </div>
-                      <Badge variant="secondary" className="shrink-0 capitalize">{e.category}</Badge>
+                      <Badge variant="secondary" className="shrink-0 capitalize">
+                        {e.category}
+                      </Badge>
                     </Link>
                   ))}
                 </div>
@@ -280,9 +314,7 @@ const Index = () => {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {members.map((m) => {
                 const name = m.display_name ?? m.mc_username ?? "Unknown";
-                const skin = m.mc_username
-                  ? `https://mc-heads.net/avatar/${m.mc_username}/96`
-                  : null;
+                const skin = m.mc_username ? `https://mc-heads.net/avatar/${m.mc_username}/96` : null;
                 return (
                   <Link
                     key={m.id}
@@ -296,7 +328,12 @@ const Index = () => {
                     <div className="min-w-0">
                       <h3 className="truncate font-semibold">{name}</h3>
                       <p className="truncate text-xs text-muted-foreground">
-                        Joined {new Date(m.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        Joined{" "}
+                        {new Date(m.created_at).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
                       </p>
                     </div>
                   </Link>
