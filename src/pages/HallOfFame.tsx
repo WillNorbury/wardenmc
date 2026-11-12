@@ -55,15 +55,12 @@ export default function HallOfFame() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {inductees.map((inductee) => {
             const Icon = inductee.icon;
 
-            return (
-              <article
-                key={inductee.category}
-                className="relative overflow-hidden rounded-xl border border-border bg-card p-6 text-center"
-              >
+            const cardContent = (
+              <>
                 <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-600">
                   <Icon className="h-8 w-8" />
                 </div>
@@ -73,6 +70,29 @@ export default function HallOfFame() {
                 <h3 className="mt-2 text-xl font-bold">{inductee.name}</h3>
 
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">{inductee.description}</p>
+              </>
+            );
+
+            const className =
+              "relative block overflow-hidden rounded-xl border border-border bg-card p-6 text-center transition-colors";
+
+            if (inductee.link) {
+              return (
+                <a
+                  key={inductee.category}
+                  href={inductee.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${className} hover:border-primary/50`}
+                >
+                  {cardContent}
+                </a>
+              );
+            }
+
+            return (
+              <article key={inductee.category} className={className}>
+                {cardContent}
               </article>
             );
           })}
