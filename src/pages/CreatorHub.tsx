@@ -57,29 +57,24 @@ export default function CreatorHub() {
           {creatorTypes.map((type) => {
             const Icon = type.icon;
 
-            return (
-              <div
-                key={type.title}
-                className="rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/50"
-              >
+            const className =
+              "block rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/50";
+            const content = (
+              <>
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Icon className="h-6 w-6" />
                 </div>
-
                 <h2 className="text-xl font-semibold">{type.title}</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{type.description}</p>
-              </div>
-            const className =
-              "relative block overflow-hidden rounded-xl border border-border bg-card p-6 text-center transition-colors hover:border-primary/50";
+              </>
+            );
 
-            return inductee.link ? (
-              <a
-                key={inductee.category}
-                href={inductee.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={className}
-              >
+            return type.link ? (
+              <a key={type.title} href={type.link} target="_blank" rel="noopener noreferrer" className={className}>
+                {content}
+              </a>
+            ) : (
+              <div key={type.title} className={className}>
                 {content}
               </div>
             );
