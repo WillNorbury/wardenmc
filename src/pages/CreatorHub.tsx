@@ -18,6 +18,12 @@ const creatorTypes = [
     title: "Community Leaders",
     description: "Connect communities, organise events and help bring players together.",
   },
+  {
+    icon: DiscordMark,
+    title: "Our Discord",
+    link: "https://discord.warden.rip",
+    description: "Join our Discord server for more details!",
+  },
 ];
 
 export default function CreatorHub() {
@@ -62,6 +68,19 @@ export default function CreatorHub() {
 
                 <h2 className="text-xl font-semibold">{type.title}</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{type.description}</p>
+              </div>
+            const className =
+              "relative block overflow-hidden rounded-xl border border-border bg-card p-6 text-center transition-colors hover:border-primary/50";
+
+            return inductee.link ? (
+              <a
+                key={inductee.category}
+                href={inductee.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={className}
+              >
+                {content}
               </div>
             );
           })}

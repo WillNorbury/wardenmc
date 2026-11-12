@@ -20,13 +20,6 @@ const inductees = [
     description: "Honouring members who go above and beyond for their community.",
     icon: Medal,
   },
-  {
-    name: "Our Discord",
-    link: "https://discord.warden.rip",
-    category: "Discord Server",
-    description: "Join our Discord server for more details!",
-    icon: DiscordMark,
-  },
 ];
 
 export default function HallOfFame() {
