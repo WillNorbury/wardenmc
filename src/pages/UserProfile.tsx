@@ -364,6 +364,18 @@ const UserProfile = () => {
     toast.success("Profile updated");
   };
 
+  useEffect(() => {
+    const onFollowed = (event: Event) => {
+      const detail = (event as CustomEvent<{ followerId: string; followeeId: string }>).detail;
+      if (detail?.followerId === user?.id && detail?.followeeId === profile?.id && !isFollowing) {
+        setIsFollowing(true);
+        setFollowerCount(count => count + 1);
+      }
+    };
+    window.addEventListener("site-user-followed", onFollowed);
+    return () => window.removeEventListener("site-user-followed", onFollowed);
+  }, [user?.id, profile?.id, isFollowing]);
+
   const toggleFollow = async () => {
     if (!user) { toast.error("Sign in to follow players"); return; }
     if (!profile) return;
@@ -488,7 +500,7 @@ const UserProfile = () => {
         <div className="min-w-0">
         <div className="h-14 px-3 flex items-center gap-5 bg-background/95 border-b border-border sticky top-0 z-20 backdrop-blur-sm">
           <Button variant="ghost" size="icon" aria-label="Back" onClick={() => navigate(-1)} className="shrink-0 rounded-full"><ArrowLeft className="h-5 w-5" /></Button>
-          <div className="min-w-0 flex-1">
+          <div data-context-user-id={profile.id} className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 font-bold text-lg leading-tight truncate">{profile.display_name ?? "Unnamed Player"}{((profile as any).verified || roles.some(isVerifiedRole) || followerCount >= 1000) && <VerifiedBadge className="h-4 w-4 shrink-0" />}</div>
             <div className="text-xs text-muted-foreground">{posts.length} post{posts.length === 1 ? "" : "s"}</div>
           </div>
@@ -496,9 +508,9 @@ const UserProfile = () => {
         </div>
 
         {/* Open cover area, as on a social profile */}
-        <div className="h-32 sm:h-44 bg-card" />
+        <div data-context-user-id={profile.id} className="h-32 sm:h-44 bg-card" />
 
-        <div className="px-4">
+        <div data-context-user-id={profile.id} className="px-4">
           {/* Avatar + actions */}
           <div className="flex items-end justify-between gap-2 -mt-12 sm:-mt-16">
             <div className="relative shrink-0">

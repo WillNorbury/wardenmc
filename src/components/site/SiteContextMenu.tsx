@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate, useNavigationType } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Copy, ExternalLink, Home, LifeBuoy, Link2, MessageSquare, RefreshCw, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Copy, ExternalLink, Home, LifeBuoy, Link2, MessageSquare, RefreshCw, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 import {
   ContextMenu,
@@ -13,7 +13,9 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { getContextLink, getContextMenuContainer, usesNativeContextMenu } from "@/lib/site-context-menu";
+import { getContextLink, getContextMenuContainer, getContextUser, usesNativeContextMenu } from "@/lib/site-context-menu";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import wardenIcon from "@/assets/warden-network-icon.png";
 
 const destinations = [
@@ -30,11 +32,13 @@ type BrowserNavigation = { canGoBack: boolean; canGoForward: boolean };
 export function SiteContextMenu({ children }: { children: ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [followBusy, setFollowBusy] = useState(false);
   const navigationType = useNavigationType();
   const [open, setOpen] = useState(false);
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const trigger = useRef<HTMLSpanElement>(null);
-  const [context, setContext] = useState({ link: null as string | null, selection: "", canGoBack: false, canGoForward: false });
+  const [context, setContext] = useState({ link: null as string | null, userId: null as string | null, selection: "", canGoBack: false, canGoForward: false });
   const maximumIndex = useRef(Number(window.history.state?.idx) || 0);
 
   useEffect(() => {
@@ -62,6 +66,7 @@ export function SiteContextMenu({ children }: { children: ReactNode }) {
       setContainer(getContextMenuContainer(event.target));
       setContext({
         link: getContextLink(event.target),
+        userId: getContextUser(event.target),
         selection: window.getSelection()?.toString() ?? "",
         canGoBack: browserNavigation?.canGoBack ?? index > 0,
         canGoForward: browserNavigation?.canGoForward ?? index < maximumIndex.current,
@@ -94,6 +99,32 @@ export function SiteContextMenu({ children }: { children: ReactNode }) {
     }
   };
 
+  const followUser = async () => {
+    const followeeId = context.userId;
+    if (!followeeId || followBusy || followeeId === user?.id) return;
+    if (!user) {
+      toast.error("Sign in to follow users");
+      navigate("/auth");
+      return;
+    }
+    setFollowBusy(true);
+    try {
+      const { error } = await supabase.from("user_follows").insert({ follower_id: user.id, followee_id: followeeId });
+      if (error?.code === "23505") {
+        toast.success("Already following this user");
+      } else if (error) {
+        toast.error("Could not follow this user. Please try again.");
+      } else {
+        window.dispatchEvent(new CustomEvent("site-user-followed", { detail: { followerId: user.id, followeeId } }));
+        toast.success("User followed");
+      }
+    } catch {
+      toast.error("Could not follow this user. Please try again.");
+    } finally {
+      setFollowBusy(false);
+    }
+  };
+
   return (
     <ContextMenu open={open} onOpenChange={setOpen}>
       {children}
@@ -103,6 +134,12 @@ export function SiteContextMenu({ children }: { children: ReactNode }) {
           <img src={wardenIcon} alt="" className="h-5 w-5" />
           WardenMC
         </ContextMenuLabel>
+        {context.userId && context.userId !== user?.id && <>
+          <ContextMenuItem disabled={followBusy} onSelect={() => void followUser()} className="gap-2 py-2">
+            <UserPlus className="h-4 w-4" /> Follow user
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+        </>}
         <ContextMenuItem disabled={!context.canGoBack} onSelect={() => navigate(-1)} className="gap-2 py-2">
           <ArrowLeft className="h-4 w-4" /> Back
         </ContextMenuItem>

@@ -114,7 +114,7 @@ const Users = () => {
                   return (
                     <Reveal key={m.id} delay={Math.min(i, 12) * 40}>
                       <GlassCard interactive className="h-full">
-                        <div className="flex items-center gap-4 p-5">
+                        <div data-context-user-id={m.id} className="flex items-center gap-4 p-5">
                           {isLive && m.twitch_login ? (
                             <a
                               href={`https://twitch.tv/${m.twitch_login}`}

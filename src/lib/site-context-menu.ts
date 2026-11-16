@@ -31,3 +31,10 @@ export function getContextLink(target: EventTarget | null): string | null {
     return null;
   }
 }
+
+/** Cards carry the exact account ID, including avatars that link to Twitch. */
+export function getContextUser(target: EventTarget | null): string | null {
+  if (!(target instanceof Element)) return null;
+  const id = target.closest('[data-context-user-id]')?.getAttribute('data-context-user-id');
+  return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? id : null;
+}

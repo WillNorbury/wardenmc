@@ -154,7 +154,7 @@ const Staff = () => {
                       return (
                         <Reveal key={m.user_id} delay={i * 45}>
                           <GlassCard interactive className="h-full">
-                            <div className="p-5">
+                            <div data-context-user-id={m.user_id} className="p-5">
                               <Link
                                 to={userProfilePath({
                                   id: m.user_id,

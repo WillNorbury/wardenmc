@@ -2,11 +2,14 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SiteContextMenu } from "@/components/site/SiteContextMenu";
-import { getContextLink, getContextMenuContainer, usesNativeContextMenu } from "@/lib/site-context-menu";
+import { getContextLink, getContextMenuContainer, getContextUser, usesNativeContextMenu } from "@/lib/site-context-menu";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import Lightbox from "@/components/site/Lightbox";
 
 const { writeText, success, error } = vi.hoisted(() => ({ writeText: vi.fn(), success: vi.fn(), error: vi.fn() }));
+const { auth, insert, from } = vi.hoisted(() => ({ auth: { user: null as { id: string } | null }, insert: vi.fn(), from: vi.fn() }));
+vi.mock("@/lib/auth", () => ({ useAuth: () => auth }));
+vi.mock("@/integrations/supabase/client", () => ({ supabase: { from } }));
 vi.mock("sonner", () => ({ toast: { success, error } }));
 
 function Fixture() {
@@ -23,6 +26,9 @@ describe("site right-click actions", () => {
     writeText.mockReset().mockResolvedValue(undefined);
     success.mockReset();
     error.mockReset();
+    auth.user = null;
+    insert.mockReset().mockResolvedValue({ error: null });
+    from.mockReset().mockReturnValue({ insert });
   });
   afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
@@ -31,6 +37,60 @@ describe("site right-click actions", () => {
     fireEvent.contextMenu(screen.getByTestId("page"), { clientX: 300, clientY: 200 });
     fireEvent.click(await screen.findByRole("menuitem", { name: "Copy page link" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(window.location.href));
+  });
+
+  const memberId = "dac096a4-e8ab-4cb2-9b60-8aa4de76dd07";
+  const viewerId = "00000000-0000-4000-8000-000000000001";
+  function MemberFixture() {
+    const location = useLocation();
+    return <SiteContextMenu><div data-context-user-id={memberId}><a href="https://twitch.tv/kaicenat">Live member</a></div><output data-testid="location">{location.pathname}</output></SiteContextMenu>;
+  }
+
+  it("follows the exact member behind a Twitch avatar without navigating", async () => {
+    auth.user = { id: viewerId };
+    render(<MemoryRouter initialEntries={["/users"]}><MemberFixture /></MemoryRouter>);
+    fireEvent.contextMenu(screen.getByText("Live member"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Follow user" }));
+    await waitFor(() => expect(insert).toHaveBeenCalledWith({ follower_id: viewerId, followee_id: memberId }));
+    expect(from).toHaveBeenCalledWith("user_follows");
+    expect(screen.getByTestId("location")).toHaveTextContent("/users");
+  });
+
+  it("requires sign-in before following", async () => {
+    render(<MemoryRouter><MemberFixture /></MemoryRouter>);
+    fireEvent.contextMenu(screen.getByText("Live member"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Follow user" }));
+    await waitFor(() => expect(screen.getByTestId("location")).toHaveTextContent("/auth"));
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("does not follow the signed-in user's own profile", async () => {
+    auth.user = { id: memberId };
+    render(<MemoryRouter><MemberFixture /></MemoryRouter>);
+    fireEvent.contextMenu(screen.getByText("Live member"));
+    await screen.findByRole("menu");
+    expect(screen.queryByRole("menuitem", { name: "Follow user" })).not.toBeInTheDocument();
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("keeps an existing follow rather than toggling it off", async () => {
+    auth.user = { id: viewerId };
+    insert.mockResolvedValue({ error: { code: "23505" } });
+    render(<MemoryRouter><MemberFixture /></MemoryRouter>);
+    fireEvent.contextMenu(screen.getByText("Live member"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Follow user" }));
+    await waitFor(() => expect(success).toHaveBeenCalledWith("Already following this user"));
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("does not report a failed follow as successful", async () => {
+    auth.user = { id: viewerId };
+    insert.mockResolvedValue({ error: { code: "42501" } });
+    render(<MemoryRouter><MemberFixture /></MemoryRouter>);
+    fireEvent.contextMenu(screen.getByText("Live member"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Follow user" }));
+    await waitFor(() => expect(error).toHaveBeenCalledTimes(1));
+    expect(success).not.toHaveBeenCalled();
   });
 
   it("copies the clicked link rather than the current page", async () => {
@@ -108,6 +168,12 @@ describe("site right-click actions", () => {
 });
 
 describe("context target handling", () => {
+  it("rejects invalid account markers and unrelated targets", () => {
+    const card = document.createElement("div");
+    card.dataset.contextUserId = "not-an-account";
+    expect(getContextUser(card.appendChild(document.createElement("span")))).toBeNull();
+    expect(getContextUser(document.createElement("a"))).toBeNull();
+  });
   it.each(["input", "textarea", "select", "video", "audio", "iframe"])("preserves the native menu for %s", tag => {
     expect(usesNativeContextMenu(document.createElement(tag))).toBe(true);
   });
