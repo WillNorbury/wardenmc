@@ -98,7 +98,7 @@ export function SiteContextMenu({ children }: { children: ReactNode }) {
     <ContextMenu open={open} onOpenChange={setOpen}>
       {children}
       <ContextMenuTrigger ref={trigger} className="pointer-events-none sr-only" aria-hidden="true" />
-      <ContextMenuContent container={container} aria-label="WardenMC right-click menu" collisionPadding={8} className="z-[110] w-60 max-w-[calc(100vw-1rem)] max-h-[var(--radix-context-menu-content-available-height)] overflow-y-auto" onClick={event => event.stopPropagation()} onPointerDown={event => event.stopPropagation()}>
+      <ContextMenuContent container={container} data-site-context-menu="true" aria-label="WardenMC right-click menu" collisionPadding={8} className="z-[110] w-60 max-w-[calc(100vw-1rem)] max-h-[var(--radix-context-menu-content-available-height)] overflow-y-auto" onClick={event => event.stopPropagation()} onPointerDown={event => event.stopPropagation()}>
         <ContextMenuLabel className="flex items-center gap-2 border-b border-border px-2 pb-3 pt-2">
           <img src={wardenIcon} alt="" className="h-5 w-5" />
           WardenMC

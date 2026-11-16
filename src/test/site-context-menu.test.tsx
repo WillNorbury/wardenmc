@@ -2,8 +2,9 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SiteContextMenu } from "@/components/site/SiteContextMenu";
-import { getContextLink, usesNativeContextMenu } from "@/lib/site-context-menu";
+import { getContextLink, getContextMenuContainer, usesNativeContextMenu } from "@/lib/site-context-menu";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import Lightbox from "@/components/site/Lightbox";
 
 const { writeText, success, error } = vi.hoisted(() => ({ writeText: vi.fn(), success: vi.fn(), error: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { success, error } }));
@@ -95,6 +96,15 @@ describe("site right-click actions", () => {
     expect(fireEvent.contextMenu(screen.getByText("Choice"))).toBe(true);
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
+
+  it("dismisses only the context menu when Escape is pressed over an image preview", async () => {
+    const onClose = vi.fn();
+    render(<MemoryRouter><SiteContextMenu><Lightbox src="/image.png" alt="Preview image" onClose={onClose} /></SiteContextMenu></MemoryRouter>);
+    fireEvent.contextMenu(screen.getByRole("img", { name: "Preview image" }));
+    const menu = await screen.findByRole("menu", { name: "WardenMC right-click menu" });
+    fireEvent.keyDown(menu, { key: "Escape" });
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });
 
 describe("context target handling", () => {
@@ -113,5 +123,19 @@ describe("context target handling", () => {
     const anchor = document.createElement("a");
     anchor.href = href;
     expect(getContextLink(anchor)).toBeNull();
+  });
+  it("puts the menu in the fullscreen element rather than its containing dialog", () => {
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    const fullscreen = dialog.appendChild(document.createElement("div"));
+    const target = fullscreen.appendChild(document.createElement("button"));
+    const previous = Object.getOwnPropertyDescriptor(document, "fullscreenElement");
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: fullscreen });
+    try {
+      expect(getContextMenuContainer(target)).toBe(fullscreen);
+    } finally {
+      if (previous) Object.defineProperty(document, "fullscreenElement", previous);
+      else Reflect.deleteProperty(document, "fullscreenElement");
+    }
   });
 });

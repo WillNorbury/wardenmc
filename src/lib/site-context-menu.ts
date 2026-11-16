@@ -9,9 +9,12 @@ export function usesNativeContextMenu(target: EventTarget | null, shiftKey = fal
 /** Keep the menu inside a modal's focus/dismissal boundary or fullscreen layer. */
 export function getContextMenuContainer(target: EventTarget | null): HTMLElement | null {
   if (!(target instanceof Element)) return null;
+  if (document.fullscreenElement instanceof HTMLElement && document.fullscreenElement.contains(target)) {
+    return document.fullscreenElement;
+  }
   const modal = target.closest('[role="dialog"], [role="alertdialog"]');
   if (modal instanceof HTMLElement) return modal;
-  return document.fullscreenElement instanceof HTMLElement ? document.fullscreenElement : null;
+  return null;
 }
 
 /** Only ordinary web links may be opened or copied by the site menu. */

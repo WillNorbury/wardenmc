@@ -12,7 +12,7 @@ export default function Lightbox({ src, alt = "", onClose }: LightboxProps) {
   useEffect(() => {
     if (!src) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !e.defaultPrevented && !document.querySelector('[data-site-context-menu="true"]')) onClose();
     };
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;

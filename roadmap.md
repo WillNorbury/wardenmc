@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Sweep right-click behavior across all routed pages, pop-ups, confirmations, gates, menus and media; fix shared inconsistencies without changing permissions or saved records.
+- [x] Sweep right-click behavior: read 56 routed screens, 26 pop-up consumers, shared controls, gates and media; fixed separate-root coverage, modal dismissal, image-preview Escape and nested fullscreen placement. Current-source browser checks and 28 tests pass, build OK. Private pop-ups remain code-reviewed only; preview cached old modules during validation. No permissions/settings/settled records changed. Changelog 7e67b17f-5ceb-4067-8746-d6fa5a175140 published.
+- [ ] Email sweep changelog 7e67b17f-5ceb-4067-8746-d6fa5a175140 — notification returned 401; staff sign-in required.
 - [x] Add a working site-wide right-click menu: page/link/selection copying, new-tab links, Go to destinations, Back/Forward/Reload and dismissal verified in the browser; native editing, Shift-right-click and touch fallback preserved; 23 tests pass, build OK. Changelog 554ba2ca-73a9-4dd3-9c83-f110314235da published.
 - [ ] Email right-click menu changelog 554ba2ca-73a9-4dd3-9c83-f110314235da — notification returned 401; staff sign-in required.
 - [x] Add blank Hall of Fame (/hall-of-fame) and Creator Hub (/creator-hub) pages; direct links, refresh, metadata and blank canvas verified, four route tests pass, sitemap updated, build OK; changelog 0c3ae3ae-b297-4400-88d0-11d10c2b45e4 published.
