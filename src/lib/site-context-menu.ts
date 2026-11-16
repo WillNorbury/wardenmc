@@ -2,8 +2,16 @@
 export function usesNativeContextMenu(target: EventTarget | null, shiftKey = false): boolean {
   if (shiftKey || !(target instanceof Element)) return true;
   return Boolean(target.closest(
-    'input, textarea, select, [contenteditable]:not([contenteditable="false"]), video, audio, iframe, [data-native-context-menu], [role="menu"]',
+    'input, textarea, select, [contenteditable]:not([contenteditable="false"]), video, audio, iframe, [data-native-context-menu], [role="menu"], [role="listbox"], [role="combobox"]',
   ));
+}
+
+/** Keep the menu inside a modal's focus/dismissal boundary or fullscreen layer. */
+export function getContextMenuContainer(target: EventTarget | null): HTMLElement | null {
+  if (!(target instanceof Element)) return null;
+  const modal = target.closest('[role="dialog"], [role="alertdialog"]');
+  if (modal instanceof HTMLElement) return modal;
+  return document.fullscreenElement instanceof HTMLElement ? document.fullscreenElement : null;
 }
 
 /** Only ordinary web links may be opened or copied by the site menu. */

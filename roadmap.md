@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Sweep right-click behavior across all routed pages, pop-ups, confirmations, gates, menus and media; fix shared inconsistencies without changing permissions or saved records.
 - [x] Add a working site-wide right-click menu: page/link/selection copying, new-tab links, Go to destinations, Back/Forward/Reload and dismissal verified in the browser; native editing, Shift-right-click and touch fallback preserved; 23 tests pass, build OK. Changelog 554ba2ca-73a9-4dd3-9c83-f110314235da published.
 - [ ] Email right-click menu changelog 554ba2ca-73a9-4dd3-9c83-f110314235da — notification returned 401; staff sign-in required.
 - [x] Add blank Hall of Fame (/hall-of-fame) and Creator Hub (/creator-hub) pages; direct links, refresh, metadata and blank canvas verified, four route tests pass, sitemap updated, build OK; changelog 0c3ae3ae-b297-4400-88d0-11d10c2b45e4 published.

@@ -3,6 +3,7 @@ import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SiteContextMenu } from "@/components/site/SiteContextMenu";
 import { getContextLink, usesNativeContextMenu } from "@/lib/site-context-menu";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
 const { writeText, success, error } = vi.hoisted(() => ({ writeText: vi.fn(), success: vi.fn(), error: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { success, error } }));
@@ -66,6 +67,32 @@ describe("site right-click actions", () => {
   it("does not cancel the native editing menu", () => {
     render(<MemoryRouter><Fixture /></MemoryRouter>);
     expect(fireEvent.contextMenu(screen.getByRole("textbox", { name: "Email" }))).toBe(true);
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("copies inside a modal without dismissing that modal", async () => {
+    const dismiss = vi.fn();
+    render(<MemoryRouter><SiteContextMenu><Dialog defaultOpen onOpenChange={dismiss}><DialogContent><DialogTitle>Modal content</DialogTitle><DialogDescription>Modal details</DialogDescription></DialogContent></Dialog></SiteContextMenu></MemoryRouter>);
+    fireEvent.contextMenu(screen.getByRole("heading", { name: "Modal content" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Copy page link" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(window.location.href));
+    expect(dismiss).not.toHaveBeenCalled();
+  });
+
+  it("handles an independently rendered confirmation without triggering its backdrop", async () => {
+    render(<MemoryRouter><Fixture /></MemoryRouter>);
+    const backdrop = vi.fn();
+    const external = render(<div role="alertdialog" onClick={backdrop}><h2>Separate confirmation</h2></div>);
+    fireEvent.contextMenu(screen.getByRole("heading", { name: "Separate confirmation" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Copy page link" }));
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(window.location.href));
+    expect(backdrop).not.toHaveBeenCalled();
+    external.unmount();
+  });
+
+  it("leaves custom selectors' own menus untouched", () => {
+    render(<MemoryRouter><SiteContextMenu><div role="listbox"><span>Choice</span></div></SiteContextMenu></MemoryRouter>);
+    expect(fireEvent.contextMenu(screen.getByText("Choice"))).toBe(true);
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
 });
