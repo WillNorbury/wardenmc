@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UpdatePrompt } from "@/components/site/UpdatePrompt";
 import VersionChecker from "@/components/site/VersionChecker";
 import { CustomCursor } from "@/components/site/CustomCursor";
+import { SiteContextMenu } from "@/components/site/SiteContextMenu";
 import { IntroVideoGate } from "@/components/site/IntroVideoGate";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
@@ -201,7 +202,7 @@ const App = () => (
       <UpdatePrompt />
       <BrowserRouter>
         <AuthProvider>
-          <AppContent />
+          <SiteContextMenu><AppContent /></SiteContextMenu>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
