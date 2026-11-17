@@ -4296,6 +4296,13 @@ export type Database = {
         Returns: string
       }
       mc_server_rotate_secret: { Args: { _server_id: string }; Returns: string }
+      owner_list_user_emails: {
+        Args: never
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       record_login_streak: {
         Args: never
         Returns: {
