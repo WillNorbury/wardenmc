@@ -526,6 +526,7 @@ const UsersTab = () => {
   const [originalEmail, setOriginalEmail] = useState("");
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [emails, setEmails] = useState<Record<string, string>>({});
 
   const openEdit = async (p: Profile) => {
     setEditing(p);
@@ -593,6 +594,11 @@ const UsersTab = () => {
     ]);
     setProfiles((p ?? []) as Profile[]);
     setRoles((r ?? []) as RoleRow[]);
+    // Only succeeds for the site owner's own account; everyone else gets "forbidden".
+    const { data: em, error: emErr } = await (supabase.rpc as any)("owner_list_user_emails");
+    if (!emErr && Array.isArray(em)) {
+      setEmails(Object.fromEntries(em.map((x: { user_id: string; email: string }) => [x.user_id, x.email])));
+    }
   };
   useEffect(() => {
     load();
@@ -681,7 +687,8 @@ const UsersTab = () => {
     return (
       (p.display_name ?? "").toLowerCase().includes(q) ||
       (p.mc_username ?? "").toLowerCase().includes(q) ||
-      p.id.toLowerCase().includes(q)
+      p.id.toLowerCase().includes(q) ||
+      (emails[p.id] ?? "").toLowerCase().includes(q)
     );
   });
 
@@ -734,6 +741,9 @@ const UsersTab = () => {
                       {p.display_name ?? p.mc_username ?? p.id.slice(0, 8)}
                     </div>
                     <div className="text-xs text-muted-foreground font-mono">{p.id.slice(0, 8)}</div>
+                    {emails[p.id] && (
+                      <div className="text-xs text-muted-foreground truncate">{emails[p.id]}</div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0">
