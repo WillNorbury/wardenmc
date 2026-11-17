@@ -144,6 +144,18 @@ const Auth = () => {
     return false;
   };
 
+  async function offerToSavePassword(id: string, password: string) {
+    // Hands the sign-in to the browser's own password manager; the site never stores passwords.
+    try {
+      const W = window as any;
+      if (W.PasswordCredential && navigator.credentials?.store) {
+        await navigator.credentials.store(new W.PasswordCredential({ id, password }));
+      }
+    } catch {
+      /* browser declined or unsupported */
+    }
+  }
+
   const handle = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse({ email, password, displayName: mode === "signup" ? displayName : undefined });
@@ -170,6 +182,7 @@ const Auth = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         rememberAccount({ email });
+        await offerToSavePassword(email, password);
         const needsMfa = await checkMfaAfterSignIn();
         if (!needsMfa) {
           toast.success("Welcome back");
@@ -514,7 +527,7 @@ const Auth = () => {
                 Continue with Google
               </Button>
             </div>
-            <form onSubmit={handle} className="space-y-4">
+            <form onSubmit={handle} className="space-y-4" method="post" action="#" autoComplete="on">
               <TabsContent value="signup" className="space-y-4 mt-0">
                 <div>
                   <Label htmlFor="dn">Display name</Label>
@@ -558,6 +571,7 @@ const Auth = () => {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="username"
                   type="email"
                   autoComplete="email"
                   placeholder="Enter your email"
@@ -587,6 +601,7 @@ const Auth = () => {
                 <div className="relative">
                   <Input
                     id="pw"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete={mode === "signup" ? "new-password" : "current-password"}
                     placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
