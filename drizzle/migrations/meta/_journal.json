@@ -141,6 +141,13 @@
       "when": 1794990605955,
       "tag": "0019_clip_likes_comments",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794990738376,
+      "tag": "0020_tighten_clip_social_reads",
+      "breakpoints": true
     }
   ]
 }

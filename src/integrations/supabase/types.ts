@@ -4056,6 +4056,7 @@ export type Database = {
           vote: string
         }[]
       }
+      get_clip_like_count: { Args: { _clip_id: string }; Returns: number }
       get_follower_count: { Args: { _user_id: string }; Returns: number }
       get_following_count: { Args: { _user_id: string }; Returns: number }
       get_issue_comment_counts: {

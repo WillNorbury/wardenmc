@@ -16,11 +16,9 @@ export function ClipLikeButton({ clipId, compact }: { clipId: string; compact?: 
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     let live = true;
-    void supabase.from("clip_likes").select("user_id").eq("clip_id", clipId).then(({ data }) => {
-      if (!live || !data) return;
-      setCount(data.length);
-      setLiked(!!user && data.some(r => r.user_id === user.id));
-    });
+    void supabase.rpc("get_clip_like_count", { _clip_id: clipId }).then(({ data }) => { if (live && typeof data === "number") setCount(data); });
+    if (user) void supabase.from("clip_likes").select("user_id").eq("clip_id", clipId).eq("user_id", user.id).maybeSingle().then(({ data }) => { if (live) setLiked(!!data); });
+    else setLiked(false);
     return () => { live = false; };
   }, [clipId, user]);
   const toggle = async () => {
