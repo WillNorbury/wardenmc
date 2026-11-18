@@ -469,6 +469,64 @@ export type Database = {
         }
         Relationships: []
       }
+      clip_comments: {
+        Row: {
+          body: string
+          clip_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          clip_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          clip_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clip_comments_clip_id_fkey"
+            columns: ["clip_id"]
+            isOneToOne: false
+            referencedRelation: "community_clips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clip_likes: {
+        Row: {
+          clip_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          clip_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          clip_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clip_likes_clip_id_fkey"
+            columns: ["clip_id"]
+            isOneToOne: false
+            referencedRelation: "community_clips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_clips: {
         Row: {
           created_at: string
