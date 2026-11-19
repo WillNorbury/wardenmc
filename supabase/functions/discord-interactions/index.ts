@@ -12,6 +12,7 @@ import { loadReplyTexts, renderReply } from "../_shared/discord-reply-texts.ts";
 import { addCustomCommand, getCustomCommandResponse, listCustomCommands, removeCustomCommand } from "../_shared/discord-custom-commands.ts";
 import { completeDeferredReply, deferredReply } from "../_shared/discord-deferred.ts";
 import { moderationReplyState, type ModerationOutcome } from "../_shared/discord-moderation-outcome.ts";
+import { aboutCommand } from "../_shared/discord-about.ts";
 
 const PUBLIC_KEY = Deno.env.get("DISCORD_PUBLIC_KEY") ?? "";
 
@@ -82,6 +83,7 @@ Deno.serve(async (req) => {
 
 async function handleApplicationCommand(body: any): Promise<Response> {
     const name = body.data?.name;
+    if (name === "about") return aboutCommand(body);
 
     // Website-editable reply texts (site_content -> discord_command_replies).
     const texts = await loadReplyTexts(createClient(

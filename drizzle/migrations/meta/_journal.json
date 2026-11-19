@@ -148,6 +148,13 @@
       "when": 1794990738376,
       "tag": "0020_tighten_clip_social_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795062846525,
+      "tag": "0021_enable_discord_about_module",
+      "breakpoints": true
     }
   ]
 }

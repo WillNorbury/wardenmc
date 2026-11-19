@@ -37,7 +37,7 @@ export const listCommandsRegistration = {
 // three management commands above. Moderation/fun/voice names are added by
 // the caller (they live in moderation-commands.ts).
 export const RESERVED_CUSTOM_COMMAND_NAMES = new Set([
-  "status", "setapply", "apply", "rules", "subscribe", "unsubscribe",
+  "status", "setapply", "apply", "rules", "subscribe", "unsubscribe", "about",
   "addcommand", "removecommand", "commands",
 ]);
 

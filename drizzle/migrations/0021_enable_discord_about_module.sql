@@ -1,0 +1,2 @@
+ALTER TABLE public.discord_guild_module_settings DROP CONSTRAINT discord_guild_module_settings_module_check;
+ALTER TABLE public.discord_guild_module_settings ADD CONSTRAINT discord_guild_module_settings_module_check CHECK (module IN ('welcome', 'reactionroles', 'automod', 'about'));

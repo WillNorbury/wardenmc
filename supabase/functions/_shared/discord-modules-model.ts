@@ -4,7 +4,9 @@
 // the defaults, the sanitizers every write goes through, and pure helpers so
 // the behaviour is testable without Discord or a database.
 
-export const MODULE_IDS = ["welcome", "reactionroles", "automod"] as const;
+import { DEFAULT_ABOUT_SETTINGS, sanitizeAboutSettings } from "./discord-about-model.ts";
+
+export const MODULE_IDS = ["welcome", "reactionroles", "automod", "about"] as const;
 export type ModuleId = (typeof MODULE_IDS)[number];
 
 export const MAX_MODULE_MESSAGE_LEN = 1000;
@@ -186,12 +188,14 @@ export function sanitizeAutoModSettings(input: unknown): AutoModModuleSettings {
 }
 
 export function sanitizeModuleSettings(module: ModuleId, input: unknown): unknown {
+  if (module === "about") return sanitizeAboutSettings(input);
   if (module === "welcome") return sanitizeWelcomeSettings(input);
   if (module === "reactionroles") return sanitizeReactionRolesSettings(input);
   return sanitizeAutoModSettings(input);
 }
 
 export function defaultModuleSettings(module: ModuleId): unknown {
+  if (module === "about") return { ...DEFAULT_ABOUT_SETTINGS };
   if (module === "welcome") return { ...DEFAULT_WELCOME_SETTINGS };
   if (module === "reactionroles") return { ...DEFAULT_REACTION_ROLES_SETTINGS, entries: [] };
   return JSON.parse(JSON.stringify(DEFAULT_AUTOMOD_SETTINGS));

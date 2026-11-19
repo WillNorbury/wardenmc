@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { getDiscordBotToken } from "../_shared/discord-token.ts";
 import { isValidGuildId } from "../_shared/discord-reply-texts.ts";
+import { isAboutChannel, sanitizeAboutSettings } from "../_shared/discord-about-model.ts";
 import {
   MODULE_IDS,
   buildNativeAutoModRules,
@@ -120,7 +121,7 @@ Deno.serve(async (req) => {
   if (!isValidGuildId(guildId)) return json({ error: "A valid guild_id is required." }, 400);
   if (!isValidDiscordId(userId)) return json({ error: "A valid user_id is required." }, 400);
   if (!MODULE_IDS.includes(moduleParam as ModuleId)) {
-    return json({ error: "module must be one of: welcome, reactionroles, automod." }, 400);
+    return json({ error: "module must be one of: welcome, reactionroles, automod, about." }, 400);
   }
   const module = moduleParam as ModuleId;
 
@@ -131,17 +132,18 @@ Deno.serve(async (req) => {
   if ("error" in check) return json({ error: check.error }, check.status);
 
   const client = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
 
   if (req.method === "GET") {
-    const { data: row } = await client
+    const { data: row, error } = await client
       .from("discord_guild_module_settings")
       .select("settings, updated_at, updated_by")
       .eq("guild_id", guildId)
       .eq("module", module)
       .maybeSingle();
+    if (error) return json({ error: "Could not read the settings. Try again shortly." }, 500);
     return json({
       guild_id: guildId,
       module,
@@ -153,6 +155,16 @@ Deno.serve(async (req) => {
 
   if (req.method === "PUT") {
     const settings = sanitizeModuleSettings(module, settingsInput);
+    if (module === "about") {
+      const raw = settingsInput && typeof settingsInput === "object" ? settingsInput as Record<string, unknown> : {};
+      const about = sanitizeAboutSettings(settings);
+      if ((raw.channel_id != null && !isValidDiscordId(raw.channel_id)) || (raw.message !== undefined && (typeof raw.message !== "string" || !raw.message.trim() || raw.message.trim().length > 2000)) || (raw.enabled !== undefined && typeof raw.enabled !== "boolean")) return json({ error: "Invalid About settings." }, 400);
+      if (about.channel_id) {
+        const channelRes = await fetch(`${DISCORD_API}/channels/${about.channel_id}`, { headers: { Authorization: `Bot ${botToken}` }, signal: AbortSignal.timeout(10000) });
+        if (!channelRes.ok) { await channelRes.text(); return json({ error: "Could not access the selected channel." }, 400); }
+        if (!isAboutChannel(await channelRes.json(), guildId)) return json({ error: "Choose a text or announcement channel belonging to this server." }, 400);
+      }
+    }
     const { error } = await client
       .from("discord_guild_module_settings")
       .upsert({ guild_id: guildId, module, settings, updated_by: userId, updated_at: new Date().toISOString() });
