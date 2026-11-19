@@ -26,7 +26,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
-// This console is locked to a single account; the database function enforces it too.
+// The server independently verifies this exact account before data operations.
 const ALLOWED_USER_ID = "a9ff5e2f-cad4-4805-9acd-095065d18179";
 
 type RunResult =
@@ -58,10 +58,12 @@ export const DbAdminSection = () => {
     setResult(null);
     const started = Date.now();
     try {
-      const { data, error } = await supabase.rpc("admin_run_sql", { _sql: sql });
+      const { data, error } = await supabase.functions.invoke("owner-database", { body: { sql } });
       if (error) {
-        setResult({ ok: false, error: error.message });
-        toast.error(error.message);
+        const details = await error.context?.json().catch(() => null);
+        const message = details?.error ?? error.message;
+        setResult({ ok: false, error: message });
+        toast.error(message);
         return;
       }
       const payload = data as { kind: string; rows?: Record<string, unknown>[]; affectedRows?: number };
@@ -105,10 +107,11 @@ export const DbAdminSection = () => {
         <div className="flex gap-3">
           <ShieldAlert className="h-5 w-5 shrink-0 mt-0.5 text-destructive" />
           <div className="text-sm space-y-1">
-            <p className="font-medium">Full access to the website database — locked to your account.</p>
+            <p className="font-medium">Website data access — locked to your account.</p>
             <p className="text-muted-foreground">
-              SELECT queries run straight away. Anything that changes data (INSERT, UPDATE, DELETE, DDL)
-              asks for confirmation first. There is no undo — double-check statements before running them.
+              Simple SELECT queries return up to 200 rows. Data changes ask for confirmation;
+              updates and deletes require an exact row ID. Structure and permission changes are blocked.
+              There is no undo — double-check statements before running them.
             </p>
           </div>
         </div>

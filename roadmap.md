@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Replace owner Database tool request with deployed exact-owner data-only executor; arbitrary SQL stays revoked. 24 tests and build pass; real owner read/insert/update/delete/read-back verified and temporary records removed. Changelog e61ba3f4-466b-4973-9703-df3edec5f0a3 published; 36 notifications queued, none failed.
+- [ ] Verify owner Database tool displayed result and resolve QA d39f227c-dc5a-58c7-a66e-28ebc74c8771 — authenticated preview is blank due to existing VITE_SUPABASE_PROJECT_ID runtime error; deployed data operations verified, page check remains blocked.
 - [x] Add owner-only /about and dashboard settings; deployed three functions, registered/read back in all four servers, 60 tests pass. Shared command execution verified against live Discord and deployed settings API: owner rejection, first-use selection, saved-channel reuse, channel changes, wrong-server rejection and mention suppression. Temporary private channels removed; original settings restored. Changelog 0d295b03-642d-4a99-a1cf-34f65c98f502 published.
 - [ ] Confirm /about through an owner-triggered signed Discord interaction — no Discord user session is available in this sandbox; live bot REST execution is verified, not an actual slash-command click.
 - [ ] Email /about changelog 0d295b03-642d-4a99-a1cf-34f65c98f502 — notify-changelog returned 401; needs staff sign-in.
