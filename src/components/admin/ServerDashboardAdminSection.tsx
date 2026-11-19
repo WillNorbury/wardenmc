@@ -15,7 +15,7 @@ type Player = { name: string; uuid?: string; online?: boolean };
 type MapRow = { id: string; name: string; url: string; description: string | null; sort_order: number; enabled: boolean };
 type Check = { checked_at: string; is_up: boolean; latency_ms: number | null };
 
-const PROJECT_ID = (import.meta as any).env.VITE_SUPABASE_PROJECT_ID as string;
+const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 
 export function ServerDashboardAdminSection() {
   const [status, setStatus] = useState<Status | null>(null);

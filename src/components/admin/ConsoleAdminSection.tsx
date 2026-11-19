@@ -23,7 +23,7 @@ type LogRow = {
   id: number; server_id: string; level: string; source: string; line: string; logged_at: string;
 };
 
-const PROJECT_ID = (import.meta as any).env.VITE_SUPABASE_PROJECT_ID as string;
+const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const BRIDGE_URL = `https://${PROJECT_ID}.functions.supabase.co/mc-bridge-poll`;
 
 function isOnline(last?: string | null) {
