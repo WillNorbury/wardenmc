@@ -169,6 +169,13 @@
       "when": 1795339034269,
       "tag": "0023_bind_staff_plugin_files_to_their_plugin",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1795339709728,
+      "tag": "0024_verified_plugin_download_entitlements",
+      "breakpoints": true
     }
   ]
 }

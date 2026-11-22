@@ -4,9 +4,11 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
-  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-  const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders })
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+  const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  const ANON_KEY = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY')
+  if (!SUPABASE_URL || !SERVICE_KEY || !ANON_KEY) return new Response('Server configuration error', { status: 500, headers: corsHeaders })
 
   const authHeader = req.headers.get('Authorization') ?? ''
   const token = authHeader.replace('Bearer ', '').trim()
@@ -56,7 +58,8 @@ Deno.serve(async (req) => {
   }
 
   const type = body?.type as 'signup' | 'recovery'
-  const email = (body?.email as string | undefined)?.trim().toLowerCase()
+  // The verified account determines the recipient, never a chosen address.
+  const email = caller.email?.trim().toLowerCase()
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return new Response(JSON.stringify({ error: 'invalid_email' }), {
       status: 400,
@@ -66,6 +69,13 @@ Deno.serve(async (req) => {
   if (type !== 'signup' && type !== 'recovery') {
     return new Response(JSON.stringify({ error: 'invalid_type' }), {
       status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  if (body?.email !== undefined && (typeof body.email !== 'string' || body.email.trim().toLowerCase() !== email)) {
+    return new Response(JSON.stringify({ error: 'Test emails can only be sent to your own account email' }), {
+      status: 403,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }

@@ -1,1 +1,2 @@
 - Download signing verifies storage uploader ownership or a service-only staff file binding to the exact plugin; editable plugin paths never authorize files, because owners can change them.
+- Only free published plugins are publicly downloadable; paid buyers require a non-revoked service-only approval for that exact plugin and account, while creator, organization-member and staff access remain separate. Never infer purchases from publication or download history.

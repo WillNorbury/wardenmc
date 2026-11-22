@@ -1,0 +1,1 @@
+- Test authentication links must target the verified caller's email; reject supplied recipient mismatches before generating any link so staff cannot target third parties.

@@ -39,3 +39,10 @@ export async function getVersionJarDownloadUrl(
   if (error || !data?.url) return null;
   return data.url as string;
 }
+
+// Resolve main files server-side as well, so paid access checks apply to links
+// returned by the website regardless of whether the file is stored here.
+export async function getPluginJarDownloadUrl(pluginId: string): Promise<string | null> {
+  const { data, error } = await supabase.functions.invoke("plugin-file-url", { body: { plugin_id: pluginId } });
+  return error || !data?.url ? null : data.url as string;
+}

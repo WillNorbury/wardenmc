@@ -19,7 +19,7 @@ function load(name: string, createClient: (...args: unknown[]) => unknown, extra
 function query(result: unknown) {
   const calls: Record<string, unknown[]> = {};
   const q: Record<string, unknown> = {};
-  for (const method of ["select", "eq", "in", "limit", "gte", "order"]) q[method] = (...args: unknown[]) => { (calls[method] ??= []).push(args); return q; };
+  for (const method of ["select", "eq", "in", "limit", "gte", "order", "is"]) q[method] = (...args: unknown[]) => { (calls[method] ??= []).push(args); return q; };
   q.maybeSingle = async () => result;
   q.then = (resolve: (result: unknown) => unknown) => Promise.resolve(result).then(resolve);
   return { q, calls };
@@ -95,5 +95,80 @@ describe("selected security fixes", () => {
     const f = pluginFixture(true);
     expect((await f.run({ path })).status).toBe(400);
     expect(f.sign).not.toHaveBeenCalled();
+  });
+
+  function paidFixture(userId: string | null, entitled: boolean, price = 10, entitlementError = false, external = false) {
+    const plugin = query({ data: { id: "plugin", published: true, user_id: "creator", org_id: null, jar_path: external ? null : "creator/file.jar", download_url: "https://example.test/file.jar", price } });
+    const roles = query({ data: null });
+    const approval = query({ data: entitled ? { plugin_id: "plugin" } : null, error: entitlementError ? new Error("unavailable") : null });
+    const from = vi.fn((table: string) => table === "plugin_download_entitlements" ? approval.q : table === "user_roles" ? roles.q : plugin.q);
+    const sign = vi.fn(async () => ({ data: { signedUrl: "https://example.test/signed" } }));
+    const run = load("plugin-file-url", () => ({ from, rpc: async () => ({ data: true }), auth: { getUser: async () => ({ data: { user: userId ? { id: userId } : null } }) }, storage: { from: () => ({ createSignedUrl: sign }) } }));
+    return { run, from, sign, approval };
+  }
+  it("denies anonymous paid downloads before signing", async () => {
+    const f = paidFixture(null, false);
+    expect((await f.run({ path: "creator/file.jar" })).status).toBe(403);
+    expect(f.sign).not.toHaveBeenCalled();
+  });
+  it("denies a signed-in buyer without approval", async () => {
+    const f = paidFixture("buyer", false);
+    expect((await f.run({ path: "creator/file.jar" })).status).toBe(403);
+    expect(f.sign).not.toHaveBeenCalled();
+  });
+  it("allows an approved buyer only for the exact plugin and account", async () => {
+    const f = paidFixture("buyer", true);
+    expect((await f.run({ path: "creator/file.jar" })).status).toBe(200);
+    expect(f.approval.calls.eq).toEqual([["plugin_id", "plugin"], ["user_id", "buyer"]]);
+    expect(f.approval.calls.is).toEqual([["revoked_at", null]]);
+    expect(f.sign).toHaveBeenCalledOnce();
+  });
+  it("fails closed when buyer approval lookup fails", async () => {
+    const f = paidFixture("buyer", true, 10, true);
+    expect((await f.run({ path: "creator/file.jar" })).status).toBe(403);
+    expect(f.sign).not.toHaveBeenCalled();
+  });
+  it("preserves free public downloads without buyer approval", async () => {
+    const f = paidFixture(null, false, 0);
+    expect((await f.run({ path: "creator/file.jar" })).status).toBe(200);
+    expect(f.from).not.toHaveBeenCalledWith("plugin_download_entitlements");
+  });
+  it("preserves creator access to their paid file", async () => {
+    const f = paidFixture("creator", false);
+    expect((await f.run({ path: "creator/file.jar" })).status).toBe(200);
+  });
+  it("does not return a paid external main link without approval", async () => {
+    const f = paidFixture(null, false, 10, false, true);
+    expect((await f.run({ plugin_id: "plugin" })).status).toBe(403);
+    expect(f.sign).not.toHaveBeenCalled();
+  });
+  it("does not accept a chosen auth-test recipient", async () => {
+    const role = query({ data: [{ role: "owner" }] }), generateLink = vi.fn();
+    const run = load("admin-test-auth-email", () => ({ from: () => role.q, auth: { getUser: async () => ({ data: { user: { id: "owner", email: "owner@example.test" } } }), admin: { generateLink } } }));
+    expect((await run({ type: "recovery", email: "victim@example.test" })).status).toBe(403);
+    expect(generateLink).not.toHaveBeenCalled();
+  });
+  it("derives auth-test recipient from the verified caller", async () => {
+    const role = query({ data: [{ role: "admin" }] }), generateLink = vi.fn(async () => ({ error: null }));
+    const run = load("admin-test-auth-email", () => ({ from: () => role.q, auth: { getUser: async () => ({ data: { user: { id: "admin", email: "admin@example.test" } } }), admin: { generateLink } } }));
+    expect((await run({ type: "recovery" })).status).toBe(200);
+    expect(generateLink).toHaveBeenCalledWith({ type: "recovery", email: "admin@example.test" });
+  });
+  function announcementFixture(savedChannel: unknown) {
+    const role = query({ data: { role: "admin" } }), config = query({ data: { value: { announceChannelId: savedChannel } } });
+    const fetch = vi.fn(async () => new Response(JSON.stringify({ id: "message" }), { status: 200 }));
+    const run = load("discord-bot-action", () => ({ from: (table: string) => table === "user_roles" ? role.q : config.q, auth: { getUser: async () => ({ data: { user: { id: "admin", user_metadata: {} } } }) } }), { fetch, getDiscordBotToken: async () => "bot-token" });
+    return { run, fetch };
+  }
+  it("announces only to the saved channel despite a chosen request channel", async () => {
+    const f = announcementFixture("123456789012345678");
+    expect((await f.run({ action: "announce", channelId: "987654321098765432", message: "Test" })).status).toBe(200);
+    expect(f.fetch).toHaveBeenCalledWith("https://discord.com/api/v10/channels/123456789012345678/messages", expect.any(Object));
+    expect(f.fetch).toHaveBeenCalledOnce();
+  });
+  it("never falls back to the request channel when saved configuration is missing", async () => {
+    const f = announcementFixture(null);
+    expect((await f.run({ action: "announce", channelId: "987654321098765432" })).status).toBe(400);
+    expect(f.fetch).not.toHaveBeenCalled();
   });
 });

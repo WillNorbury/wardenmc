@@ -1,0 +1,1 @@
+- Announcements use only the saved announceChannelId, never the request's channelId, because staff action permission does not authorize arbitrary bot destinations.

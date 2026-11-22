@@ -9,7 +9,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import PageLoader from "@/components/site/PageLoader";
 import { supabase } from "@/integrations/supabase/client";
-import { getJarDownloadUrl, getVersionJarDownloadUrl } from "@/lib/plugin-files";
+import { getPluginJarDownloadUrl, getVersionJarDownloadUrl } from "@/lib/plugin-files";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -272,8 +272,7 @@ const PluginDetail = () => {
   const downloadVersion = async (v: PluginVersion) => {
     if (!plugin) return;
     // Anonymous visitors can't see jar_path (column-level grant) — resolve by version id instead.
-    const src = resolveVersionUrl(v);
-    const url = src ? await getJarDownloadUrl(src) : await getVersionJarDownloadUrl(v.id);
+    const url = await getVersionJarDownloadUrl(v.id);
     if (!url) {
       toast.error("Could not create a download link");
       return;
@@ -304,7 +303,9 @@ const PluginDetail = () => {
 
   const doDownload = async () => {
     if (!plugin || !latestDownloadSource) return;
-    const latestDownloadUrl = await getJarDownloadUrl(latestDownloadSource);
+    const latestDownloadUrl = plugin.jar_path || plugin.download_url
+      ? await getPluginJarDownloadUrl(plugin.id)
+      : versions[0] ? await getVersionJarDownloadUrl(versions[0].id) : null;
     if (!latestDownloadUrl) {
       toast.error("Could not create a download link");
       return;

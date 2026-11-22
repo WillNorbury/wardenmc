@@ -1,10 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -33,15 +28,18 @@ function normalisePath(bucket: string, input: string): string | null {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   try {
     const body = await req.json().catch(() => ({}));
     const bucket = "plugin-jars";
     const versionId = typeof body?.version_id === "string" ? body.version_id : null;
-
+    const requestedPluginId = typeof body?.plugin_id === "string" ? body.plugin_id : null;
+    const serviceUrl = Deno.env.get("SUPABASE_URL"), serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!serviceUrl || !serviceKey) return json({ error: "Server configuration error" }, 500);
     const admin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      serviceUrl,
+      serviceKey,
       { auth: { persistSession: false } },
     );
 
@@ -67,6 +65,13 @@ Deno.serve(async (req) => {
       } else {
         return json({ error: "File not found" }, 404);
       }
+    } else if (requestedPluginId) {
+      const { data: main } = await admin.from("plugins").select("id, jar_path, download_url").eq("id", requestedPluginId).maybeSingle();
+      if (!main) return json({ error: "File not found" }, 404);
+      pluginId = main.id;
+      path = main.jar_path;
+      if (!path && typeof main.download_url === "string" && /^https?:\/\//i.test(main.download_url)) externalUrl = main.download_url;
+      if (!path && !externalUrl) return json({ error: "File not found" }, 404);
     } else {
       // Legacy flow: caller supplies the storage path directly.
       path = normalisePath(bucket, String(body?.path ?? ""));
@@ -102,7 +107,7 @@ Deno.serve(async (req) => {
 
     const { data: plugin } = await admin
       .from("plugins")
-      .select("id, published, user_id, org_id, jar_path")
+      .select("id, published, user_id, org_id, jar_path, price")
       .eq("id", pluginId)
       .maybeSingle();
     if (!plugin) return json({ error: "File not found" }, 404);
@@ -116,7 +121,9 @@ Deno.serve(async (req) => {
       if (uploaderError || uploaderMatches !== true) return json({ error: "File not found" }, 404);
     }
 
-    let allowed = plugin.published === true;
+    // Publication grants public access only to free plugins. Paid files require
+    // a server-recorded buyer approval, except existing creator/staff access.
+    let allowed = plugin.published === true && Number(plugin.price ?? 0) === 0;
 
     if (!allowed && userId) {
       if (plugin.user_id === userId) {
@@ -128,6 +135,7 @@ Deno.serve(async (req) => {
             .select("role")
             .eq("user_id", userId)
             .in("role", ["admin", "owner", "founder", "star"])
+            .limit(1)
             .maybeSingle(),
           plugin.org_id
             ? admin
@@ -139,6 +147,11 @@ Deno.serve(async (req) => {
             : Promise.resolve({ data: null }),
         ]);
         allowed = !!adminRole || !!member;
+      }
+      if (!allowed && plugin.published === true && Number(plugin.price) > 0) {
+        const { data: entitlement, error } = await admin.from("plugin_download_entitlements")
+          .select("plugin_id").eq("plugin_id", plugin.id).eq("user_id", userId).is("revoked_at", null).maybeSingle();
+        allowed = !error && !!entitlement;
       }
     }
 

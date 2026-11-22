@@ -61,6 +61,7 @@ export const EmailTestSection = () => {
 
   useEffect(() => {
     loadLatest();
+    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
   }, []);
 
   const trigger = async (type: "signup" | "recovery") => {
@@ -100,8 +101,7 @@ export const EmailTestSection = () => {
             <Mail className="h-5 w-5" /> Test auth emails
           </CardTitle>
           <CardDescription>
-            Trigger a real signup confirmation or password reset email to verify branding and delivery on production.
-            Signup test creates an auth user — use a fresh address.
+            Your account email
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -112,16 +112,16 @@ export const EmailTestSection = () => {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              readOnly
               autoComplete="off"
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => trigger("signup")} disabled={busy !== null}>
+            <Button onClick={() => trigger("signup")} disabled={busy !== null || !email}>
               {busy === "signup" ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Mail className="h-4 w-4 mr-2" />}
               Send signup test
             </Button>
-            <Button onClick={() => trigger("recovery")} disabled={busy !== null} variant="secondary">
+            <Button onClick={() => trigger("recovery")} disabled={busy !== null || !email} variant="secondary">
               {busy === "recovery" ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <KeyRound className="h-4 w-4 mr-2" />}
               Send password reset test
             </Button>

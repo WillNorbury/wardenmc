@@ -1,11 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { getDiscordBotToken } from "../_shared/discord-token.ts";
 import { buildRulesEmbed } from "../_shared/rules-embed.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
-};
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
 type Action = "announce" | "status" | "welcome" | "roles" | "info" | "rules";
 
@@ -152,9 +148,10 @@ Deno.serve(async (req) => {
     };
 
     if (action === "announce") {
-      const channelId = body.channelId || cfg.announceChannelId;
+      const channelId = cfg.announceChannelId;
+      if (typeof channelId !== "string" || !/^\d{17,20}$/.test(channelId)) return json({ ok: false, error: "No valid announcements channel configured" }, 400);
+      if (body.message !== undefined && (typeof body.message !== "string" || !body.message.trim() || body.message.length > 4096)) return json({ ok: false, error: "Announcement must contain 1 to 4096 characters" }, 400);
       const message = body.message || "📢 **Test announcement** from the Warden Network admin panel.";
-      if (!channelId) return json({ ok: false, error: "No announcements channel configured" });
       const r = await discordPost(channelId, token, {
         embeds: [
           {
