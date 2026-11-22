@@ -35,8 +35,11 @@ Deno.serve(async (req) => {
     const token = await getDiscordBotToken();
     if (!appId || !token) return json({ ok: false, error: "Missing DISCORD_APPLICATION_ID or DISCORD_BOT_TOKEN" }, 400);
 
-    // Upsert only /about in each guild: never bulk-overwrite per-server custom commands.
+    // Normal admin sync is global-only. Guild /about setup is explicitly requested,
+    // so a missing guild permission or rate limit cannot block global commands.
     const guildResults: { guild_id: string; ok: boolean; status: number }[] = [];
+    if (input.about_only || input.guild_id) {
+    // Upsert only /about: never bulk-overwrite per-server custom commands.
     let after = "";
     do {
       let guilds: { id: string }[];
@@ -55,6 +58,7 @@ Deno.serve(async (req) => {
     } while (after);
     if (guildResults.some((g) => !g.ok)) return json({ ok: false, guild_commands: guildResults }, 502);
     if (input.about_only) return json({ ok: true, guild_commands: guildResults });
+    }
     // Commands are configured in the admin panel (site_content -> discord_commands).
     const { data: cfgRow } = await userClient
       .from("site_content").select("value").eq("key", "discord_commands").maybeSingle();
