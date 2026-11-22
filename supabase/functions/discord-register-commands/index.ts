@@ -38,26 +38,41 @@ Deno.serve(async (req) => {
     // Normal admin sync is global-only. Guild /about setup is explicitly requested,
     // so a missing guild permission or rate limit cannot block global commands.
     const guildResults: { guild_id: string; ok: boolean; status: number }[] = [];
+    let guildError: string | undefined;
     if (input.about_only || input.guild_id) {
-    // Upsert only /about: never bulk-overwrite per-server custom commands.
-    let after = "";
-    do {
-      let guilds: { id: string }[];
-      if (input.guild_id) guilds = [{ id: input.guild_id }];
-      else {
-        const page = await fetch(`https://discord.com/api/v10/users/@me/guilds?limit=200${after ? `&after=${after}` : ""}`, { headers: { Authorization: `Bot ${token}` }, signal: AbortSignal.timeout(10000) });
-        if (!page.ok) { await page.text(); return json({ ok: false, error: "Could not list WardenBot servers", status: page.status }, 502); }
-        guilds = await page.json();
+      // Upsert only /about: never bulk-overwrite per-server custom commands.
+      try {
+        let after = "";
+        do {
+          let guilds: { id: string }[];
+          if (input.guild_id) guilds = [{ id: input.guild_id }];
+          else {
+            const page = await fetch(`https://discord.com/api/v10/users/@me/guilds?limit=200${after ? `&after=${after}` : ""}`, { headers: { Authorization: `Bot ${token}` }, signal: AbortSignal.timeout(10000) });
+            if (!page.ok) {
+              await page.text();
+              if (input.about_only) return json({ ok: false, error: "Could not list WardenBot servers", status: page.status, guild_commands: guildResults }, 502);
+              throw new Error(`Could not list WardenBot servers (${page.status})`);
+            }
+            guilds = await page.json();
+          }
+          for (const guild of guilds) {
+            try {
+              const registered = await fetch(`https://discord.com/api/v10/applications/${appId}/guilds/${guild.id}/commands`, { method: "POST", headers: { Authorization: `Bot ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(aboutRegistration), signal: AbortSignal.timeout(10000) });
+              await registered.text();
+              guildResults.push({ guild_id: guild.id, ok: registered.ok, status: registered.status });
+            } catch {
+              // A timeout or network failure in one guild must not skip the rest.
+              guildResults.push({ guild_id: guild.id, ok: false, status: 0 });
+            }
+          }
+          after = !input.guild_id && guilds.length === 200 ? guilds[guilds.length - 1]?.id ?? "" : "";
+        } while (after);
+      } catch {
+        guildError = "Could not finish guild About registration";
       }
-      for (const guild of guilds) {
-        const registered = await fetch(`https://discord.com/api/v10/applications/${appId}/guilds/${guild.id}/commands`, { method: "POST", headers: { Authorization: `Bot ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(aboutRegistration), signal: AbortSignal.timeout(10000) });
-        await registered.text();
-        guildResults.push({ guild_id: guild.id, ok: registered.ok, status: registered.status });
-      }
-      after = !input.guild_id && guilds.length === 200 ? guilds[guilds.length - 1]?.id ?? "" : "";
-    } while (after);
-    if (guildResults.some((g) => !g.ok)) return json({ ok: false, guild_commands: guildResults }, 502);
-    if (input.about_only) return json({ ok: true, guild_commands: guildResults });
+      const guildsOk = !guildError && guildResults.every((g) => g.ok);
+      if (input.about_only) return json({ ok: guildsOk, guild_commands: guildResults, ...(guildError ? { error: guildError } : {}) }, guildsOk ? 200 : 502);
+      // Combined guild/global requests still sync globally despite guild errors.
     }
     // Commands are configured in the admin panel (site_content -> discord_commands).
     const { data: cfgRow } = await userClient
@@ -86,7 +101,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify(allCmds),
     });
     const data = await r.json().catch(() => ({}));
-    return json(r.ok ? { ok: true, registered: data, guild_commands: guildResults } : { ok: false, status: r.status, details: data }, r.ok ? 200 : 500);
+    return json(r.ok ? { ok: true, registered: data, guild_commands: guildResults, ...(guildError ? { guild_error: guildError } : {}) } : { ok: false, status: r.status, details: data }, r.ok ? 200 : 500);
   } catch (e) {
     return json({ ok: false, error: (e as Error).message }, 500);
   }

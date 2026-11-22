@@ -71,4 +71,30 @@ describe("Discord admin command registration isolation", () => {
     expect(response.status).toBe(502);
     expect(await response.json()).toMatchObject({ ok: false, status: 429 });
   });
+  it.each([403, 429])("combined guild/global sync still registers global commands after guild rejection %s", async (status) => {
+    const f = fixture(status);
+    const response = await f.run({ guild_id: "111111" });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, registered: [{ name: "rules" }], guild_commands: [{ guild_id: "111111", ok: false, status }] });
+    expect(f.fetch).toHaveBeenLastCalledWith(expect.stringMatching(/\/applications\/[^/]+\/commands$/), expect.objectContaining({ method: "PUT" }));
+  });
+  it("a timed-out guild does not skip the next server in explicit About setup", async () => {
+    const f = fixture();
+    f.fetch.mockImplementation(async (url) => {
+      if (url.includes("/users/@me/guilds")) return Response.json([{ id: "111111" }, { id: "222222" }]);
+      if (url.includes("/guilds/111111/")) throw new Error("Request timed out");
+      return Response.json({ id: "about" }, { status: 201 });
+    });
+    const response = await f.run({ about_only: true });
+    expect(response.status).toBe(502);
+    expect(await response.json()).toMatchObject({ ok: false, guild_commands: [{ guild_id: "111111", ok: false, status: 0 }, { guild_id: "222222", ok: true, status: 201 }] });
+    expect(f.fetch).toHaveBeenCalledTimes(3);
+  });
+  it("a guild network failure cannot block a combined global sync", async () => {
+    const f = fixture();
+    f.fetch.mockImplementationOnce(async () => { throw new Error("Network unavailable"); });
+    const response = await f.run({ guild_id: "111111" });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ ok: true, registered: [{ name: "rules" }], guild_commands: [{ guild_id: "111111", ok: false, status: 0 }] });
+  });
 });
