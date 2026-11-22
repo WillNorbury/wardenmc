@@ -21,12 +21,13 @@ function normalisePath(bucket: string, input: string): string | null {
   const idx = value.indexOf(marker);
   if (idx >= 0) value = value.slice(idx + marker.length);
   value = value.split("?")[0];
-  if (!value || value.includes("..")) return null;
+  if (!value) return null;
   try {
     value = decodeURIComponent(value);
   } catch {
-    /* keep as-is */
+    return null;
   }
+  if (value.includes("..") || value.startsWith("/") || value.includes("\\")) return null;
   return value;
 }
 
@@ -106,12 +107,13 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (!plugin) return json({ error: "File not found" }, 404);
 
-    // A version/plugin row's jar_path is caller-controlled, so only sign files
-    // stored in the plugin owner's folder, or the plugin's staff-set main jar.
+    // Plugin paths are mutable. Storage uploader identity, not row equality,
+    // is the authority for both owner uploads and legacy staff uploads.
     if (path) {
-      const ownerFolder = plugin.user_id ? `${plugin.user_id}/` : null;
-      const ownsPath = !!ownerFolder && path.startsWith(ownerFolder) && !path.includes("..");
-      if (!ownsPath && path !== plugin.jar_path) return json({ error: "File not found" }, 404);
+      path = normalisePath(bucket, path);
+      if (!path) return json({ error: "File not found" }, 404);
+      const { data: uploaderMatches, error: uploaderError } = await admin.rpc("plugin_file_uploader_matches", { _plugin_id: plugin.id, _path: path });
+      if (uploaderError || uploaderMatches !== true) return json({ error: "File not found" }, 404);
     }
 
     let allowed = plugin.published === true;

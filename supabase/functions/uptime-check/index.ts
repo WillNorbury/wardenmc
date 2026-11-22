@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { STATUS_URL } from '../_shared/site-urls.ts'
 import { getDiscordBotToken } from '../_shared/discord-token.ts'
+import { authenticateCronRequest } from '../_shared/cron-auth.ts'
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -308,6 +309,16 @@ Deno.serve(async (req) => {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
   const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+  if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: corsHeaders });
+  if (authenticateCronRequest(req)) {
+    const auth = req.headers.get("Authorization") ?? "";
+    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: auth } } });
+    const { data: identity } = await userClient.auth.getUser();
+    if (!identity?.user) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+    const { data: roles } = await userClient.from("user_roles").select("role").eq("user_id", identity.user.id).in("role", ["admin", "owner", "founder", "star"]).limit(1);
+    if (!roles?.length) return new Response("Forbidden", { status: 403, headers: corsHeaders });
+  }
 
   // Load alert settings
   const { data: alertSettings } = await supabase

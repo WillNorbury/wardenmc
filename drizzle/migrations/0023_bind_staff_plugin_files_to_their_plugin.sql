@@ -1,0 +1,14 @@
+CREATE TABLE public.plugin_staff_file_bindings (plugin_id uuid NOT NULL REFERENCES public.plugins(id) ON DELETE CASCADE, object_path text NOT NULL, PRIMARY KEY(plugin_id,object_path));
+GRANT ALL ON public.plugin_staff_file_bindings TO service_role;
+ALTER TABLE public.plugin_staff_file_bindings ENABLE ROW LEVEL SECURITY;
+INSERT INTO public.plugin_staff_file_bindings(plugin_id,object_path)
+SELECT p.id,o.name FROM public.plugins p JOIN storage.objects o ON o.bucket_id='plugin-jars' AND o.name=p.jar_path WHERE EXISTS (SELECT 1 FROM public.user_roles r WHERE r.user_id::text=COALESCE(o.owner_id,o.owner::text) AND r.role IN ('admin','owner','founder','star'))
+UNION SELECT v.plugin_id,o.name FROM public.plugin_versions v JOIN storage.objects o ON o.bucket_id='plugin-jars' AND o.name=v.jar_path WHERE EXISTS (SELECT 1 FROM public.user_roles r WHERE r.user_id::text=COALESCE(o.owner_id,o.owner::text) AND r.role IN ('admin','owner','founder','star'));
+CREATE FUNCTION public.bind_staff_plugin_file() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$ BEGIN
+ IF EXISTS (SELECT 1 FROM public.user_roles WHERE user_id=auth.uid() AND role IN ('admin','owner','founder','star')) AND NEW.jar_path IS NOT NULL THEN
+ INSERT INTO public.plugin_staff_file_bindings(plugin_id,object_path) SELECT CASE WHEN TG_TABLE_NAME='plugins' THEN (to_jsonb(NEW)->>'id')::uuid ELSE (to_jsonb(NEW)->>'plugin_id')::uuid END, o.name FROM storage.objects o WHERE o.bucket_id='plugin-jars' AND o.name=NEW.jar_path AND EXISTS (SELECT 1 FROM public.user_roles r WHERE r.user_id::text=COALESCE(o.owner_id,o.owner::text) AND r.role IN ('admin','owner','founder','star')) ON CONFLICT DO NOTHING;
+ END IF; RETURN NEW; END; $$;
+REVOKE ALL ON FUNCTION public.bind_staff_plugin_file() FROM PUBLIC, anon, authenticated;
+CREATE TRIGGER bind_staff_main_plugin_file AFTER INSERT OR UPDATE OF jar_path ON public.plugins FOR EACH ROW EXECUTE FUNCTION public.bind_staff_plugin_file();
+CREATE TRIGGER bind_staff_version_plugin_file AFTER INSERT OR UPDATE OF jar_path ON public.plugin_versions FOR EACH ROW EXECUTE FUNCTION public.bind_staff_plugin_file();
+CREATE OR REPLACE FUNCTION public.plugin_file_uploader_matches(_plugin_id uuid,_path text) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO 'public' AS $$ SELECT EXISTS (SELECT 1 FROM storage.objects o JOIN public.plugins p ON p.id=_plugin_id WHERE o.bucket_id='plugin-jars' AND o.name=_path AND (COALESCE(o.owner_id,o.owner::text)=p.user_id::text OR EXISTS (SELECT 1 FROM public.plugin_staff_file_bindings b WHERE b.plugin_id=p.id AND b.object_path=o.name))); $$;

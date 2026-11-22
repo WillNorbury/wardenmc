@@ -15,6 +15,7 @@ function loadChecker(fetchImpl: () => Promise<Response>) {
     createClient: () => ({}),
     STATUS_URL: "https://warden.rip/status",
     getDiscordBotToken: async () => null,
+    authenticateCronRequest: () => new Response("Unauthorized", { status: 401 }),
     Deno: { env: { get: () => "test" }, serve: () => {} },
     Response,
     AbortController,

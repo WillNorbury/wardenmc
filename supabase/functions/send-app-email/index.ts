@@ -128,13 +128,14 @@ Deno.serve(async (req) => {
     })
 
   // Confirms an appeal matching the supplied details was really filed here.
-  const findRecentAppeal = async (username: unknown) => {
+  const findRecentAppeal = async (username: unknown, callerId: string) => {
     if (typeof username !== 'string' || !username.trim()) return null
     const since = new Date(Date.now() - 15 * 60 * 1000).toISOString()
     const { data } = await supabase
       .from('ban_appeals')
       .select('id, email, minecraft_username, created_at')
       .eq('minecraft_username', username.trim())
+      .eq('user_id', callerId)
       .gte('created_at', since)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -161,7 +162,8 @@ Deno.serve(async (req) => {
       fromOverride = TEMPLATE_FROM[templateName]
 
       if (APPEAL_TEMPLATES.has(templateName)) {
-        const appeal = await findRecentAppeal(templateData?.minecraftUsername)
+        if (!caller) return forbidden()
+        const appeal = await findRecentAppeal(templateData?.minecraftUsername, caller.id)
         if (!appeal) return forbidden()
         recipientEmail = templateName === 'ban-appeal-admin' ? '' : (appeal.email ?? '')
         if (!recipientEmail && templateName === 'ban-appeal-received') return forbidden()

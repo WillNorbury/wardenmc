@@ -1,0 +1,1 @@
+- Download signing verifies storage uploader ownership or a service-only staff file binding to the exact plugin; editable plugin paths never authorize files, because owners can change them.

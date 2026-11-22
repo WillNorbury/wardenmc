@@ -155,6 +155,20 @@
       "when": 1795062846525,
       "tag": "0021_enable_discord_about_module",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1795338916176,
+      "tag": "0022_protect_selected_plugin_and_mod_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1795339034269,
+      "tag": "0023_bind_staff_plugin_files_to_their_plugin",
+      "breakpoints": true
     }
   ]
 }

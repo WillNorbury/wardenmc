@@ -1,0 +1,1 @@
+- Uptime execution accepts managed cron credentials or server-verified staff sessions before private reads; public status viewing uses stored results, because visitors must not trigger privileged alert work.

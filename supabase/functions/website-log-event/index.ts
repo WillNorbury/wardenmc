@@ -12,7 +12,7 @@ interface Payload {
 
 // Kinds an anonymous visitor may legitimately trigger (contact form, ban
 // appeal, owner mailto). Everything else (admin activity logs) requires a
-// valid user session so outsiders can't forge staff actions.
+// verified staff role so members cannot forge staff actions.
 const PUBLIC_KINDS = new Set(["contact_message", "ban_appeal_new", "owner_contact"]);
 
 const cap = (v: unknown, n: number): string | undefined =>
@@ -72,6 +72,11 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    if (!PUBLIC_KINDS.has(kind)) {
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid).in("role", ["admin", "owner", "founder", "star"]).limit(1);
+      if (!roles?.length) return new Response(JSON.stringify({ error: "forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // Resolve webhook URL
     const { data: alertSettings } = await supabase

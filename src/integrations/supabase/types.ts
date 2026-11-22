@@ -2378,6 +2378,29 @@ export type Database = {
           },
         ]
       }
+      plugin_staff_file_bindings: {
+        Row: {
+          object_path: string
+          plugin_id: string
+        }
+        Insert: {
+          object_path: string
+          plugin_id: string
+        }
+        Update: {
+          object_path?: string
+          plugin_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plugin_staff_file_bindings_plugin_id_fkey"
+            columns: ["plugin_id"]
+            isOneToOne: false
+            referencedRelation: "plugins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plugin_versions: {
         Row: {
           changelog: string | null
@@ -4361,6 +4384,10 @@ export type Database = {
           email: string
           user_id: string
         }[]
+      }
+      plugin_file_uploader_matches: {
+        Args: { _path: string; _plugin_id: string }
+        Returns: boolean
       }
       record_login_streak: {
         Args: never
