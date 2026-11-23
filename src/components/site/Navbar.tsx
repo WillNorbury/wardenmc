@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import logo from "@/assets/warden-network-icon.png";
 import DiscordMark from "./DiscordMark";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Check, Loader2, LogIn, LogOut, Plus, Repeat, Shield, User as UserIcon, type LucideIcon } from "lucide-react";
 import { listSavedAccounts, type SavedAccount } from "@/lib/saved-accounts";
 import { ADD_ACCOUNT_KEY, hasAccountSession, restoreAccountSession, saveAccountSession } from "@/lib/account-sessions";
@@ -111,6 +112,7 @@ const Navbar = () => {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <LanguageSwitcher />
           {user ? (
             <DropdownMenu onOpenChange={(open) => { if (open) setAccounts(listSavedAccounts()); }}>
               <DropdownMenuTrigger asChild>
