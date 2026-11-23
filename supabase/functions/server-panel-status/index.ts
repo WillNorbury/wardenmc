@@ -2,6 +2,7 @@
 // Returns players online, ping latency, uptime %, and keeps the /tab "Server"
 // animation lines in sync with the current MOTD / IP / player count.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { authenticateCronRequest } from '../_shared/cron-auth.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,10 +49,25 @@ function buildLines(opts: {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  if (authenticateCronRequest(req)) {
+    const userClient = createClient(
+      SUPABASE_URL,
+      Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } },
+    );
+    const { data: identity } = await userClient.auth.getUser();
+    if (!identity?.user) return json({ ok: false, error: "Unauthorized" }, 401);
+    const { data: roles } = await userClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", identity.user.id)
+      .in("role", ["admin", "owner"])
+      .limit(1);
+    if (!roles?.length) return json({ ok: false, error: "Forbidden" }, 403);
+  }
+
+  const supabase = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
   const { data: settings, error } = await supabase
     .from("server_panel_settings")

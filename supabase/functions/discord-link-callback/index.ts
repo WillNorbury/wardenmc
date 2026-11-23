@@ -8,6 +8,9 @@ const ALLOWED_ORIGINS = new Set([
   "https://alsnetwork.fun",
   "https://www.alsnetwork.fun",
   "https://xylomc.lovable.app",
+  "https://wardennetwork.lovable.app",
+  "https://carnagemc.net",
+  "https://id-preview--c9d110ee-1d92-4be5-b8fd-699d505d0940.lovable.app",
 ]);
 
 function safeReturnTo(input: string | null): string {
@@ -15,7 +18,7 @@ function safeReturnTo(input: string | null): string {
   if (!input) return fallback;
   try {
     const u = new URL(input);
-    const ok = ALLOWED_ORIGINS.has(u.origin) || /\.lovable\.app$/.test(u.hostname);
+    const ok = ALLOWED_ORIGINS.has(u.origin);
     return ok ? u.toString() : fallback;
   } catch {
     return fallback;

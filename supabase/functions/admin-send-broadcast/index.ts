@@ -122,6 +122,8 @@ Deno.serve(async (req) => {
       if (!testEmail) return json({ ok: false, error: 'testEmail required for test category' }, 400)
       const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRe.test(testEmail)) return json({ ok: false, error: 'invalid testEmail' }, 400)
+      if (testEmail !== (userData.user.email ?? '').trim().toLowerCase())
+        return json({ ok: false, error: 'Test emails can only be sent to your own address' }, 403)
       list = [testEmail]
     } else if (category === 'owners' || category === 'admins') {
       const targetRoles = category === 'owners' ? ['owner'] : ['admin', 'owner']
