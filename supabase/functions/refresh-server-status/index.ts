@@ -1,6 +1,7 @@
 // Polls mcsrvstat.us for each configured server IP and updates public status.
 // Called by pg_cron every minute (and manually from admin UI).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { authenticateCronRequest } from "../_shared/cron-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -45,6 +46,24 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
+
+  // Only the scheduled job or a signed-in admin/owner may refresh.
+  if (authenticateCronRequest(req) !== null) {
+    const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+    const { data: u } = token ? await supabase.auth.getUser(token) : { data: { user: null } };
+    const uid = u?.user?.id;
+    let ok = false;
+    if (uid) {
+      const { data: role } = await supabase.from("user_roles").select("role")
+        .eq("user_id", uid).in("role", ["admin", "owner"]).limit(1).maybeSingle();
+      ok = !!role;
+    }
+    if (!ok) {
+      return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
 
   const { data: rows, error } = await supabase
     .from("mc_public_servers")

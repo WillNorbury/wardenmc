@@ -100,6 +100,10 @@ const Faq = () => {
 
   const vote = async (faqId: string, v: "helpful" | "not_helpful") => {
     if (myVotes[faqId] === v) return;
+    if (!user) {
+      toast.error("Sign in to vote on FAQs");
+      return;
+    }
     const payload: any = { faq_id: faqId, vote: v };
     if (user) payload.user_id = user.id;
     else payload.voter_key = getVoterKey();

@@ -28,10 +28,15 @@ Deno.serve(async (req) => {
 
     const { data: sk } = await admin
       .from("user_skripts")
-      .select("id, user_id, published, storage_path, filename")
+      .select("id, user_id, uploaded_by, published, storage_path, filename")
       .eq("id", skriptId)
       .maybeSingle();
     if (!sk?.storage_path) return json({ error: "File not found" }, 404);
+    // The file must live in the uploader's own folder, otherwise a row could point at someone else's file.
+    const owner = sk.uploaded_by ?? sk.user_id;
+    if (!owner || !sk.storage_path.startsWith(`${owner}/`) || sk.storage_path.includes("..")) {
+      return json({ error: "File not found" }, 404);
+    }
 
     let allowed = sk.published === true;
 

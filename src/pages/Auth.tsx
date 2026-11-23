@@ -49,7 +49,7 @@ const Auth = () => {
   const nextParam = searchParams.get("next") ?? "";
   // Only accept same-origin relative paths (e.g. "/.lovable/oauth/consent?...").
   const safeNext = useMemo(
-    () => (nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/"),
+    () => (nextParam.startsWith("/") && !nextParam.startsWith("//") && !nextParam.includes("\\") && !/[\u0000-\u001f]/.test(nextParam) ? nextParam : "/"),
     [nextParam],
   );
   const goNext = () => {

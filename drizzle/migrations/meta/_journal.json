@@ -176,6 +176,13 @@
       "when": 1795339709728,
       "tag": "0024_verified_plugin_download_entitlements",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1795409129859,
+      "tag": "0025_security_fixes_orgs_faq_verified",
+      "breakpoints": true
     }
   ]
 }
