@@ -63,7 +63,7 @@ const Navbar = () => {
     try {
       if (session) saveAccountSession(session);
       await restoreAccountSession(email);
-      window.location.assign("/");
+      window.location.assign(window.location.pathname + window.location.search);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not switch account.");
       addAccount(email);
