@@ -53,6 +53,14 @@ Deno.serve(async (req) => {
     const subject = String(body?.subject ?? '').trim()
     const message = String(body?.message ?? '').trim()
     const category = String(body?.category ?? 'all') as Category
+    const mode = body?.mode ?? 'send'
+    if (!['send', 'gmail-draft'].includes(mode)) return json({ ok: false, error: 'Invalid mode' }, 400)
+    if (mode === 'gmail-draft') {
+      if (category !== 'all') return json({ ok: false, error: 'Gmail drafts support All Users only' }, 400)
+      // Reuse the exact-account owner guard: general admins must never export member emails.
+      const { error } = await userClient.rpc('owner_list_user_emails')
+      if (error) return json({ ok: false, error: 'Only the site owner can open drafts containing member emails' }, 403)
+    }
     const from = typeof body?.from === 'string' ? body.from.trim() : undefined
     const testEmail =
       typeof body?.testEmail === 'string' && body.testEmail.trim()
@@ -188,7 +196,8 @@ Deno.serve(async (req) => {
 
     // Drop suppressed
     if (list.length > 0) {
-      const { data: suppressed } = await admin.from('suppressed_emails').select('email')
+      const { data: suppressed, error: suppressionError } = await admin.from('suppressed_emails').select('email')
+      if (suppressionError) return json({ ok: false, error: 'Could not check email suppression' }, 500)
       for (const r of suppressed ?? []) {
         if (r?.email) {
           const idx = list.indexOf(String(r.email).toLowerCase())
@@ -196,6 +205,8 @@ Deno.serve(async (req) => {
         }
       }
     }
+
+    if (mode === 'gmail-draft') return json({ ok: true, recipients: list, total: list.length })
 
     if (list.length === 0) return json({ ok: true, queued: 0, total: 0, message: 'No recipients' })
 

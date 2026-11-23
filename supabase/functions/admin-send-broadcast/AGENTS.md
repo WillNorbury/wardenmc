@@ -1,0 +1,2 @@
+# Broadcast and draft rules
+- Gmail draft mode uses the existing exact-owner email RPC guard and the confirmed-account/suppression filters; return recipients without sending or adding a sent audit record, because recipient export is private and opening a draft is not delivery.
