@@ -104,3 +104,4 @@
 - [x] Plugin downloads use real file storage (verified working)
 - [x] WardenMC theme on main public pages (admin/dashboard pages later)
 - [x] Live page channel picker is now a plain row of push buttons (name only, selected one highlighted); three buttons verified in a test browser, clicking switches the stream, phone layout wraps cleanly, build OK; changelog d4413dcd-8902-4c64-b114-c68f0557eeff emailed to 33 subscribers, none failed.
+- [x] reCAPTCHA on sign-in/sign-up

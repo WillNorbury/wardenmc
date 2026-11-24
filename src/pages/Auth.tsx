@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { z } from "zod";
@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import logo from "@/assets/warden-network-icon.png";
 import { Link } from "react-router-dom";
 import { SEO } from "@/components/site/SEO";
+import { Recaptcha, type RecaptchaHandle } from "@/components/site/Recaptcha";
+
 import {
   Mail,
   Loader2,
@@ -69,6 +71,8 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [accountType, setAccountType] = useState<"personal" | "business">("personal");
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<RecaptchaHandle>(null);
   const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -156,6 +160,11 @@ const Auth = () => {
     }
   }
 
+  const readFnError = async (error: any) => {
+    try { const b = await error?.context?.json(); if (b?.error) return b.error; } catch { /* ignore */ }
+    return error?.message ?? "Authentication failed";
+  };
+
   const handle = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse({ email, password, displayName: mode === "signup" ? displayName : undefined });
@@ -163,24 +172,27 @@ const Auth = () => {
       toast.error(parsed.error.errors[0].message);
       return;
     }
+    if (!captchaToken) {
+      toast.error("Please tick the \"I'm not a robot\" box");
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}${safeNext}`,
-            data: { display_name: displayName, account_type: accountType },
-          },
+        const { data, error } = await supabase.functions.invoke("recaptcha-auth", {
+          body: { action: "signup", token: captchaToken, email, password, displayName, accountType, redirectTo: `${window.location.origin}${safeNext}` },
         });
-        if (error) throw error;
+        if (error || data?.error) throw new Error(data?.error ?? (await readFnError(error)));
         trackFunnelEvent("signup_complete");
         setOtp("");
         setMode("verify");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const { data, error } = await supabase.functions.invoke("recaptcha-auth", {
+          body: { action: "signin", token: captchaToken, email, password },
+        });
+        if (error || data?.error) throw new Error(data?.error ?? (await readFnError(error)));
+        const { error: sessionError } = await supabase.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token });
+        if (sessionError) throw sessionError;
         rememberAccount({ email });
         await offerToSavePassword(email, password);
         const needsMfa = await checkMfaAfterSignIn();
@@ -191,6 +203,7 @@ const Auth = () => {
       }
     } catch (err: any) {
       toast.error(err.message ?? "Authentication failed");
+      captchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -624,7 +637,8 @@ const Auth = () => {
                   </Button>
                 </div>
               </div>
-              <Button type="submit" className="eclipse-auth-submit w-full" disabled={loading}>
+              <Recaptcha ref={captchaRef} onChange={setCaptchaToken} />
+              <Button type="submit" className="eclipse-auth-submit w-full" disabled={loading || !captchaToken}>
                 {loading ? "Please wait..." : mode === "signup" ? "Create account" : "Sign in"}
                 {loading ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
