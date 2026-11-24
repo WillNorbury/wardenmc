@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
 
     const { data: signed, error } = await admin.storage
       .from("user-skripts")
-      .createSignedUrl(sk.storage_path, 300, { download: sk.filename ?? true });
+      .createSignedUrl(sk.storage_path, 30, { download: sk.filename ?? true });
 
     if (error || !signed?.signedUrl) {
       return json({ error: error?.message ?? "Could not create download link" }, 500);

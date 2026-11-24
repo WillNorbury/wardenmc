@@ -190,6 +190,13 @@
       "when": 1795492835923,
       "tag": "0026_security_fixes_apps_codes_secrets",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1795493009434,
+      "tag": "0027_lock_grant_membership_rank",
+      "breakpoints": true
     }
   ]
 }
