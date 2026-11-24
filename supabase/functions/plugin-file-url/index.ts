@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
 
     const { data: signed, error } = await admin.storage
       .from(bucket)
-      .createSignedUrl(path, 300, { download: true });
+      .createSignedUrl(path, 30, { download: true });
 
     if (error || !signed?.signedUrl) {
       return json({ error: error?.message ?? "Could not create download link" }, 500);

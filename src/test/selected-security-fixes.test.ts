@@ -89,7 +89,7 @@ describe("selected security fixes", () => {
   it("verified uploader files still receive download links", async () => {
     const f = pluginFixture(true);
     expect((await f.run({ path: "owner/file.jar" })).status).toBe(200);
-    expect(f.sign).toHaveBeenCalledWith("owner/file.jar", 300, { download: true });
+    expect(f.sign).toHaveBeenCalledWith("owner/file.jar", 30, { download: true });
   });
   it.each(["owner/%2e%2e/victim.jar", "owner/../victim.jar", "%2fother/file.jar"])("rejects unsafe decoded storage path %s", async (path) => {
     const f = pluginFixture(true);

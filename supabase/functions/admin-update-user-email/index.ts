@@ -86,10 +86,8 @@ Deno.serve(async (req) => {
         // Non-fatal — the email change itself already succeeded.
       }
     };
-    await Promise.all([
-      notify(trimmed),
-      previousEmail && previousEmail.toLowerCase() !== trimmed ? notify(previousEmail) : Promise.resolve(),
-    ]);
+    // Only notify the account's previous (verified) address, never an admin-chosen one.
+    if (previousEmail && previousEmail.toLowerCase() !== trimmed) await notify(previousEmail);
 
     return json(200, { ok: true, email: updated.user?.email ?? trimmed });
   } catch (e) {

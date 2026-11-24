@@ -13,7 +13,7 @@ interface Payload {
 // Kinds an anonymous visitor may legitimately trigger (contact form, ban
 // appeal, owner mailto). Everything else (admin activity logs) requires a
 // verified staff role so members cannot forge staff actions.
-const PUBLIC_KINDS = new Set(["contact_message", "ban_appeal_new", "owner_contact"]);
+const PUBLIC_KINDS = new Set<string>();
 
 const cap = (v: unknown, n: number): string | undefined =>
   typeof v === "string" && v.length ? v.slice(0, n) : undefined;

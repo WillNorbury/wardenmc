@@ -183,6 +183,13 @@
       "when": 1795409129859,
       "tag": "0025_security_fixes_orgs_faq_verified",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1795492835923,
+      "tag": "0026_security_fixes_apps_codes_secrets",
+      "breakpoints": true
     }
   ]
 }

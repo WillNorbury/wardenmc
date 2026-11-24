@@ -4402,7 +4402,6 @@ const ApplicationsTab = () => {
       const ROLE_MAP: Record<string, string> = {
         staff: "trainee",
         creator: "media",
-        admin: "admin",
         developer: "developer",
         builder: "builder",
       };

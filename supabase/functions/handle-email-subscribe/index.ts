@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
   const { data: userData, error: userErr } = await admin.auth.getUser(token);
-  if (userErr || !userData?.user?.email) {
+  if (userErr || !userData?.user?.email || !userData.user.email_confirmed_at) {
     return json({ error: "Unauthorized" }, 401);
   }
 
