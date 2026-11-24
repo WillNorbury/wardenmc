@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
-export const RECAPTCHA_SITE_KEY = "6LdUmC8uAAAAAFbv8WnUrCcxq3Qn_F8pDImvBrAq";
+export const RECAPTCHA_SITE_KEY = "6Lddmi8uAAAAADLcg8gFC32Jo2HDd44D1zvjQSVV";
 
 declare global {
   interface Window { grecaptcha?: any; __onRecaptchaLoad?: () => void }
