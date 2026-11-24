@@ -10,7 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Mail, Send, ShieldAlert, History, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { buildGmailDraftUrl } from "@/lib/gmail-draft";
 import {
   AllowedFromAddressesAdminSection,
   formatFromAddress,
@@ -104,37 +103,6 @@ export const SendEmailAdminSection = ({ isOwner }: { isOwner: boolean }) => {
       return;
     }
 
-    if (category === "all") {
-      const draft = window.open("about:blank", "_blank");
-      if (!draft) {
-        toast.error("Allow pop-ups for this website to open Gmail");
-        return;
-      }
-      draft.opener = null;
-      setSending(true);
-      setResult(null);
-      try {
-        const { data, error } = await supabase.functions.invoke("admin-send-broadcast", {
-          body: { mode: "gmail-draft", category: "all", subject: subject.trim(), message: message.trim(), from, bcc: bccList },
-        });
-        if (error) {
-          const details = error.context instanceof Response ? await error.context.json().catch(() => null) : null;
-          throw new Error(details?.error ?? error.message);
-        }
-        if (!data?.ok || !Array.isArray(data.recipients)) throw new Error(data?.error ?? "Could not prepare recipients");
-        draft.location.replace(buildGmailDraftUrl(subject, message, data.recipients));
-        setResult({ ok: true, msg: `Gmail draft opened for ${data.total} recipients. Nothing has been sent.` });
-      } catch (error) {
-        draft.close();
-        const msg = error instanceof Error ? error.message : "Could not open Gmail";
-        setResult({ ok: false, msg });
-        toast.error(msg);
-      } finally {
-        setSending(false);
-      }
-      return;
-    }
-
     setSending(true);
     setResult(null);
     const { data, error } = await supabase.functions.invoke("admin-send-broadcast", {
@@ -186,9 +154,7 @@ export const SendEmailAdminSection = ({ isOwner }: { isOwner: boolean }) => {
           <Mail className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-bold">Send Email</h2>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {category === "all" ? "All Users · Gmail" : "Website email"}
-        </p>
+        <p className="text-sm text-muted-foreground">Website email</p>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
@@ -209,7 +175,7 @@ export const SendEmailAdminSection = ({ isOwner }: { isOwner: boolean }) => {
           </div>
           <div className="space-y-2">
             <Label>From</Label>
-            <Select value={from} onValueChange={setFrom} disabled={category === "all"}>
+            <Select value={from} onValueChange={setFrom}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {fromOptions.map((o) => (
@@ -217,7 +183,6 @@ export const SendEmailAdminSection = ({ isOwner }: { isOwner: boolean }) => {
                 ))}
               </SelectContent>
             </Select>
-            {category === "all" && <p className="text-xs text-muted-foreground">Your signed-in Gmail account</p>}
           </div>
         </div>
 
@@ -268,7 +233,7 @@ export const SendEmailAdminSection = ({ isOwner }: { isOwner: boolean }) => {
 
         {result && (
           <Alert variant={result.ok ? "default" : "destructive"}>
-            <AlertTitle>{result.ok ? (category === "all" ? "Draft ready" : "Sent") : "Error"}</AlertTitle>
+            <AlertTitle>{result.ok ? "Sent" : "Error"}</AlertTitle>
             <AlertDescription>{result.msg}</AlertDescription>
           </Alert>
         )}
@@ -276,7 +241,7 @@ export const SendEmailAdminSection = ({ isOwner }: { isOwner: boolean }) => {
         <div className="flex justify-end">
           <Button onClick={send} disabled={sending}>
             {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-            {category === "all" ? "Send to all" : "Send Email"}
+            Send Email
           </Button>
         </div>
       </Card>

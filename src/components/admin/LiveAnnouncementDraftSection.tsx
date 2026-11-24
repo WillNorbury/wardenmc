@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Copy, Download, Mail, Radio, RotateCcw, Save } from "lucide-react";
+import { Copy, Download, Loader2, Mail, Radio, RotateCcw, Save, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { buildGmailDraftUrl } from "@/lib/gmail-draft";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +15,7 @@ export function LiveAnnouncementDraftSection() {
   const { user } = useAuth();
   const [draft, setDraft] = useState<LiveAnnouncementDraft>({ ...DEFAULT_LIVE_ANNOUNCEMENT });
   const [saved, setSaved] = useState(false);
+  const [opening, setOpening] = useState(false);
   const preview = useRef<HTMLElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const cta = useRef<HTMLAnchorElement>(null);
@@ -64,6 +67,33 @@ export function LiveAnnouncementDraftSection() {
       toast.success("Email draft downloaded");
     } catch { toast.error("Could not download the draft."); }
   };
+  const sendToAll = async () => {
+    if (!checked.success) return;
+    const draftWindow = window.open("about:blank", "_blank");
+    if (!draftWindow) {
+      toast.error("Allow pop-ups for this website to open Gmail");
+      return;
+    }
+    draftWindow.opener = null;
+    setOpening(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-send-broadcast", {
+        body: { mode: "gmail-draft", category: "all", subject: checked.data.subject, message: buildAnnouncementText(checked.data) },
+      });
+      if (error) {
+        const details = error.context instanceof Response ? await error.context.json().catch(() => null) : null;
+        throw new Error(details?.error ?? error.message);
+      }
+      if (!data?.ok || !Array.isArray(data.recipients)) throw new Error(data?.error ?? "Could not prepare recipients");
+      draftWindow.location.replace(buildGmailDraftUrl(checked.data.subject, buildAnnouncementText(checked.data), data.recipients));
+      toast.success(`Gmail draft opened for ${data.total} recipients. Nothing has been sent.`);
+    } catch (error) {
+      draftWindow.close();
+      toast.error(error instanceof Error ? error.message : "Could not open Gmail");
+    } finally {
+      setOpening(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -89,7 +119,11 @@ export function LiveAnnouncementDraftSection() {
             <Button variant="outline" disabled={!checked.success} onClick={() => copy("text")}><Copy className="mr-2 h-4 w-4" />Copy email text</Button>
             <Button variant="outline" disabled={!checked.success} onClick={() => copy("html")}><Copy className="mr-2 h-4 w-4" />Copy HTML</Button>
             <Button variant="outline" disabled={!checked.success} onClick={download}><Download className="mr-2 h-4 w-4" />Download HTML</Button>
+            <Button disabled={!checked.success || opening} onClick={sendToAll}>
+              {opening ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}Send to all
+            </Button>
           </div>
+          <p className="text-xs text-muted-foreground">Send to all opens a Gmail draft with every member's address hidden in BCC — nothing is sent until you press Send in Gmail.</p>
         </div>
         <div className="min-w-0 space-y-3">
           <h2 className="font-display text-2xl">Email preview</h2>
