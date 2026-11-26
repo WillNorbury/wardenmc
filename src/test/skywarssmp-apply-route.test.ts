@@ -8,7 +8,7 @@ const SITEMAP = readFileSync("scripts/generate-sitemap.ts", "utf8");
 describe("SkywarsSMP application route", () => {
   it("serves the SkywarsSMP application at /skywarssmp/apply", () => {
     expect(APP).toContain(
-      '<Route path="/skywarssmp/apply" element={<Apply fixedSlug="skywarssmp" applicationPath="/skywarssmp/apply" />} />',
+      '<Route path="/skywarssmp/apply" element={<SkywarsSMPApply />} />',
     );
   });
 

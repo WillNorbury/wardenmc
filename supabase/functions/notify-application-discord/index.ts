@@ -1,7 +1,9 @@
 // Sends a Discord DM about a new application to every staff member with role
-// owner, manager, or admin who has a linked Discord account.
+// owner, manager, or admin who has a linked Discord account, plus configured
+// application-specific recipients.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { getDiscordBotToken } from "../_shared/discord-token.ts";
+import { applicationAlertRecipients } from "../_shared/application-alert-recipients.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -91,17 +93,22 @@ Deno.serve(async (req) => {
     if (rolesErr) return json({ ok: false, error: rolesErr.message }, 500);
 
     const userIds = Array.from(new Set((staffRows ?? []).map((r) => r.user_id)));
-    if (userIds.length === 0) return json({ ok: true, sent: 0, skipped: 0, reason: "no staff" });
 
-    const { data: profiles, error: profErr } = await admin
-      .from("profiles_private")
-      .select("user_id, discord_id")
-      .in("user_id", userIds);
-    if (profErr) return json({ ok: false, error: profErr.message }, 500);
+    let staffRecipients: { id: string; discord_id: string }[] = [];
+    if (userIds.length > 0) {
+      const { data: profiles, error: profErr } = await admin
+        .from("profiles_private")
+        .select("user_id, discord_id")
+        .in("user_id", userIds);
+      if (profErr) return json({ ok: false, error: profErr.message }, 500);
 
-    const recipients = (profiles ?? [])
-      .filter((p) => p.discord_id)
-      .map((p) => ({ id: p.user_id, discord_id: p.discord_id }));
+      staffRecipients = (profiles ?? [])
+        .filter((p) => p.discord_id)
+        .map((p) => ({ id: p.user_id, discord_id: p.discord_id }));
+    }
+
+    const recipients = applicationAlertRecipients(String(app.type ?? ""), staffRecipients);
+    if (recipients.length === 0) return json({ ok: true, sent: 0, skipped: 0, reason: "no recipients" });
 
     const trunc = (s: string | null | undefined, n = 1024) =>
       !s ? "—" : s.length > n ? s.slice(0, n - 1) + "…" : s;
@@ -141,7 +148,7 @@ Deno.serve(async (req) => {
     return json({
       ok: errors.length === 0,
       sent,
-      skipped: userIds.length - recipients.length,
+      skipped: userIds.length - staffRecipients.length,
       errors,
     });
   } catch (e) {
