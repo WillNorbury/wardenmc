@@ -128,7 +128,7 @@ const skywarssmpGroup: NavGroup = {
   id: "skywarssmp",
   label: "SkywarsSMP",
   items: [
-    { to: "/skywarssmp", label: "SkywarsSMP", icon: skywarsLogo },
+    { to: "/skywarssmp", label: "SkywarsSMP", image: skywarsLogo },
     { to: "/skywarssmp/apply", label: "Apply", icon: FileText },
   ],
 };
