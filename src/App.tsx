@@ -144,6 +144,7 @@ const Shell = () => {
 
               <Route path="/apply" element={<Apply />} />
               <Route path="/apply/:slug" element={<Apply />} />
+              <Route path="/skywarssmp/apply" element={<Apply fixedSlug="skywarssmp" applicationPath="/skywarssmp/apply" />} />
               <Route path="/applications" element={<ApplicationStatus />} />
               <Route path="/applications/:id" element={<ApplicationStatus />} />
 

@@ -68,8 +68,9 @@ const Shell = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const Apply = () => {
-  const { slug } = useParams();
+const Apply = ({ fixedSlug, applicationPath }: { fixedSlug?: string; applicationPath?: string }) => {
+  const { slug: routeSlug } = useParams();
+  const slug = fixedSlug ?? routeSlug;
   const navigate = useNavigate();
   const [types, setTypes] = useState<ApplicationType[] | null>(null);
 
@@ -86,7 +87,7 @@ const Apply = () => {
     if (slug === "partner") {
       return <PartnerApplyForm types={types} onBack={() => navigate("/apply")} />;
     }
-    return <ApplyForm slug={slug} types={types} onBack={() => navigate("/apply")} />;
+    return <ApplyForm slug={slug} types={types} applicationPath={applicationPath} onBack={() => navigate("/apply")} />;
   }
 
   return (
@@ -158,7 +159,7 @@ const Apply = () => {
             return (
               <Link
                 key={t.id}
-                to={t.accepting ? `/apply/${t.slug}` : "#"}
+                to={t.accepting ? (t.slug === "skywarssmp" ? "/skywarssmp/apply" : `/apply/${t.slug}`) : "#"}
                 onClick={(e) => {
                   if (!t.accepting) {
                     e.preventDefault();
@@ -196,10 +197,12 @@ const Apply = () => {
 const ApplyForm = ({
   slug,
   types,
+  applicationPath,
   onBack,
 }: {
   slug: string;
   types: ApplicationType[] | null;
+  applicationPath?: string;
   onBack: () => void;
 }) => {
   const { user, loading: authLoading } = useAuth();
@@ -217,6 +220,7 @@ const ApplyForm = ({
   const [submitting, setSubmitting] = useState(false);
   const [type, setType] = useState<ApplicationType | null>(null);
   const [typeError, setTypeError] = useState<string | null>(null);
+  const formPath = applicationPath ?? `/apply/${slug}`;
 
   useEffect(() => {
     if (types) {
@@ -242,7 +246,7 @@ const ApplyForm = ({
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      navigate(`/auth?redirect=${encodeURIComponent(`/apply/${slug}`)}`);
+      navigate(`/auth?redirect=${encodeURIComponent(formPath)}`);
       return;
     }
     supabase
@@ -253,7 +257,7 @@ const ApplyForm = ({
       .then(({ data }) => {
         if (data?.mc_username) setForm((f) => ({ ...f, mc_username: data.mc_username! }));
       });
-  }, [user, authLoading, navigate, slug]);
+  }, [user, authLoading, navigate, slug, formPath]);
 
   const next = () => {
     if (step === 0) {
@@ -388,7 +392,7 @@ const ApplyForm = ({
       <SEO
         title={`Apply as ${type.label}`}
         description={type.description}
-        path={`/apply/${type.slug}`}
+        path={formPath}
       />
       <section className="aurora border-b border-border/60 mb-10">
         <div className="container max-w-4xl py-10 md:py-14">

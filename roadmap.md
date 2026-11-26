@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Add /skywarssmp/apply as a dedicated SkywarsSMP staff application, with its own category, sign-in return, application-card link and sitemap entry; four route tests pass, build OK, public route and custom link verified.
+- [ ] Verify the signed-in SkywarsSMP form and email changelog c8781e94-b361-44e3-b270-02d02c024ff3 — the test member stopped at device verification; notification returned 401 and requires staff sign-in.
 - [x] All Users now opens a Gmail draft with subject, message and BCC; deployed recipient preparation retains exact-owner access, confirmed-account and suppression checks, without sending or recording delivery. 30 tests passed, build OK; deployed anonymous call denied 401.
 - [ ] Verify Gmail draft through the real owner Admin button and notify changelog 027a467b-63ef-4f1d-827d-ac493a417c61 — no owner session is available; preview redirects to sign-in, notification returned 401. Published changelog exists; nothing was sent.
 - [ ] Email security restriction changelog 699b7127-a55f-4ba9-81a9-787323c73eee — notification returned 401; requires a valid staff session. Do not resend earlier changelog notifications without checking delivery.
