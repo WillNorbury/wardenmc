@@ -101,6 +101,7 @@ export type AdminSection =
   | "server-panel"
   | "skripts"
   | "game-modes"
+  | "skywarssmp"
   | "site-pages"
   | "mod-skripts"
   | "mod-servers"
@@ -116,7 +117,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   "email-diagnostics", "reports", "bot-dashboard", "bot-management",
   "bot-config", "punishments", "console", "mysql", "database", "servers-status", "store", "orders",
   "signup-funnel",
-  "vote-links", "partners", "tiers", "memberships", "account-removals", "seasons", "tab-animations", "server-panel", "skripts", "game-modes", "site-pages",
+  "vote-links", "partners", "tiers", "memberships", "account-removals", "seasons", "tab-animations", "server-panel", "skripts", "game-modes", "skywarssmp", "site-pages",
   "mod-skripts", "mod-servers", "mod-mods", "mod-reviews",
 ];
 
@@ -193,6 +194,7 @@ export const SECTION_PERMISSIONS: Partial<Record<AdminSection, string>> = {
   permissions: "permissions.edit",
   news: "news.view",
   content: "content.edit",
+  skywarssmp: "content.edit",
   status: "status.view",
   logs: "admin.logs.view",
   tickets: "tickets.view_all",
@@ -232,6 +234,7 @@ const items: NavItem[] = [
   { kind: "link", id: "features", icon: Sparkles, label: "Features" },
   { kind: "link", id: "rules", icon: Gavel, label: "Rules" },
   { kind: "link", id: "game-modes", icon: Sparkles, label: "Game Modes" },
+  { kind: "link", id: "skywarssmp", icon: Server, label: "SkywarsSMP" },
   { kind: "link", id: "site-pages", icon: FileText, label: "Site Pages" },
 
 

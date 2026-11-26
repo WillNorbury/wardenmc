@@ -65,6 +65,7 @@ import { BanAppealsAdminSection } from "@/components/admin/BanAppealsAdminSectio
 import { ContactAdminSection } from "@/components/admin/ContactAdminSection";
 import { EmailTestSection } from "@/components/admin/EmailTestSection";
 import { ApplyTypesAdminSection } from "@/components/admin/ApplyTypesAdminSection";
+import { SkywarsSMPAdminSection } from "@/components/admin/SkywarsSMPAdminSection";
 
 import { StatCard } from "@/components/admin/StatCard";
 import { CustomRolesManager, type CustomRole } from "@/components/admin/CustomRolesManager";
@@ -236,6 +237,10 @@ const sectionMeta: Record<AdminSection, { title: string; description: string }> 
   "game-modes": {
     title: "Game Modes",
     description: "Manage the game modes shown on /gamemodes and their detail pages.",
+  },
+  skywarssmp: {
+    title: "SkywarsSMP",
+    description: "Edit the server address, queue command and joining steps shown on /skywarssmp.",
   },
 };
 
@@ -416,6 +421,7 @@ const Admin = () => {
           )}
           {section === "skripts" && <AdminSkriptsSection />}
           {section === "game-modes" && <GameModesAdminSection />}
+          {section === "skywarssmp" && <SkywarsSMPAdminSection />}
           {section === "site-pages" && <SitePagesAdminSection />}
           {section === "mod-skripts" && <SkriptsModerationSection />}
           {section === "mod-servers" && <ServersModerationSection />}

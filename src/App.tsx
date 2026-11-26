@@ -63,6 +63,7 @@ import Status from "./pages/Status.tsx";
 import StatusIncident from "./pages/StatusIncident.tsx";
 import StatusUnsubscribe from "./pages/StatusUnsubscribe.tsx";
 import GameModeDetail from "./pages/GameModeDetail.tsx";
+import SkywarsSMP from "./pages/SkywarsSMP";
 import Servers from "./pages/Servers.tsx";
 import ServerDetail from "./pages/ServerDetail.tsx";
 import Organizations from "./pages/Organizations.tsx";
@@ -144,6 +145,7 @@ const Shell = () => {
 
               <Route path="/apply" element={<Apply />} />
               <Route path="/apply/:slug" element={<Apply />} />
+              <Route path="/skywarssmp" element={<SkywarsSMP />} />
               <Route path="/skywarssmp/apply" element={<Apply fixedSlug="skywarssmp" applicationPath="/skywarssmp/apply" />} />
               <Route path="/applications" element={<ApplicationStatus />} />
               <Route path="/applications/:id" element={<ApplicationStatus />} />

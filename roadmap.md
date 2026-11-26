@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Add /skywarssmp joining-information page and staff editing at /admin?tab=skywarssmp; play.warden.rip and /joinqueue SkywarsSMP are editable. Public copy controls, real staff save/public read-back/restoration and public content access verified; temporary staff role removed.
+- [ ] Verify the SkywarsSMP Admin form visually and email changelog d62371a2-fdb1-4460-83aa-79dfc6463fe9 — Admin remains behind device verification; notification requires staff sign-in.
 - [x] Add /skywarssmp/apply as a dedicated SkywarsSMP staff application, with its own category, sign-in return, application-card link and sitemap entry; four route tests pass, build OK, public route and custom link verified.
 - [ ] Verify the signed-in SkywarsSMP form and email changelog c8781e94-b361-44e3-b270-02d02c024ff3 — the test member stopped at device verification; notification returned 401 and requires staff sign-in.
 - [x] All Users now opens a Gmail draft with subject, message and BCC; deployed recipient preparation retains exact-owner access, confirmed-account and suppression checks, without sending or recording delivery. 30 tests passed, build OK; deployed anonymous call denied 401.
