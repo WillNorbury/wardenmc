@@ -43,6 +43,7 @@ import PluginSettings from "./pages/PluginSettings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ApplicationStatus from "./pages/ApplicationStatus.tsx";
 import Apply from "./pages/Apply.tsx";
+import SkywarsSMPApply from "./pages/SkywarsSMPApply.tsx";
 import Partners from "./pages/Partners.tsx";
 import PartnerDetail from "./pages/PartnerDetail.tsx";
 import Changelog from "./pages/Changelog.tsx";
@@ -146,7 +147,7 @@ const Shell = () => {
               <Route path="/apply" element={<Apply />} />
               <Route path="/apply/:slug" element={<Apply />} />
               <Route path="/skywarssmp" element={<SkywarsSMP />} />
-              <Route path="/skywarssmp/apply" element={<Apply fixedSlug="skywarssmp" applicationPath="/skywarssmp/apply" />} />
+              <Route path="/skywarssmp/apply" element={<SkywarsSMPApply />} />
               <Route path="/applications" element={<ApplicationStatus />} />
               <Route path="/applications/:id" element={<ApplicationStatus />} />
 
