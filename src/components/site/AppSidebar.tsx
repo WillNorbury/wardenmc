@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth";
 import logo from "@/assets/warden-network-icon.png";
 import DiscordMark from "./DiscordMark";
 import spectorLogo from "@/assets/spectorclient-logo.png";
+import skywarsLogo from "@/assets/skywarssmp-logo.png";
 import {
   Home,
   Gamepad2,
@@ -123,6 +124,15 @@ const helpGroup: NavGroup = {
   ],
 };
 
+const skywarssmpGroup: NavGroup = {
+  id: "skywarssmp",
+  label: "SkywarsSMP",
+  items: [
+    { to: "/skywarssmp", label: "SkywarsSMP", icon: skywarsLogo },
+    { to: "/skywarssmp/apply", label: "Apply", icon: FileText },
+  ],
+};
+
 const accountGroup: NavGroup = {
   id: "account",
   label: "Account",
@@ -222,6 +232,7 @@ export function AppSidebar() {
     mediaGroup,
     storeGroup,
     helpGroup,
+    skywarssmpGroup,
     ...(user ? [accountGroup] : []),
     ...(isAdmin
       ? [
