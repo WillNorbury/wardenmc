@@ -6,13 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { SEO } from "@/components/site/SEO";
 import { toast } from "sonner";
 import { CheckCircle2, Info, Loader2, Send } from "lucide-react";
-import type { ApplicationType } from "./Apply";
 
 const PATH = "/skywarssmp/apply";
 
@@ -54,19 +52,12 @@ const Field = ({ label, required, hint, children }: { label: string; required?: 
 const SkywarsSMPApply = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [types, setTypes] = useState<ApplicationType[]>([]);
-  const [category, setCategory] = useState("skywarssmp");
+  const category = "skywarssmp";
   const [form, setForm] = useState(empty);
   const [agree, setAgree] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const set = (k: keyof typeof empty) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  useEffect(() => {
-    supabase.from("application_types" as any).select("*").eq("enabled", true).eq("accepting", true)
-      .order("sort_order").then(({ data }) =>
-        setTypes((((data ?? []) as unknown) as ApplicationType[]).filter((t) => t.slug !== "partner")));
-  }, []);
 
   useEffect(() => {
     if (loading) return;
@@ -112,7 +103,6 @@ const SkywarsSMPApply = () => {
     navigate(appId ? `/applications/${appId}` : "/applications");
   };
 
-  const options = types.some((t) => t.slug === "skywarssmp") ? types : [{ slug: "skywarssmp", label: "SkywarsSMP" } as ApplicationType, ...types];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -134,14 +124,6 @@ const SkywarsSMPApply = () => {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5 space-y-5">
-            <Field label="Which category are you applying for?" required>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {options.map((t) => <SelectItem key={t.slug} value={t.slug}>{t.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </Field>
             <Field label="Minecraft In-Game Name (IGN)" required hint="Max 16 characters.">
               <Input value={form.mc_username} onChange={set("mc_username")} maxLength={16} />
             </Field>
